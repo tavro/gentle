@@ -3,11 +3,12 @@
 
 #include <SDL2/SDL.h>
 #include "./texture.h"
+#include "./gameobject.h"
 
 const int TILE_WIDTH = 32;
 const int TILE_HEIGHT = 32;
 
-class Tile
+class Tile : public GameObject
 {
     public:
 		Tile( int x, int y, int tileType );
@@ -16,13 +17,7 @@ class Tile
 
 		int getType();
 
-		SDL_Rect getBox();
-
-        Texture tileSheetTexture;
-
     private:
-		SDL_Rect box;
-
 		int type;
 };
 

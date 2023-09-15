@@ -12,7 +12,7 @@ const int LEVEL_HEIGHT = 384 + 96;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-class Player
+class Player : public GameObject
 {
     public:
 		static const int WIDTH = 20;
@@ -31,16 +31,10 @@ class Player
 
 		void render( SDL_Rect& camera, SDL_Rect* currentClip, SDL_Renderer* gRenderer );
 
-        Texture texture;
-
 		Particle* particles[ TOTAL_PARTICLES ];
     private:
 
 		void renderParticles(SDL_Renderer* gRenderer);
-
-		SDL_Rect mBox;
-
-		int mVelX, mVelY;
 };
 
 #endif // PLAYER_H

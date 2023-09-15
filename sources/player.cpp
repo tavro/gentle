@@ -47,7 +47,7 @@ bool touchesWall( SDL_Rect box, Tile* tiles[] )
                                     // TILE_CENTER                       // TILE_TOPLEFT
         if( ( tiles[ i ]->getType() >= 3 ) && ( tiles[ i ]->getType() <= 11 ) )
         {
-            if( checkCollision2( box, tiles[ i ]->getBox() ) )
+            if( checkCollision2( box, tiles[ i ]->toBox() ) )
             {
                 return true;
             }
@@ -59,17 +59,13 @@ bool touchesWall( SDL_Rect box, Tile* tiles[] )
 
 Player::Player()
 {
-    mBox.x = 0;
-    mBox.y = 0;
-	mBox.w = WIDTH;
-	mBox.h = HEIGHT;
-
-    mVelX = 0;
-    mVelY = 0;
+    setPosition(Vector2D(0, 0));
+    setSize(Vector2D(WIDTH, HEIGHT));
+    setVelocity(Vector2D(0, 0));
 
     for( int i = 0; i < TOTAL_PARTICLES; ++i )
     {
-        particles[ i ] = new Particle( mBox.x, mBox.y );
+        particles[ i ] = new Particle( getPosition().getX(), getPosition().getY() );
     }
 }
 
@@ -88,49 +84,49 @@ void Player::handleEvent( SDL_Event& e )
     {
         switch( e.key.keysym.sym )
         {
-            case SDLK_UP: mVelY -= VELOCITY; break;
-            case SDLK_DOWN: mVelY += VELOCITY; break;
-            case SDLK_LEFT: mVelX -= VELOCITY; break;
-            case SDLK_RIGHT: mVelX += VELOCITY; break;
+            case SDLK_UP: getVelocity().decreaseY(VELOCITY); break;
+            case SDLK_DOWN: getVelocity().increaseY(VELOCITY); break;
+            case SDLK_LEFT: getVelocity().decreaseX(VELOCITY); break;
+            case SDLK_RIGHT: getVelocity().increaseX(VELOCITY); break;
         }
     }
     else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
     {
         switch( e.key.keysym.sym )
         {
-            case SDLK_UP: mVelY += VELOCITY; break;
-            case SDLK_DOWN: mVelY -= VELOCITY; break;
-            case SDLK_LEFT: mVelX += VELOCITY; break;
-            case SDLK_RIGHT: mVelX -= VELOCITY; break;
+            case SDLK_UP: getVelocity().increaseY(VELOCITY); break;
+            case SDLK_DOWN: getVelocity().decreaseY(VELOCITY); break;
+            case SDLK_LEFT: getVelocity().increaseX(VELOCITY); break;
+            case SDLK_RIGHT: getVelocity().decreaseX(VELOCITY); break;
         }
     }
 }
 
 void Player::move( Tile *tiles[] )
 {
-    mBox.x += mVelX;
+    getPosition().increaseX(getVelocity().getX());
 
-    // If the dot went too far to the left or right or touched a wall
-    if( ( mBox.x < 0 ) || ( mBox.x + WIDTH > LEVEL_WIDTH ) || touchesWall( mBox, tiles ) )
+    // If the player went too far to the left or right or touched a wall
+    if( ( getPosition().getX() < 0 ) || ( getPosition().getX() + WIDTH > LEVEL_WIDTH ) || touchesWall( toBox(), tiles ) )
     {
         // move back
-        mBox.x -= mVelX;
+        getPosition().decreaseX(getVelocity().getX());
     }
 
-    mBox.y += mVelY;
+    getPosition().increaseY(getVelocity().getY());
 
-    // If the dot went too far up or down or touched a wall
-    if( ( mBox.y < 0 ) || ( mBox.y + HEIGHT > LEVEL_HEIGHT ) || touchesWall( mBox, tiles ) )
+    // If the player went too far up or down or touched a wall
+    if( ( getPosition().getY() < 0 ) || ( getPosition().getY() + HEIGHT > LEVEL_HEIGHT ) || touchesWall( toBox(), tiles ) )
     {
         // move back
-        mBox.y -= mVelY;
+        getPosition().decreaseY(getVelocity().getY());
     }
 }
 
 void Player::setCamera( SDL_Rect& camera )
 {
-	camera.x = ( mBox.x + WIDTH / 2 ) - SCREEN_WIDTH / 2;
-	camera.y = ( mBox.y + HEIGHT / 2 ) - SCREEN_HEIGHT / 2;
+	camera.x = ( getPosition().getX() + WIDTH / 2 ) - SCREEN_WIDTH / 2;
+	camera.y = ( getPosition().getY() + HEIGHT / 2 ) - SCREEN_HEIGHT / 2;
 
 	if( camera.x < 0 )
 	{ 
@@ -152,7 +148,7 @@ void Player::setCamera( SDL_Rect& camera )
 
 void Player::render( SDL_Rect& camera, SDL_Rect* currentClip, SDL_Renderer* gRenderer )
 {
-	texture.render( mBox.x - camera.x, mBox.y - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);// add for animation => , currentClip );
+	getTexture().render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);// add for animation => , currentClip );
 	renderParticles(gRenderer);
 }
 
@@ -163,7 +159,7 @@ void Player::renderParticles(SDL_Renderer* gRenderer)
         if( particles[ i ]->isDead() )
         {
             delete particles[ i ];
-            particles[ i ] = new Particle( mBox.x, mBox.y );
+            particles[ i ] = new Particle( getPosition().getX(), getPosition().getY() );
         }
     }
 

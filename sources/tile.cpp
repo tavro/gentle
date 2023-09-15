@@ -43,29 +43,21 @@ bool checkCollision( SDL_Rect a, SDL_Rect b )
 
 Tile::Tile( int x, int y, int tileType )
 {
-    box.x = x;
-    box.y = y;
-
-    box.w = TILE_WIDTH;
-    box.h = TILE_HEIGHT;
+    setPosition(Vector2D(x, y));
+    setSize(Vector2D(TILE_WIDTH, TILE_HEIGHT));
 
     type = tileType;
 }
 
 void Tile::render( SDL_Rect& camera, SDL_Rect (&gTileClips)[12], SDL_Renderer* gRenderer, Texture& gTileTexture )
 {
-    if( checkCollision( camera, box ) )
+    if( checkCollision( camera, toBox() ) )
     {
-        gTileTexture.render( box.x - camera.x, box.y - camera.y, &gTileClips[ type ], 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+        gTileTexture.render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, &gTileClips[ type ], 0.0, NULL, SDL_FLIP_NONE, gRenderer );
     }
 }
 
 int Tile::getType()
 {
     return type;
-}
-
-SDL_Rect Tile::getBox()
-{
-    return box;
 }

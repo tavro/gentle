@@ -134,7 +134,7 @@ bool loadMedia( Tile* tiles[] )
 {
 	bool success = true;
 
-	if( !dot.texture.loadFromFile( "./resources/dotanim.png", gRenderer ) )
+	if( !dot.getTexture().loadFromFile( "./resources/dotanim.png", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
@@ -247,7 +247,7 @@ bool loadMedia( Tile* tiles[] )
 		success = false;
 	}
 
-	if( !dot.texture.loadFromFile( "./resources/dot.bmp", gRenderer ) )
+	if( !dot.getTexture().loadFromFile( "./resources/dot.bmp", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
@@ -320,7 +320,7 @@ void close( Tile* tiles[] )
 	gFPSTextTexture.free();
 	gPromptTextTexture.free();
 	gInputTextTexture.free();
-	dot.texture.free();
+	dot.getTexture().free();
 	gTileTexture.free();
 
     for(int x = 0; x < 4; x++ ) {

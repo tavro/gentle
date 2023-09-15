@@ -4,6 +4,13 @@
 #include <SDL2/SDL.h>
 #include "./tile.h"
 #include "./particle.h"
+#include "./texture.h"
+
+const int LEVEL_WIDTH = 512 + 128;
+const int LEVEL_HEIGHT = 384 + 96;
+
+const int SCREEN_WIDTH = 640;
+const int SCREEN_HEIGHT = 480;
 
 class Player
 {
@@ -22,12 +29,14 @@ class Player
 
 		void setCamera( SDL_Rect& camera );
 
-		void render( SDL_Rect& camera, SDL_Rect* currentClip );
+		void render( SDL_Rect& camera, SDL_Rect* currentClip, SDL_Renderer* gRenderer );
 
-    private:
+        Texture texture;
+
 		Particle* particles[ TOTAL_PARTICLES ];
+    private:
 
-		void renderParticles();
+		void renderParticles(SDL_Renderer* gRenderer);
 
 		SDL_Rect mBox;
 

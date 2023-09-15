@@ -8,9 +8,14 @@ class Particle
 	public:
 		Particle( int x, int y );
 
-		void render();
+		void render(SDL_Renderer* gRenderer);
 
 		bool isDead();
+
+        Texture redTexture;
+        Texture greenTexture;
+        Texture blueTexture;
+        Texture shimmerTexture;
 
 	private:
 		int posX, posY;

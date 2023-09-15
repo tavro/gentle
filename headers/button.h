@@ -2,6 +2,10 @@
 #define BUTTON_H
 
 #include <SDL2/SDL.h>
+#include "./texture.h"
+
+const int BUTTON_WIDTH = 96;
+const int BUTTON_HEIGHT = 32;
 
 enum ButtonSprite 
 {
@@ -21,7 +25,10 @@ class Button
 
 		void handleEvent( SDL_Event* e );
 
-		void render();
+		void render(SDL_Renderer* gRenderer);
+
+        SDL_Rect spriteClips[ 4 ];          // These should be private, but I'm lazy.
+        Texture buttonSpriteSheetTexture;
 
 	private:
 		SDL_Point position;

@@ -15,15 +15,7 @@
 #include "./headers/tile.h"
 #include "./headers/button.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
-const int LEVEL_WIDTH = 512 + 128;
-const int LEVEL_HEIGHT = 384 + 96;
-
-const int TILE_WIDTH = 32;
-const int TILE_HEIGHT = 32;
-const int TOTAL_TILES = 192 + 48 + 60;
+const int TOTAL_TILES = 300;
 const int TOTAL_TILE_SPRITES = 12;
 
 const int TILE_RED = 0;
@@ -39,8 +31,6 @@ const int TILE_BOTTOMLEFT = 9;
 const int TILE_LEFT = 10;
 const int TILE_TOPLEFT = 11;
 
-const int BUTTON_WIDTH = 96;
-const int BUTTON_HEIGHT = 32;
 const int TOTAL_BUTTONS = 4;
 
 const int SCREEN_FPS = 60;
@@ -51,9 +41,6 @@ bool init();
 bool loadMedia( Tile* tiles[] );
 
 void close( Tile* tiles[] );
-
-bool checkCollision( SDL_Rect a, SDL_Rect b );
-bool touchesWall( SDL_Rect box, Tile* tiles[] );
 
 bool setTiles( Tile *tiles[] );
 
@@ -67,19 +54,11 @@ Texture gPromptTextTexture;
 Texture gInputTextTexture;
 Texture gTileTexture;
 Texture gFPSTextTexture;
-Texture gRedTexture;
-Texture gGreenTexture;
-Texture gBlueTexture;
-Texture gShimmerTexture;
 
 SDL_Rect gTileClips[ TOTAL_TILE_SPRITES ];
 
 const int DOT_ANIMATION_FRAMES = 4;
 SDL_Rect gDotSpriteClips[ DOT_ANIMATION_FRAMES ];
-Texture gDotTexture;
-
-SDL_Rect gSpriteClips[ 4 ];
-Texture gButtonSpriteSheetTexture;
 
 Button gButtons[ TOTAL_BUTTONS ]; 
 
@@ -90,460 +69,7 @@ Mix_Chunk *gHigh = NULL;
 Mix_Chunk *gMedium = NULL;
 Mix_Chunk *gLow = NULL;
 
-Texture::Texture()
-{
-	texture = NULL;
-	width = 0;
-	height = 0;
-}
-
-Texture::~Texture()
-{
-	free();
-}
-
-bool Texture::loadFromFile( std::string path )
-{
-	free();
-
-	SDL_Texture* newTexture = NULL;
-
-	SDL_Surface* loadedSurface = IMG_Load( path.c_str() );
-	if( loadedSurface == NULL )
-	{
-		printf( "Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError() );
-	}
-	else
-	{
-		SDL_SetColorKey( loadedSurface, SDL_TRUE, SDL_MapRGB( loadedSurface->format, 0, 0xFF, 0xFF ) );
-
-        newTexture = SDL_CreateTextureFromSurface( gRenderer, loadedSurface );
-		if( newTexture == NULL )
-		{
-			printf( "Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError() );
-		}
-		else
-		{
-			width = loadedSurface->w;
-			height = loadedSurface->h;
-		}
-
-		SDL_FreeSurface( loadedSurface );
-	}
-
-	texture = newTexture;
-	return texture != NULL;
-}
-
-#if defined(SDL_TTF_MAJOR_VERSION)
-bool Texture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
-{
-	free();
-
-	SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
-	if( textSurface != NULL )
-	{
-        texture = SDL_CreateTextureFromSurface( gRenderer, textSurface );
-		if( texture == NULL )
-		{
-			printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
-		}
-		else
-		{
-			width = textSurface->w;
-			height = textSurface->h;
-		}
-
-		SDL_FreeSurface( textSurface );
-	}
-	else
-	{
-		printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
-	}
-
-	return texture != NULL;
-}
-#endif
-
-void Texture::free()
-{
-	if( texture != NULL )
-	{
-		SDL_DestroyTexture( texture );
-		texture = NULL;
-		width = 0;
-		height = 0;
-	}
-}
-
-void Texture::setColor( Uint8 red, Uint8 green, Uint8 blue )
-{
-	SDL_SetTextureColorMod( texture, red, green, blue );
-}
-
-void Texture::setBlendMode( SDL_BlendMode blending )
-{
-	SDL_SetTextureBlendMode( texture, blending );
-}
-		
-void Texture::setAlpha( Uint8 alpha )
-{
-	SDL_SetTextureAlphaMod( texture, alpha );
-}
-
-void Texture::render( int x, int y, SDL_Rect* clip, double angle, SDL_Point* center, SDL_RendererFlip flip )
-{
-	SDL_Rect renderQuad = { x, y, width, height };
-
-	if( clip != NULL )
-	{
-		renderQuad.w = clip->w;
-		renderQuad.h = clip->h;
-	}
-
-	SDL_RenderCopyEx( gRenderer, texture, clip, &renderQuad, angle, center, flip );
-}
-
-int Texture::getWidth()
-{
-	return width;
-}
-
-int Texture::getHeight()
-{
-	return height;
-}
-
-
-Timer::Timer()
-{
-    startTicks = 0;
-    pausedTicks = 0;
-
-    paused = false;
-    started = false;
-}
-
-void Timer::start()
-{
-    started = true;
-    paused = false;
-
-    startTicks = SDL_GetTicks();
-	pausedTicks = 0;
-}
-
-void Timer::stop()
-{
-    started = false;
-    paused = false;
-
-	startTicks = 0;
-	pausedTicks = 0;
-}
-
-void Timer::pause()
-{
-    if( started && !paused )
-    {
-        paused = true;
-
-        pausedTicks = SDL_GetTicks() - startTicks;
-		startTicks = 0;
-    }
-}
-
-void Timer::unpause()
-{
-    if( started && paused )
-    {
-        paused = false;
-
-        startTicks = SDL_GetTicks() - pausedTicks;
-        pausedTicks = 0;
-    }
-}
-
-Uint32 Timer::getTicks()
-{
-	Uint32 time = 0;
-
-    if( started )
-    {
-        if( paused )
-        {
-            time = pausedTicks;
-        }
-        else
-        {
-            time = SDL_GetTicks() - startTicks;
-        }
-    }
-
-    return time;
-}
-
-bool Timer::isStarted()
-{
-    return started;
-}
-
-bool Timer::isPaused()
-{
-    return paused && started;
-}
-
-Button::Button()
-{
-	position.x = 0;
-	position.y = 0;
-
-	currentSprite = BS_MOUSE_OUT;
-}
-
-void Button::setPosition( int x, int y )
-{
-	position.x = x;
-	position.y = y;
-}
-
-void Button::handleEvent( SDL_Event* e )
-{
-	if( e->type == SDL_MOUSEMOTION || e->type == SDL_MOUSEBUTTONDOWN || e->type == SDL_MOUSEBUTTONUP )
-	{
-		int x, y;
-		SDL_GetMouseState( &x, &y );
-
-		bool inside = true;
-
-		// Mouse is left of the button
-		if( x < position.x )
-		{
-			inside = false;
-		}
-		// Mouse is right of the button
-		else if( x > position.x + BUTTON_WIDTH )
-		{
-			inside = false;
-		}
-		// Mouse above the button
-		else if( y < position.y )
-		{
-			inside = false;
-		}
-		// Mouse below the button
-		else if( y > position.y + BUTTON_HEIGHT )
-		{
-			inside = false;
-		}
-
-		// Mouse is outside button
-		if( !inside )
-		{
-			currentSprite = BS_MOUSE_OUT;
-		}
-		// Mouse is inside button
-		else
-		{
-			switch( e->type )
-			{
-				case SDL_MOUSEMOTION:
-				currentSprite = BS_MOUSE_OVER_MOTION;
-				break;
-			
-				case SDL_MOUSEBUTTONDOWN:
-				currentSprite = BS_MOUSE_DOWN;
-				break;
-				
-				case SDL_MOUSEBUTTONUP:
-				currentSprite = BS_MOUSE_UP;
-				break;
-			}
-		}
-	}
-}
-	
-void Button::render()
-{
-	gButtonSpriteSheetTexture.render( position.x, position.y, &gSpriteClips[ currentSprite ] );
-}
-
-Tile::Tile( int x, int y, int tileType )
-{
-    box.x = x;
-    box.y = y;
-
-    box.w = TILE_WIDTH;
-    box.h = TILE_HEIGHT;
-
-    type = tileType;
-}
-
-void Tile::render( SDL_Rect& camera )
-{
-    if( checkCollision( camera, box ) )
-    {
-        gTileTexture.render( box.x - camera.x, box.y - camera.y, &gTileClips[ type ] );
-    }
-}
-
-int Tile::getType()
-{
-    return type;
-}
-
-SDL_Rect Tile::getBox()
-{
-    return box;
-}
-
-Particle::Particle( int x, int y )
-{
-    posX = x - 5 + ( rand() % 25 );
-    posY = y - 5 + ( rand() % 25 );
-
-    frame = rand() % 5;
-
-    switch( rand() % 3 )
-    {
-        case 0: texture = &gRedTexture; break;
-        case 1: texture = &gGreenTexture; break;
-        case 2: texture = &gBlueTexture; break;
-    }
-}
-
-void Particle::render()
-{
-	texture->render( posX, posY );
-
-    if( frame % 2 == 0 )
-    {
-		gShimmerTexture.render( posX, posY );
-    }
-
-    frame++;
-}
-
-bool Particle::isDead()
-{
-    return frame > 10;
-}
-
-Player::Player()
-{
-    mBox.x = 0;
-    mBox.y = 0;
-	mBox.w = WIDTH;
-	mBox.h = HEIGHT;
-
-    mVelX = 0;
-    mVelY = 0;
-
-    for( int i = 0; i < TOTAL_PARTICLES; ++i )
-    {
-        particles[ i ] = new Particle( mBox.x, mBox.y );
-    }
-}
-
-
-Player::~Player()
-{
-    for( int i = 0; i < TOTAL_PARTICLES; ++i )
-    {
-        delete particles[ i ];
-    }
-}
-
-void Player::handleEvent( SDL_Event& e )
-{
-	if( e.type == SDL_KEYDOWN && e.key.repeat == 0 )
-    {
-        switch( e.key.keysym.sym )
-        {
-            case SDLK_UP: mVelY -= VELOCITY; break;
-            case SDLK_DOWN: mVelY += VELOCITY; break;
-            case SDLK_LEFT: mVelX -= VELOCITY; break;
-            case SDLK_RIGHT: mVelX += VELOCITY; break;
-        }
-    }
-    else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
-    {
-        switch( e.key.keysym.sym )
-        {
-            case SDLK_UP: mVelY += VELOCITY; break;
-            case SDLK_DOWN: mVelY -= VELOCITY; break;
-            case SDLK_LEFT: mVelX += VELOCITY; break;
-            case SDLK_RIGHT: mVelX -= VELOCITY; break;
-        }
-    }
-}
-
-void Player::move( Tile *tiles[] )
-{
-    mBox.x += mVelX;
-
-    // If the dot went too far to the left or right or touched a wall
-    if( ( mBox.x < 0 ) || ( mBox.x + WIDTH > LEVEL_WIDTH ) || touchesWall( mBox, tiles ) )
-    {
-        // move back
-        mBox.x -= mVelX;
-    }
-
-    mBox.y += mVelY;
-
-    // If the dot went too far up or down or touched a wall
-    if( ( mBox.y < 0 ) || ( mBox.y + HEIGHT > LEVEL_HEIGHT ) || touchesWall( mBox, tiles ) )
-    {
-        // move back
-        mBox.y -= mVelY;
-    }
-}
-
-void Player::setCamera( SDL_Rect& camera )
-{
-	camera.x = ( mBox.x + WIDTH / 2 ) - SCREEN_WIDTH / 2;
-	camera.y = ( mBox.y + HEIGHT / 2 ) - SCREEN_HEIGHT / 2;
-
-	if( camera.x < 0 )
-	{ 
-		camera.x = 0;
-	}
-	if( camera.y < 0 )
-	{
-		camera.y = 0;
-	}
-	if( camera.x > LEVEL_WIDTH - camera.w )
-	{
-		camera.x = LEVEL_WIDTH - camera.w;
-	}
-	if( camera.y > LEVEL_HEIGHT - camera.h )
-	{
-		camera.y = LEVEL_HEIGHT - camera.h;
-	}
-}
-
-void Player::render( SDL_Rect& camera, SDL_Rect* currentClip )
-{
-	gDotTexture.render( mBox.x - camera.x, mBox.y - camera.y);// add for animation => , currentClip );
-	// add for particles => renderParticles();
-}
-
-void Player::renderParticles()
-{
-    for( int i = 0; i < TOTAL_PARTICLES; ++i )
-    {
-        if( particles[ i ]->isDead() )
-        {
-            delete particles[ i ];
-            particles[ i ] = new Particle( mBox.x, mBox.y );
-        }
-    }
-
-    for( int i = 0; i < TOTAL_PARTICLES; ++i )
-    {
-        particles[ i ]->render();
-    }
-}
+Player dot;
 
 bool init()
 {
@@ -608,7 +134,7 @@ bool loadMedia( Tile* tiles[] )
 {
 	bool success = true;
 
-	if( !gDotTexture.loadFromFile( "./resources/dotanim.png" ) )
+	if( !dot.texture.loadFromFile( "./resources/dotanim.png", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
@@ -636,7 +162,7 @@ bool loadMedia( Tile* tiles[] )
 		gDotSpriteClips[ 3 ].h = 20;
 	}
 
-	if( !gTileTexture.loadFromFile( "./resources/tilesheet.png" ) )
+	if( !gTileTexture.loadFromFile( "./resources/tilesheet.png", gRenderer ) )
 	{
 		printf( "Failed to load tile set texture!\n" );
 		success = false;
@@ -657,33 +183,34 @@ bool loadMedia( Tile* tiles[] )
 	else
 	{
 		SDL_Color textColor = { 0, 0, 0, 0xFF };
-		if( !gPromptTextTexture.loadFromRenderedText( "Enter Text:", textColor ) )
+		if( !gPromptTextTexture.loadFromRenderedText( "Enter Text:", textColor, gRenderer, gFont ) )
 		{
 			printf( "Failed to render prompt text!\n" );
 			success = false;
 		}
 	}
 
-	if( !gButtonSpriteSheetTexture.loadFromFile( "./resources/buttonsheet.png" ) )
-	{
-		printf( "Failed to load button sprite texture!\n" );
-		success = false;
-	}
-	else
-	{
-		for( int i = 0; i < 4; ++i )
-		{
-			gSpriteClips[ i ].x = 0;
-			gSpriteClips[ i ].y = i * BUTTON_HEIGHT;
-			gSpriteClips[ i ].w = BUTTON_WIDTH;
-			gSpriteClips[ i ].h = BUTTON_HEIGHT;
-		}
-
-		gButtons[ 0 ].setPosition( 0, 0 );
-		gButtons[ 1 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, 0 );
-		gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
-		gButtons[ 3 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT );
-	}
+    for(int x = 0; x < 4; x++ ) {
+        if( !gButtons[x].buttonSpriteSheetTexture.loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
+        {
+            printf( "Failed to load button sprite texture!\n" );
+            success = false;
+        }
+        else
+        {
+            for( int i = 0; i < 4; ++i )
+            {
+                gButtons[x].spriteClips[ i ].x = 0;
+                gButtons[x].spriteClips[ i ].y = i * BUTTON_HEIGHT;
+                gButtons[x].spriteClips[ i ].w = BUTTON_WIDTH;
+                gButtons[x].spriteClips[ i ].h = BUTTON_HEIGHT;
+            }
+        }
+    }
+    gButtons[ 0 ].setPosition( 0, 0 );
+    gButtons[ 1 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, 0 );
+    gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
+    gButtons[ 3 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT );
 
 	gMusic = Mix_LoadMUS( "./resources/beat.wav" );
 	if( gMusic == NULL )
@@ -720,40 +247,42 @@ bool loadMedia( Tile* tiles[] )
 		success = false;
 	}
 
-	if( !gDotTexture.loadFromFile( "./resources/dot.bmp" ) )
+	if( !dot.texture.loadFromFile( "./resources/dot.bmp", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
 	}
 
-	if( !gRedTexture.loadFromFile( "./resources/red.bmp" ) )
-	{
-		printf( "Failed to load red texture!\n" );
-		success = false;
-	}
+    for(int i = 0; i < dot.TOTAL_PARTICLES; i++) {
+        if( !dot.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
+        {
+            printf( "Failed to load red texture!\n" );
+            success = false;
+        }
 
-	if( !gGreenTexture.loadFromFile( "./resources/green.bmp" ) )
-	{
-		printf( "Failed to load green texture!\n" );
-		success = false;
-	}
+        if( !dot.particles[i]->greenTexture.loadFromFile( "./resources/green.bmp", gRenderer ) )
+        {
+            printf( "Failed to load green texture!\n" );
+            success = false;
+        }
 
-	if( !gBlueTexture.loadFromFile( "./resources/blue.bmp" ) )
-	{
-		printf( "Failed to load blue texture!\n" );
-		success = false;
-	}
+        if( !dot.particles[i]->blueTexture.loadFromFile( "./resources/blue.bmp", gRenderer ) )
+        {
+            printf( "Failed to load blue texture!\n" );
+            success = false;
+        }
 
-	if( !gShimmerTexture.loadFromFile( "./resources/shimmer.bmp" ) )
-	{
-		printf( "Failed to load shimmer texture!\n" );
-		success = false;
-	}
+        if( !dot.particles[i]->shimmerTexture.loadFromFile( "./resources/shimmer.bmp", gRenderer ) )
+        {
+            printf( "Failed to load shimmer texture!\n" );
+            success = false;
+        }
 	
-	gRedTexture.setAlpha( 192 );
-	gGreenTexture.setAlpha( 192 );
-	gBlueTexture.setAlpha( 192 );
-	gShimmerTexture.setAlpha( 192 );
+	    dot.particles[i]->redTexture.setAlpha( 192 );
+	    dot.particles[i]->greenTexture.setAlpha( 192 );
+	    dot.particles[i]->blueTexture.setAlpha( 192 );
+	    dot.particles[i]->shimmerTexture.setAlpha( 192 );
+    }
 
 	return success;
 }
@@ -781,17 +310,22 @@ void close( Tile* tiles[] )
 	Mix_FreeMusic( gMusic );
 	gMusic = NULL;
 
-	gDotTexture.free();
-	gRedTexture.free();
-	gGreenTexture.free();
-	gBlueTexture.free();
-	gShimmerTexture.free();
+    for(int i = 0; i < dot.TOTAL_PARTICLES; i++) {
+        dot.particles[i]->redTexture.free();
+        dot.particles[i]->greenTexture.free();
+        dot.particles[i]->blueTexture.free();
+        dot.particles[i]->shimmerTexture.free();
+    }
+
 	gFPSTextTexture.free();
 	gPromptTextTexture.free();
 	gInputTextTexture.free();
-	gDotTexture.free();
+	dot.texture.free();
 	gTileTexture.free();
-	gButtonSpriteSheetTexture.free();
+
+    for(int x = 0; x < 4; x++ ) {
+	    gButtons[x].buttonSpriteSheetTexture.free();
+    }
 
 	TTF_CloseFont( gFont );
 	gFont = NULL;
@@ -805,46 +339,6 @@ void close( Tile* tiles[] )
 	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
-}
-
-bool checkCollision( SDL_Rect a, SDL_Rect b )
-{
-    int leftA, leftB;
-    int rightA, rightB;
-    int topA, topB;
-    int bottomA, bottomB;
-
-    leftA = a.x;
-    rightA = a.x + a.w;
-    topA = a.y;
-    bottomA = a.y + a.h;
-
-    leftB = b.x;
-    rightB = b.x + b.w;
-    topB = b.y;
-    bottomB = b.y + b.h;
-
-    if( bottomA <= topB )
-    {
-        return false;
-    }
-
-    if( topA >= bottomB )
-    {
-        return false;
-    }
-
-    if( rightA <= leftB )
-    {
-        return false;
-    }
-
-    if( leftA >= rightB )
-    {
-        return false;
-    }
-
-    return true;
 }
 
 bool setTiles( Tile* tiles[] )
@@ -965,22 +459,6 @@ bool setTiles( Tile* tiles[] )
     return tilesLoaded;
 }
 
-bool touchesWall( SDL_Rect box, Tile* tiles[] )
-{
-    for( int i = 0; i < TOTAL_TILES; ++i )
-    {
-        if( ( tiles[ i ]->getType() >= TILE_CENTER ) && ( tiles[ i ]->getType() <= TILE_TOPLEFT ) )
-        {
-            if( checkCollision( box, tiles[ i ]->getBox() ) )
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 int main( int argc, char* args[] )
 {
 	if( !init() )
@@ -1015,11 +493,9 @@ int main( int argc, char* args[] )
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 			std::string inputText = "Sample Text";
-			gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor );
+			gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, gFont );
 
 			SDL_StartTextInput();
-
-			Player dot;
 
 			SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
@@ -1120,7 +596,7 @@ int main( int argc, char* args[] )
 				timeText.str( "" );
 				timeText << "Average Frames Per Second (With Cap) " << avgFPS;
 
-				if( !gFPSTextTexture.loadFromRenderedText( timeText.str().c_str(), textColor ) )
+				if( !gFPSTextTexture.loadFromRenderedText( timeText.str().c_str(), textColor, gRenderer, gFont ) )
 				{
 					printf( "Unable to render FPS texture!\n" );
 				}
@@ -1129,11 +605,11 @@ int main( int argc, char* args[] )
 				{
 					if( inputText != "" )
 					{
-						gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor );
+						gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, gFont );
 					}
 					else
 					{
-						gInputTextTexture.loadFromRenderedText( " ", textColor );
+						gInputTextTexture.loadFromRenderedText( " ", textColor, gRenderer, gFont );
 					}
 				}
 
@@ -1145,20 +621,20 @@ int main( int argc, char* args[] )
 
 				for( int i = 0; i < TOTAL_TILES; ++i )
 				{
-					tileSet[ i ]->render( camera );
+					tileSet[ i ]->render( camera, gTileClips, gRenderer, gTileTexture);
 				}
 
 				SDL_Rect* currentClip = &gDotSpriteClips[ frame / 4 ];
-				dot.render( camera, currentClip );
+				dot.render( camera, currentClip, gRenderer );
 
 				for( int i = 0; i < TOTAL_BUTTONS; ++i )
 				{
-					gButtons[ i ].render();
+					gButtons[ i ].render(gRenderer);
 				}
 
-				gPromptTextTexture.render( ( SCREEN_WIDTH - gPromptTextTexture.getWidth() ) / 2, 0 );
-				gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight() );
-				gFPSTextTexture.render( ( SCREEN_WIDTH - gFPSTextTexture.getWidth() ) / 2, ( SCREEN_HEIGHT - gFPSTextTexture.getHeight() ) );
+				gPromptTextTexture.render( ( SCREEN_WIDTH - gPromptTextTexture.getWidth() ) / 2, 0, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+				gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+				gFPSTextTexture.render( ( SCREEN_WIDTH - gFPSTextTexture.getWidth() ) / 2, ( SCREEN_HEIGHT - gFPSTextTexture.getHeight() ), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
 
 				SDL_RenderPresent( gRenderer );
 

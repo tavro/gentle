@@ -2,26 +2,26 @@
 
 Particle::Particle( int x, int y )
 {
-    posX = x - 5 + ( rand() % 25 );
-    posY = y - 5 + ( rand() % 25 );
+    getPosition().setX( x - 5 + ( rand() % 25 ) );
+    getPosition().setY( y - 5 + ( rand() % 25 ) );
 
     frame = rand() % 5;
 
     switch( rand() % 3 )
     {
-        case 0: texture = &redTexture; break;
-        case 1: texture = &greenTexture; break;
-        case 2: texture = &blueTexture; break;
+        case 0: setTexture(redTexture); break; // might have to be reference
+        case 1: setTexture(greenTexture); break;
+        case 2: setTexture(blueTexture); break;
     }
 }
 
 void Particle::render(SDL_Renderer* gRenderer)
 {
-	texture->render( posX, posY );
+	getTexture().render( getPosition().getX(), getPosition().getY() );
 
     if( frame % 2 == 0 )
     {
-		shimmerTexture.render( posX, posY, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+		shimmerTexture.render( getPosition().getX(), getPosition().getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
     }
 
     frame++;

@@ -14,53 +14,30 @@
 #include "./headers/timer.h"
 #include "./headers/tile.h"
 #include "./headers/button.h"
-
-const int TOTAL_TILES = 300;
-const int TOTAL_TILE_SPRITES = 12;
-
-const int TILE_RED = 0;
-const int TILE_GREEN = 1;
-const int TILE_BLUE = 2;
-const int TILE_CENTER = 3;
-const int TILE_TOP = 4;
-const int TILE_TOPRIGHT = 5;
-const int TILE_RIGHT = 6;
-const int TILE_BOTTOMRIGHT = 7;
-const int TILE_BOTTOM = 8;
-const int TILE_BOTTOMLEFT = 9;
-const int TILE_LEFT = 10;
-const int TILE_TOPLEFT = 11;
-
-const int TOTAL_BUTTONS = 4;
+#include "./headers/tile_map.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
 bool init();
 
-bool loadMedia( Tile* tiles[] );
+bool loadMedia();
 
-void close( Tile* tiles[] );
+void close();
 
-bool setTiles( Tile *tiles[] );
+SDL_Window*     gWindow = NULL;
+SDL_Renderer*   gRenderer = NULL;
 
-SDL_Window* gWindow = NULL;
-
-SDL_Renderer* gRenderer = NULL;
-
-TTF_Font* gFont = NULL;
+TTF_Font*       globalFont = NULL;
 
 Texture gPromptTextTexture;
 Texture gInputTextTexture;
-Texture gTileTexture;
 Texture gFPSTextTexture;
-
-SDL_Rect gTileClips[ TOTAL_TILE_SPRITES ];
 
 const int DOT_ANIMATION_FRAMES = 4;
 SDL_Rect gDotSpriteClips[ DOT_ANIMATION_FRAMES ];
 
-Button gButtons[ TOTAL_BUTTONS ]; 
+Button gButtons[ 4 ];
 
 Mix_Music *gMusic = NULL;
 
@@ -69,7 +46,8 @@ Mix_Chunk *gHigh = NULL;
 Mix_Chunk *gMedium = NULL;
 Mix_Chunk *gLow = NULL;
 
-Player dot;
+Player player;
+TileMap tileMap;
 
 bool init()
 {
@@ -130,11 +108,11 @@ bool init()
 	return success;
 }
 
-bool loadMedia( Tile* tiles[] )
+bool loadMedia()
 {
 	bool success = true;
 
-	if( !dot.getTexture().loadFromFile( "./resources/dotanim.png", gRenderer ) )
+	if( !player.getTexture().loadFromFile( "./resources/dotanim.png", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
@@ -162,20 +140,22 @@ bool loadMedia( Tile* tiles[] )
 		gDotSpriteClips[ 3 ].h = 20;
 	}
 
-	if( !gTileTexture.loadFromFile( "./resources/tilesheet.png", gRenderer ) )
+	if( !tileMap.getTexture().loadFromFile( "./resources/tilesheet.png", gRenderer ) )
 	{
 		printf( "Failed to load tile set texture!\n" );
 		success = false;
 	}
 
+    /*
 	if( !setTiles( tiles ) )
 	{
 		printf( "Failed to load tile set!\n" );
 		success = false;
 	}
+    */
 
-	gFont = TTF_OpenFont( "./resources/lazy.ttf", 28 );
-	if( gFont == NULL )
+	globalFont = TTF_OpenFont( "./resources/lazy.ttf", 28 );
+	if( globalFont == NULL )
 	{
 		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
 		success = false;
@@ -183,7 +163,7 @@ bool loadMedia( Tile* tiles[] )
 	else
 	{
 		SDL_Color textColor = { 0, 0, 0, 0xFF };
-		if( !gPromptTextTexture.loadFromRenderedText( "Enter Text:", textColor, gRenderer, gFont ) )
+		if( !gPromptTextTexture.loadFromRenderedText( "Enter Text:", textColor, gRenderer, globalFont ) )
 		{
 			printf( "Failed to render prompt text!\n" );
 			success = false;
@@ -191,7 +171,7 @@ bool loadMedia( Tile* tiles[] )
 	}
 
     for(int x = 0; x < 4; x++ ) {
-        if( !gButtons[x].buttonSpriteSheetTexture.loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
+        if( !gButtons[x].getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
         {
             printf( "Failed to load button sprite texture!\n" );
             success = false;
@@ -200,10 +180,10 @@ bool loadMedia( Tile* tiles[] )
         {
             for( int i = 0; i < 4; ++i )
             {
-                gButtons[x].spriteClips[ i ].x = 0;
-                gButtons[x].spriteClips[ i ].y = i * BUTTON_HEIGHT;
-                gButtons[x].spriteClips[ i ].w = BUTTON_WIDTH;
-                gButtons[x].spriteClips[ i ].h = BUTTON_HEIGHT;
+                gButtons[x].getSpriteClip( i ).x = 0;
+                gButtons[x].getSpriteClip( i ).y = i * BUTTON_HEIGHT;
+                gButtons[x].getSpriteClip( i ).w = BUTTON_WIDTH;
+                gButtons[x].getSpriteClip( i ).h = BUTTON_HEIGHT;
             }
         }
     }
@@ -247,56 +227,49 @@ bool loadMedia( Tile* tiles[] )
 		success = false;
 	}
 
-	if( !dot.getTexture().loadFromFile( "./resources/dot.bmp", gRenderer ) )
+	if( !player.getTexture().loadFromFile( "./resources/dot.bmp", gRenderer ) )
 	{
 		printf( "Failed to load dot texture!\n" );
 		success = false;
 	}
 
-    for(int i = 0; i < dot.TOTAL_PARTICLES; i++) {
-        if( !dot.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
+    for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
+        if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
         {
             printf( "Failed to load red texture!\n" );
             success = false;
         }
 
-        if( !dot.particles[i]->greenTexture.loadFromFile( "./resources/green.bmp", gRenderer ) )
+        if( !player.particles[i]->greenTexture.loadFromFile( "./resources/green.bmp", gRenderer ) )
         {
             printf( "Failed to load green texture!\n" );
             success = false;
         }
 
-        if( !dot.particles[i]->blueTexture.loadFromFile( "./resources/blue.bmp", gRenderer ) )
+        if( !player.particles[i]->blueTexture.loadFromFile( "./resources/blue.bmp", gRenderer ) )
         {
             printf( "Failed to load blue texture!\n" );
             success = false;
         }
 
-        if( !dot.particles[i]->shimmerTexture.loadFromFile( "./resources/shimmer.bmp", gRenderer ) )
+        if( !player.particles[i]->shimmerTexture.loadFromFile( "./resources/shimmer.bmp", gRenderer ) )
         {
             printf( "Failed to load shimmer texture!\n" );
             success = false;
         }
 	
-	    dot.particles[i]->redTexture.setAlpha( 192 );
-	    dot.particles[i]->greenTexture.setAlpha( 192 );
-	    dot.particles[i]->blueTexture.setAlpha( 192 );
-	    dot.particles[i]->shimmerTexture.setAlpha( 192 );
+	    player.particles[i]->redTexture.setAlpha( 192 );
+	    player.particles[i]->greenTexture.setAlpha( 192 );
+	    player.particles[i]->blueTexture.setAlpha( 192 );
+	    player.particles[i]->shimmerTexture.setAlpha( 192 );
     }
 
 	return success;
 }
 
-void close( Tile* tiles[] )
+void close()
 {
-	for( int i = 0; i < TOTAL_TILES; ++i )
-	{
-		 if( tiles[ i ] != NULL )
-		 {
-			delete tiles[ i ];
-			tiles[ i ] = NULL;
-		 }
-	}
+    tileMap.deleteTiles();
 
 	Mix_FreeChunk( gScratch );
 	Mix_FreeChunk( gHigh );
@@ -310,25 +283,25 @@ void close( Tile* tiles[] )
 	Mix_FreeMusic( gMusic );
 	gMusic = NULL;
 
-    for(int i = 0; i < dot.TOTAL_PARTICLES; i++) {
-        dot.particles[i]->redTexture.free();
-        dot.particles[i]->greenTexture.free();
-        dot.particles[i]->blueTexture.free();
-        dot.particles[i]->shimmerTexture.free();
+    for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
+        player.particles[i]->redTexture.free();
+        player.particles[i]->greenTexture.free();
+        player.particles[i]->blueTexture.free();
+        player.particles[i]->shimmerTexture.free();
     }
 
 	gFPSTextTexture.free();
 	gPromptTextTexture.free();
 	gInputTextTexture.free();
-	dot.getTexture().free();
-	gTileTexture.free();
+	player.getTexture().free();
+	tileMap.getTexture().free();
 
     for(int x = 0; x < 4; x++ ) {
-	    gButtons[x].buttonSpriteSheetTexture.free();
+	    gButtons[x].getTexture().free();
     }
 
-	TTF_CloseFont( gFont );
-	gFont = NULL;
+	TTF_CloseFont( globalFont );
+	globalFont = NULL;
 
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -341,124 +314,6 @@ void close( Tile* tiles[] )
 	SDL_Quit();
 }
 
-bool setTiles( Tile* tiles[] )
-{
-	bool tilesLoaded = true;
-
-    int x = 0, y = 0;
-
-    std::ifstream map( "./resources/lazy.map" );
-
-    if( map.fail() )
-    {
-		printf( "Unable to load map file!\n" );
-		tilesLoaded = false;
-    }
-	else
-	{
-		for( int i = 0; i < TOTAL_TILES; ++i )
-		{
-			int tileType = -1;
-
-			map >> tileType;
-
-			if( map.fail() )
-			{
-				printf( "Error loading map: Unexpected end of file!\n" );
-				tilesLoaded = false;
-				break;
-			}
-
-			if( ( tileType >= 0 ) && ( tileType < TOTAL_TILE_SPRITES ) )
-			{
-				tiles[ i ] = new Tile( x, y, tileType );
-			}
-			else
-			{
-				printf( "Error loading map: Invalid tile type at %d!\n", i );
-				tilesLoaded = false;
-				break;
-			}
-
-			x += TILE_WIDTH;
-
-			if( x >= LEVEL_WIDTH )
-			{
-				x = 0;
-
-				y += TILE_HEIGHT;
-			}
-		}
-		
-		if( tilesLoaded )
-		{
-			gTileClips[ TILE_RED ].x = 0;
-			gTileClips[ TILE_RED ].y = 0;
-			gTileClips[ TILE_RED ].w = TILE_WIDTH;
-			gTileClips[ TILE_RED ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_GREEN ].x = 0;
-			gTileClips[ TILE_GREEN ].y = TILE_HEIGHT;
-			gTileClips[ TILE_GREEN ].w = TILE_WIDTH;
-			gTileClips[ TILE_GREEN ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_BLUE ].x = 0;
-			gTileClips[ TILE_BLUE ].y = TILE_HEIGHT * 2;
-			gTileClips[ TILE_BLUE ].w = TILE_WIDTH;
-			gTileClips[ TILE_BLUE ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_TOPLEFT ].x = TILE_WIDTH;
-			gTileClips[ TILE_TOPLEFT ].y = 0;
-			gTileClips[ TILE_TOPLEFT ].w = TILE_WIDTH;
-			gTileClips[ TILE_TOPLEFT ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_LEFT ].x = TILE_WIDTH;
-			gTileClips[ TILE_LEFT ].y = TILE_HEIGHT;
-			gTileClips[ TILE_LEFT ].w = TILE_WIDTH;
-			gTileClips[ TILE_LEFT ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_BOTTOMLEFT ].x = TILE_WIDTH;
-			gTileClips[ TILE_BOTTOMLEFT ].y = TILE_HEIGHT * 2;
-			gTileClips[ TILE_BOTTOMLEFT ].w = TILE_WIDTH;
-			gTileClips[ TILE_BOTTOMLEFT ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_TOP ].x = TILE_WIDTH * 2;
-			gTileClips[ TILE_TOP ].y = 0;
-			gTileClips[ TILE_TOP ].w = TILE_WIDTH;
-			gTileClips[ TILE_TOP ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_CENTER ].x = TILE_WIDTH * 2;
-			gTileClips[ TILE_CENTER ].y = TILE_HEIGHT;
-			gTileClips[ TILE_CENTER ].w = TILE_WIDTH;
-			gTileClips[ TILE_CENTER ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_BOTTOM ].x = TILE_WIDTH * 2;
-			gTileClips[ TILE_BOTTOM ].y = TILE_HEIGHT * 2;
-			gTileClips[ TILE_BOTTOM ].w = TILE_WIDTH;
-			gTileClips[ TILE_BOTTOM ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_TOPRIGHT ].x = TILE_WIDTH * 3;
-			gTileClips[ TILE_TOPRIGHT ].y = 0;
-			gTileClips[ TILE_TOPRIGHT ].w = TILE_WIDTH;
-			gTileClips[ TILE_TOPRIGHT ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_RIGHT ].x = TILE_WIDTH * 3;
-			gTileClips[ TILE_RIGHT ].y = TILE_HEIGHT;
-			gTileClips[ TILE_RIGHT ].w = TILE_WIDTH;
-			gTileClips[ TILE_RIGHT ].h = TILE_HEIGHT;
-
-			gTileClips[ TILE_BOTTOMRIGHT ].x = TILE_WIDTH * 3;
-			gTileClips[ TILE_BOTTOMRIGHT ].y = TILE_HEIGHT * 2;
-			gTileClips[ TILE_BOTTOMRIGHT ].w = TILE_WIDTH;
-			gTileClips[ TILE_BOTTOMRIGHT ].h = TILE_HEIGHT;
-		}
-	}
-
-    map.close();
-
-    return tilesLoaded;
-}
-
 int main( int argc, char* args[] )
 {
 	if( !init() )
@@ -467,9 +322,7 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
-		Tile* tileSet[ TOTAL_TILES ];
-
-		if( !loadMedia( tileSet ) )
+		if( !loadMedia() )
 		{
 			printf( "Failed to load media!\n" );
 		}
@@ -493,7 +346,7 @@ int main( int argc, char* args[] )
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 			std::string inputText = "Sample Text";
-			gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, gFont );
+			gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
 
 			SDL_StartTextInput();
 
@@ -579,12 +432,12 @@ int main( int argc, char* args[] )
 						}
 					}
 
-					for( int i = 0; i < TOTAL_BUTTONS; ++i )
+					for( int i = 0; i < 4; ++i )
 					{
 						gButtons[ i ].handleEvent( &e );
 					}
 
-					dot.handleEvent( e );
+					player.handleEvent( e );
 				}
 
 				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
@@ -596,7 +449,7 @@ int main( int argc, char* args[] )
 				timeText.str( "" );
 				timeText << "Average Frames Per Second (With Cap) " << avgFPS;
 
-				if( !gFPSTextTexture.loadFromRenderedText( timeText.str().c_str(), textColor, gRenderer, gFont ) )
+				if( !gFPSTextTexture.loadFromRenderedText( timeText.str().c_str(), textColor, gRenderer, globalFont ) )
 				{
 					printf( "Unable to render FPS texture!\n" );
 				}
@@ -605,29 +458,26 @@ int main( int argc, char* args[] )
 				{
 					if( inputText != "" )
 					{
-						gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, gFont );
+						gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
 					}
 					else
 					{
-						gInputTextTexture.loadFromRenderedText( " ", textColor, gRenderer, gFont );
+						gInputTextTexture.loadFromRenderedText( " ", textColor, gRenderer, globalFont );
 					}
 				}
 
-				dot.move( tileSet );
-				dot.setCamera( camera );
+				player.move( tileMap.getTiles() );
+				player.setCamera( camera );
 
 				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( gRenderer );
 
-				for( int i = 0; i < TOTAL_TILES; ++i )
-				{
-					tileSet[ i ]->render( camera, gTileClips, gRenderer, gTileTexture);
-				}
+                tileMap.render( camera, gRenderer );
 
 				SDL_Rect* currentClip = &gDotSpriteClips[ frame / 4 ];
-				dot.render( camera, currentClip, gRenderer );
+				player.render( camera, currentClip, gRenderer );
 
-				for( int i = 0; i < TOTAL_BUTTONS; ++i )
+				for( int i = 0; i < 4; ++i )
 				{
 					gButtons[ i ].render(gRenderer);
 				}
@@ -657,7 +507,7 @@ int main( int argc, char* args[] )
 			SDL_StopTextInput();
 		}
 		
-		close( tileSet );
+		close();
 	}
 
 	return 0;

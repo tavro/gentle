@@ -2,8 +2,9 @@
 #define PARTICLE_H
 
 #include "./texture.h"
+#include "../headers/game_object.h"
 
-class Particle
+class Particle : public GameObject
 {
 	public:
 		Particle( int x, int y );
@@ -18,10 +19,7 @@ class Particle
         Texture shimmerTexture;
 
 	private:
-		int posX, posY;
 		int frame;
-
-		Texture *texture;
 };
 
 #endif // PARTICLE_H

@@ -16,6 +16,7 @@
 #include "./headers/button.h"
 #include "./headers/tile_map.h"
 #include "./headers/audio_source.h"
+#include "./headers/text.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
@@ -27,16 +28,15 @@ void close();
 SDL_Window*     gWindow = NULL;
 SDL_Renderer*   gRenderer = NULL;
 
-TTF_Font*       globalFont = NULL;                  // TODO: Have this by default in Text class
-
-Texture gPromptTextTexture;                         // TODO: Implement Text class
-Texture gInputTextTexture;
-Texture gFPSTextTexture;
+Texture gInputTextTexture;                          // TODO: Implement Input Field class
 
 const int DOT_ANIMATION_FRAMES = 4;                 // TODO: Implement Animation class and connect to GameObject
 SDL_Rect gDotSpriteClips[ DOT_ANIMATION_FRAMES ];
 
 Button gButtons[ 4 ];
+
+Text FPSText{"", 0, SCREEN_HEIGHT - 28};
+Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
 
 Player player;
 TileMap tileMap;
@@ -134,22 +134,12 @@ bool loadMedia()
 	}
 
     success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
+    
+    success = promtText.loadFont( "./resources/lazy.ttf", 28 );
+    success = promtText.loadTexture( gRenderer );
 
-	globalFont = TTF_OpenFont( "./resources/lazy.ttf", 28 );
-	if( globalFont == NULL )
-	{
-		printf( "Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError() );
-		success = false;
-	}
-	else
-	{
-		SDL_Color textColor = { 0, 0, 0, 0xFF };
-		if( !gPromptTextTexture.loadFromRenderedText( "Enter Text:", textColor, gRenderer, globalFont ) )
-		{
-			printf( "Failed to render prompt text!\n" );
-			success = false;
-		}
-	}
+    success = FPSText.loadFont( "./resources/lazy.ttf", 28 );
+    success = FPSText.loadTexture( gRenderer );
 
     for(int x = 0; x < 4; x++ ) {
         if( !gButtons[x].getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
@@ -239,8 +229,8 @@ void close()
         player.particles[i]->shimmerTexture.free();
     }
 
-	gFPSTextTexture.free();
-	gPromptTextTexture.free();
+	FPSText.getTexture().free();
+	promtText.getTexture().free();
 	gInputTextTexture.free();
 	player.getTexture().free();
 	tileMap.getTexture().free();
@@ -249,8 +239,8 @@ void close()
 	    gButtons[x].getTexture().free();
     }
 
-	TTF_CloseFont( globalFont );
-	globalFont = NULL;
+	//TTF_CloseFont( globalFont );
+	// globalFont = NULL;
 
 	SDL_DestroyRenderer( gRenderer );
 	SDL_DestroyWindow( gWindow );
@@ -295,7 +285,7 @@ int main( int argc, char* args[] )
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 			std::string inputText = "Sample Text";
-			gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
+			//gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
 
 			SDL_StartTextInput();
 
@@ -397,12 +387,10 @@ int main( int argc, char* args[] )
 
 				timeText.str( "" );
 				timeText << "Average Frames Per Second (With Cap) " << avgFPS;
+                FPSText.updateContent(timeText.str());
+                FPSText.loadTexture(gRenderer);
 
-				if( !gFPSTextTexture.loadFromRenderedText( timeText.str().c_str(), textColor, gRenderer, globalFont ) )
-				{
-					printf( "Unable to render FPS texture!\n" );
-				}
-
+                /*
 				if( renderText )
 				{
 					if( inputText != "" )
@@ -414,6 +402,7 @@ int main( int argc, char* args[] )
 						gInputTextTexture.loadFromRenderedText( " ", textColor, gRenderer, globalFont );
 					}
 				}
+                */
 
 				player.move( tileMap.getTiles() );
 				player.setCamera( camera );
@@ -431,9 +420,10 @@ int main( int argc, char* args[] )
 					gButtons[ i ].render(gRenderer);
 				}
 
-				gPromptTextTexture.render( ( SCREEN_WIDTH - gPromptTextTexture.getWidth() ) / 2, 0, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
-				gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
-				gFPSTextTexture.render( ( SCREEN_WIDTH - gFPSTextTexture.getWidth() ) / 2, ( SCREEN_HEIGHT - gFPSTextTexture.getHeight() ), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+                promtText.render(gRenderer);
+                FPSText.render(gRenderer);
+
+				// gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
 
 				SDL_RenderPresent( gRenderer );
 

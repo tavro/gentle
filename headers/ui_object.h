@@ -6,15 +6,6 @@
 #include "./utils/vector2d.h"
 #include "./texture.h"
 
-enum UIState
-{
-    UI_MOUSE_OUT         = 0,
-    UI_MOUSE_OVER_MOTION = 1,
-    UI_MOUSE_DOWN        = 2,
-    UI_MOUSE_UP          = 3,
-    UI_TOTAL             = 4
-}; 
-
 class UIObject
 {
 	public:
@@ -22,29 +13,21 @@ class UIObject
 
 		void setPosition( int x, int y );
 
-		void handleEvent( SDL_Event* e );
+        virtual void render(SDL_Renderer* renderer)
+        {
+            texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+        }
 
-		void render( SDL_Renderer* renderer );
-
-        void addSpriteClip( SDL_Rect clip );
-
-        void setCurrentState( UIState state );
+        Vector2D& getPosition();
+        Vector2D& getSize();
 
         Texture& getTexture();
 
-        SDL_Rect& getSpriteClip( int index );
-
 	private:
-        std::vector<SDL_Rect> spriteClips;
         Texture texture;
-
-        TTF_Font* font;
-        Texture textTexture;
 
 		Vector2D position;
 		Vector2D size;
-
-		UIState currentState;
 };
 
 #endif // UI_OBJECT_H

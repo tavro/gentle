@@ -29,7 +29,9 @@ class TileMap
 
         bool setTiles(std::string mapPath);
 
-		void render( SDL_Rect& camera, SDL_Renderer* gRenderer );
+		void render( SDL_Rect& camera, SDL_Renderer* renderer );
+
+        bool loadTexture( SDL_Renderer* renderer, std::string path );
 
         void deleteTiles();
 

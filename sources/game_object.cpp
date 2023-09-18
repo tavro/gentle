@@ -97,3 +97,8 @@ bool GameObject::hasCollision(GameObject& other)
 
     return true;
 }
+
+bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
+{
+    return texture.loadFromFile(path, renderer);
+}

@@ -17,6 +17,7 @@ class GameObject
         Vector2D& getVelocity();
 
         void setTexture(Texture texture);
+        bool loadTexture(SDL_Renderer* renderer, std::string path);
 
         void setPosition(Vector2D position);
         void setVelocity(Vector2D velocity);
@@ -32,6 +33,7 @@ class GameObject
 
     private:
         Texture texture;
+        std::string texturePath;
 
         Vector2D position;
         Vector2D velocity;

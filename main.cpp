@@ -15,39 +15,32 @@
 #include "./headers/tile.h"
 #include "./headers/button.h"
 #include "./headers/tile_map.h"
+#include "./headers/audio_source.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
 bool init();
-
 bool loadMedia();
-
 void close();
 
 SDL_Window*     gWindow = NULL;
 SDL_Renderer*   gRenderer = NULL;
 
-TTF_Font*       globalFont = NULL;
+TTF_Font*       globalFont = NULL;                  // TODO: Have this by default in Text class
 
-Texture gPromptTextTexture;
+Texture gPromptTextTexture;                         // TODO: Implement Text class
 Texture gInputTextTexture;
 Texture gFPSTextTexture;
 
-const int DOT_ANIMATION_FRAMES = 4;
+const int DOT_ANIMATION_FRAMES = 4;                 // TODO: Implement Animation class and connect to GameObject
 SDL_Rect gDotSpriteClips[ DOT_ANIMATION_FRAMES ];
 
 Button gButtons[ 4 ];
 
-Mix_Music *gMusic = NULL;
-
-Mix_Chunk *gScratch = NULL;
-Mix_Chunk *gHigh = NULL;
-Mix_Chunk *gMedium = NULL;
-Mix_Chunk *gLow = NULL;
-
 Player player;
 TileMap tileMap;
+AudioSource audioSource;
 
 bool init()
 {
@@ -140,19 +133,7 @@ bool loadMedia()
 		gDotSpriteClips[ 3 ].h = 20;
 	}
 
-	if( !tileMap.getTexture().loadFromFile( "./resources/tilesheet.png", gRenderer ) )
-	{
-		printf( "Failed to load tile set texture!\n" );
-		success = false;
-	}
-
-    /*
-	if( !setTiles( tiles ) )
-	{
-		printf( "Failed to load tile set!\n" );
-		success = false;
-	}
-    */
+    success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
 
 	globalFont = TTF_OpenFont( "./resources/lazy.ttf", 28 );
 	if( globalFont == NULL )
@@ -192,46 +173,14 @@ bool loadMedia()
     gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
     gButtons[ 3 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT );
 
-	gMusic = Mix_LoadMUS( "./resources/beat.wav" );
-	if( gMusic == NULL )
-	{
-		printf( "Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
+    audioSource.addMusic( "./resources/beat.wav" );
+
+    audioSource.addSound( "./resources/scratch.wav" );
+    audioSource.addSound( "./resources/high.wav" );
+    audioSource.addSound( "./resources/medium.wav" );
+    audioSource.addSound( "./resources/low.wav" );
 	
-	gScratch = Mix_LoadWAV( "./resources/scratch.wav" );
-	if( gScratch == NULL )
-	{
-		printf( "Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
-	
-	gHigh = Mix_LoadWAV( "./resources/high.wav" );
-	if( gHigh == NULL )
-	{
-		printf( "Failed to load high sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
-
-	gMedium = Mix_LoadWAV( "./resources/medium.wav" );
-	if( gMedium == NULL )
-	{
-		printf( "Failed to load medium sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
-
-	gLow = Mix_LoadWAV( "./resources/low.wav" );
-	if( gLow == NULL )
-	{
-		printf( "Failed to load low sound effect! SDL_mixer Error: %s\n", Mix_GetError() );
-		success = false;
-	}
-
-	if( !player.getTexture().loadFromFile( "./resources/dot.bmp", gRenderer ) )
-	{
-		printf( "Failed to load dot texture!\n" );
-		success = false;
-	}
+    success = player.loadTexture( gRenderer, "./resources/dot.bmp" );
 
     for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
         if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
@@ -271,17 +220,17 @@ void close()
 {
     tileMap.deleteTiles();
 
-	Mix_FreeChunk( gScratch );
-	Mix_FreeChunk( gHigh );
-	Mix_FreeChunk( gMedium );
-	Mix_FreeChunk( gLow );
-	gScratch = NULL;
-	gHigh = NULL;
-	gMedium = NULL;
-	gLow = NULL;
+	Mix_FreeChunk( audioSource.getSound(0) );
+	Mix_FreeChunk( audioSource.getSound(1) );
+	Mix_FreeChunk( audioSource.getSound(2) );
+	Mix_FreeChunk( audioSource.getSound(3) );
+	//gScratch = NULL; <------ TODO
+	//gHigh = NULL;
+	//gMedium = NULL;
+	//gLow = NULL;
 	
-	Mix_FreeMusic( gMusic );
-	gMusic = NULL;
+	Mix_FreeMusic( audioSource.getMusic(0) );
+	// gMusic = NULL;
 
     for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
         player.particles[i]->redTexture.free();
@@ -385,25 +334,25 @@ int main( int argc, char* args[] )
 						switch( e.key.keysym.sym )
 						{
 							case SDLK_1:
-							Mix_PlayChannel( -1, gHigh, 0 );
+							Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
 							break;
 							
 							case SDLK_2:
-							Mix_PlayChannel( -1, gMedium, 0 );
+							Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
 							break;
 							
 							case SDLK_3:
-							Mix_PlayChannel( -1, gLow, 0 );
+							Mix_PlayChannel( -1, audioSource.getSound(2), 0 );
 							break;
 							
 							case SDLK_4:
-							Mix_PlayChannel( -1, gScratch, 0 );
+							Mix_PlayChannel( -1, audioSource.getSound(3), 0 );
 							break;
 							
 							case SDLK_9:
 							if( Mix_PlayingMusic() == 0 )
 							{
-								Mix_PlayMusic( gMusic, -1 );
+								Mix_PlayMusic( audioSource.getMusic(0), -1 );
 							}
 							else
 							{

@@ -128,10 +128,10 @@ bool TileMap::setTiles(std::string mapPath)
     return tilesLoaded;
 }
 
-void TileMap::render( SDL_Rect& camera, SDL_Renderer* gRenderer ) {
+void TileMap::render( SDL_Rect& camera, SDL_Renderer* renderer ) {
     for( int i = 0; i < TOTAL_TILES; ++i )
 	{
-		tiles[ i ]->render( camera, clips, gRenderer, sheetTexture);
+		tiles[ i ]->render( camera, clips, renderer, sheetTexture);
 	}
 }
 
@@ -155,4 +155,9 @@ void TileMap::deleteTiles()
             tiles[ i ] = NULL;
         }
     }
+}
+
+bool TileMap::loadTexture( SDL_Renderer* renderer, std::string path )
+{
+    return sheetTexture.loadFromFile( path, renderer );
 }

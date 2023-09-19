@@ -146,9 +146,10 @@ void Player::setCamera( SDL_Rect& camera )
 	}
 }
 
-void Player::render( SDL_Rect& camera, SDL_Rect* currentClip, SDL_Renderer* gRenderer )
+void Player::render( SDL_Rect& camera, SDL_Renderer* gRenderer )
 {
-	getTexture().render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);// add for animation => , currentClip );
+    animation.render({getPosition().getX() - camera.x, getPosition().getY() - camera.y}, gRenderer);
+	//getTexture().render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);
 	renderParticles(gRenderer);
 }
 
@@ -167,4 +168,9 @@ void Player::renderParticles(SDL_Renderer* gRenderer)
     {
         particles[ i ]->render(gRenderer);
     }
+}
+
+Animation& Player::getAnimation()
+{
+    return animation;
 }

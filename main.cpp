@@ -30,9 +30,6 @@ SDL_Renderer*   gRenderer = NULL;
 
 Texture gInputTextTexture;                          // TODO: Implement Input Field class
 
-const int DOT_ANIMATION_FRAMES = 4;                 // TODO: Implement Animation class and connect to GameObject
-SDL_Rect gDotSpriteClips[ DOT_ANIMATION_FRAMES ];
-
 Button gButtons[ 4 ];
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
@@ -105,34 +102,6 @@ bool loadMedia()
 {
 	bool success = true;
 
-	if( !player.getTexture().loadFromFile( "./resources/dotanim.png", gRenderer ) )
-	{
-		printf( "Failed to load dot texture!\n" );
-		success = false;
-	}
-    else
-	{
-		gDotSpriteClips[ 0 ].x = 0;
-		gDotSpriteClips[ 0 ].y = 0;
-		gDotSpriteClips[ 0 ].w = 20;
-		gDotSpriteClips[ 0 ].h = 20;
-
-		gDotSpriteClips[ 1 ].x = 20;
-		gDotSpriteClips[ 1 ].y = 0;
-		gDotSpriteClips[ 1 ].w = 20;
-		gDotSpriteClips[ 1 ].h = 20;
-		
-		gDotSpriteClips[ 2 ].x = 40;
-		gDotSpriteClips[ 2 ].y = 0;
-		gDotSpriteClips[ 2 ].w = 20;
-		gDotSpriteClips[ 2 ].h = 20;
-
-		gDotSpriteClips[ 3 ].x = 60;
-		gDotSpriteClips[ 3 ].y = 0;
-		gDotSpriteClips[ 3 ].w = 20;
-		gDotSpriteClips[ 3 ].h = 20;
-	}
-
     success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
     
     success = promtText.loadFont( "./resources/lazy.ttf", 28 );
@@ -171,6 +140,7 @@ bool loadMedia()
     audioSource.addSound( "./resources/low.wav" );
 	
     success = player.loadTexture( gRenderer, "./resources/dot.bmp" );
+    success = player.getAnimation().loadTexture( gRenderer, "./resources/dotanim.png" );
 
     for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
         if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
@@ -362,6 +332,7 @@ int main( int argc, char* args[] )
 							break;
 						}
 					}
+                    /*
 					else if( e.type == SDL_TEXTINPUT )
 					{
 						if( !( SDL_GetModState() & KMOD_CTRL && ( e.text.text[ 0 ] == 'c' || e.text.text[ 0 ] == 'C' || e.text.text[ 0 ] == 'v' || e.text.text[ 0 ] == 'V' ) ) )
@@ -370,6 +341,7 @@ int main( int argc, char* args[] )
 							renderText = true;
 						}
 					}
+                    */
 
 					for( int i = 0; i < 4; ++i )
 					{
@@ -411,9 +383,7 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( gRenderer );
 
                 tileMap.render( camera, gRenderer );
-
-				SDL_Rect* currentClip = &gDotSpriteClips[ frame / 4 ];
-				player.render( camera, currentClip, gRenderer );
+				player.render( camera, gRenderer );
 
 				for( int i = 0; i < 4; ++i )
 				{
@@ -426,13 +396,6 @@ int main( int argc, char* args[] )
 				// gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
 
 				SDL_RenderPresent( gRenderer );
-
-				++frame;
-
-				if( frame / 4 >= DOT_ANIMATION_FRAMES )
-				{
-					frame = 0;
-				}
 
 				++countedFrames;
 

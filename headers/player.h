@@ -6,6 +6,8 @@
 #include "./particle.h"
 #include "./texture.h"
 
+#include "./animation.h"
+
 const int LEVEL_WIDTH = 512 + 128;
 const int LEVEL_HEIGHT = 384 + 96;
 
@@ -29,11 +31,13 @@ class Player : public GameObject
 
 		void setCamera( SDL_Rect& camera );
 
-		void render( SDL_Rect& camera, SDL_Rect* currentClip, SDL_Renderer* gRenderer );
+		void render( SDL_Rect& camera, SDL_Renderer* gRenderer );
+
+        Animation& getAnimation();
 
 		Particle* particles[ TOTAL_PARTICLES ];
     private:
-
+        Animation animation;
 		void renderParticles(SDL_Renderer* gRenderer);
 };
 

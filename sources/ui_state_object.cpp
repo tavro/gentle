@@ -75,3 +75,8 @@ SDL_Rect& UIStateObject::getSpriteClip( int index )
 {
     return spriteClips[ index ];
 }
+
+UIState UIStateObject::getCurrentState()
+{
+	return currentState;
+}

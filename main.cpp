@@ -17,6 +17,7 @@
 #include "./headers/tile_map.h"
 #include "./headers/audio_source.h"
 #include "./headers/text.h"
+#include "./headers/input_field.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
@@ -28,12 +29,12 @@ void close();
 SDL_Window*     gWindow = NULL;
 SDL_Renderer*   gRenderer = NULL;
 
-Texture gInputTextTexture;                          // TODO: Implement Input Field class
-
 Button gButtons[ 4 ];
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
+
+InputField field{0, 0, SCREEN_WIDTH, 28};
 
 Player player;
 TileMap tileMap;
@@ -104,6 +105,8 @@ bool loadMedia()
 
     success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
     
+	field.getText().loadFont( "./resources/lazy.ttf", 28 );
+
     success = promtText.loadFont( "./resources/lazy.ttf", 28 );
     success = promtText.loadTexture( gRenderer );
 
@@ -201,7 +204,7 @@ void close()
 
 	FPSText.getTexture().free();
 	promtText.getTexture().free();
-	gInputTextTexture.free();
+	// gInputTextTexture.free();
 	player.getTexture().free();
 	tileMap.getTexture().free();
 
@@ -255,7 +258,8 @@ int main( int argc, char* args[] )
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 			std::string inputText = "Sample Text";
-			//gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
+			field.setText(inputText);
+			field.loadTextTexture(gRenderer);
 
 			SDL_StartTextInput();
 
@@ -332,16 +336,13 @@ int main( int argc, char* args[] )
 							break;
 						}
 					}
-                    /*
 					else if( e.type == SDL_TEXTINPUT )
 					{
-						if( !( SDL_GetModState() & KMOD_CTRL && ( e.text.text[ 0 ] == 'c' || e.text.text[ 0 ] == 'C' || e.text.text[ 0 ] == 'v' || e.text.text[ 0 ] == 'V' ) ) )
+						if(!(SDL_GetModState() & KMOD_CTRL))
 						{
-							inputText += e.text.text;
-							renderText = true;
+							field.updateText(e.text.text);
 						}
 					}
-                    */
 
 					for( int i = 0; i < 4; ++i )
 					{
@@ -362,20 +363,6 @@ int main( int argc, char* args[] )
                 FPSText.updateContent(timeText.str());
                 FPSText.loadTexture(gRenderer);
 
-                /*
-				if( renderText )
-				{
-					if( inputText != "" )
-					{
-						gInputTextTexture.loadFromRenderedText( inputText.c_str(), textColor, gRenderer, globalFont );
-					}
-					else
-					{
-						gInputTextTexture.loadFromRenderedText( " ", textColor, gRenderer, globalFont );
-					}
-				}
-                */
-
 				player.move( tileMap.getTiles() );
 				player.setCamera( camera );
 
@@ -393,7 +380,7 @@ int main( int argc, char* args[] )
                 promtText.render(gRenderer);
                 FPSText.render(gRenderer);
 
-				// gInputTextTexture.render( ( SCREEN_WIDTH /*- gInputTextTexture.getWidth()*/ ) / 2, gPromptTextTexture.getHeight(), NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer );
+				field.render(gRenderer); 
 
 				SDL_RenderPresent( gRenderer );
 

@@ -29,6 +29,8 @@ class UIStateObject : public UIObject
 
         SDL_Rect& getSpriteClip( int index );
 
+        UIState getCurrentState();
+
         void render(SDL_Renderer* renderer) override
         {
             getTexture().render( getPosition().getX(), getPosition().getY(), &spriteClips[ currentState ], 0.0, NULL, SDL_FLIP_NONE, renderer );

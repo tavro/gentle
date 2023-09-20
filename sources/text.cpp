@@ -1,4 +1,5 @@
 #include "../headers/text.h"
+#include <iostream>
 
 Text::Text(std::string content, int x, int y) : UIObject(x, y, 0, 0)
 {
@@ -9,6 +10,7 @@ Text::Text(std::string content, int x, int y) : UIObject(x, y, 0, 0)
 bool Text::loadFont(std::string path, int size)
 {
     font = TTF_OpenFont( path.c_str(), size );
+    std::cout << "=======================================>" << ( font == NULL ) << std::endl; 
     return ( font == NULL );
 }
 
@@ -20,4 +22,9 @@ bool Text::loadTexture(SDL_Renderer* renderer)
 void Text::updateContent(std::string content)
 {
     this->content = content;
+}
+
+void Text::appendContent(std::string content)
+{
+    this->content += content;
 }

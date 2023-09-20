@@ -16,6 +16,8 @@ class Text : public UIObject
 
         void updateContent(std::string content);
 
+        void appendContent(std::string content);
+
     private:
         TTF_Font* font;
         SDL_Color color;

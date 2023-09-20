@@ -7,7 +7,7 @@
 class InputField : public UIStateObject
 {
     public:
-        InputField( int x, int y, int w, int h );
+        InputField( int x, int y, int w, int h, int max );
 
         void render(SDL_Renderer* renderer) override
         {
@@ -24,14 +24,20 @@ class InputField : public UIStateObject
 
         void updateText(std::string content);
 
+        void removeChar();
+
         void loadTextTexture(SDL_Renderer* renderer);
 
         Text& getText();
 
     private:
         Text text{" ", 0, 0};
+        
         bool isActive;
         bool hasUpdate;
+
+        std::string textStr;
+        int maxCharacters;
 };
 
 #endif // INPUT_FIELD_H

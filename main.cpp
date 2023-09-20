@@ -34,7 +34,7 @@ Button gButtons[ 4 ];
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
 
-InputField field{0, 0, SCREEN_WIDTH, 28};
+InputField field{0, 0, SCREEN_WIDTH, 28, 20};
 
 Player player;
 TileMap tileMap;
@@ -270,8 +270,6 @@ int main( int argc, char* args[] )
 			{
 				capTimer.start();
 
-				bool renderText = false;
-
 				while( SDL_PollEvent( &e ) != 0 )
 				{
 					if( e.type == SDL_QUIT )
@@ -280,10 +278,9 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_KEYDOWN )
 					{
-						if( e.key.keysym.sym == SDLK_BACKSPACE && inputText.length() > 0 )
+						if( e.key.keysym.sym == SDLK_BACKSPACE)
 						{
-							inputText.pop_back();
-							renderText = true;
+							field.removeChar();
 						}
 						else if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
 						{
@@ -292,7 +289,7 @@ int main( int argc, char* args[] )
 						else if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
 						{
 							inputText = SDL_GetClipboardText();
-							renderText = true;
+							// renderText = true;
 						}
 
 						switch( e.key.keysym.sym )

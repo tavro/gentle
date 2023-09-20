@@ -10,7 +10,6 @@ Text::Text(std::string content, int x, int y) : UIObject(x, y, 0, 0)
 bool Text::loadFont(std::string path, int size)
 {
     font = TTF_OpenFont( path.c_str(), size );
-    std::cout << "=======================================>" << ( font == NULL ) << std::endl; 
     return ( font == NULL );
 }
 
@@ -27,4 +26,9 @@ void Text::updateContent(std::string content)
 void Text::appendContent(std::string content)
 {
     this->content += content;
+}
+
+std::string Text::getContent()
+{
+    return content;
 }

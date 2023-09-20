@@ -1,9 +1,11 @@
 #include "../headers/input_field.h"
 #include <iostream>
 
-InputField::InputField( int x, int y, int w, int h ) : UIStateObject( x, y, w, h )
+InputField::InputField( int x, int y, int w, int h, int max ) : UIStateObject( x, y, w, h )
 {
+    maxCharacters = max;
     text.setPosition(x, y);
+    textStr = "Sample Text";
 }
 
 void InputField::setText(std::string content)
@@ -22,9 +24,28 @@ void InputField::updateText(std::string content)
     {
         if( content != "" )
         {
-            text.appendContent(content);
+            textStr += content;
+            std::string tmp = textStr;
+            if(textStr.length() > maxCharacters) {
+                tmp = textStr.substr(textStr.length() - maxCharacters, textStr.length());
+            }
+            text.updateContent(tmp);
             hasUpdate = true;
         }
+    }
+}
+
+void InputField::removeChar()
+{
+    if(textStr.length() > 0)
+    {
+	    textStr.pop_back();
+        std::string tmp = textStr;
+        if(textStr.length() > maxCharacters) {
+            tmp = textStr.substr(textStr.length() - maxCharacters, textStr.length());
+        }
+        text.updateContent(tmp);
+        hasUpdate = true;
     }
 }
 

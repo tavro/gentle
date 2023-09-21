@@ -13,8 +13,6 @@ Compile with following flags:
 * -lSDL2_mixer
 
 ## TODO
-* scene class
-* canvas class
 * custom width for input fields
 * transitions between scenes
 * animator class

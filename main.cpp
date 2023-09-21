@@ -18,6 +18,7 @@
 #include "./headers/audio_source.h"
 #include "./headers/text.h"
 #include "./headers/input_field.h"
+#include "./headers/canvas.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
@@ -29,12 +30,11 @@ void close();
 SDL_Window*     gWindow = NULL;
 SDL_Renderer*   gRenderer = NULL;
 
+Canvas canvas;
 Button gButtons[ 4 ];
-
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
-
-InputField field{0, 28, 96, 28, 20};
+InputField field{0, 48, 96, 28, 20};
 
 Player player;
 TileMap tileMap;
@@ -109,9 +109,11 @@ bool loadMedia()
 
     success = promtText.loadFont( "./resources/lazy.ttf", 28 );
     success = promtText.loadTexture( gRenderer );
+	canvas.addObj(&promtText);
 
     success = FPSText.loadFont( "./resources/lazy.ttf", 28 );
     success = FPSText.loadTexture( gRenderer );
+	canvas.addObj(&FPSText);
 
     for(int x = 0; x < 4; x++ ) {
 		field.getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer );
@@ -138,12 +140,17 @@ bool loadMedia()
         field.getSpriteClip( i ).w = BUTTON_WIDTH;
         field.getSpriteClip( i ).h = BUTTON_HEIGHT;
 	}
-    gButtons[ 0 ].setPosition( 0, 28 );
+	canvas.addObj(&field);
 
     gButtons[ 0 ].setPosition( 0, 0 );
     gButtons[ 1 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, 0 );
     gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
     gButtons[ 3 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT );
+
+	canvas.addObj(&gButtons[0]);
+	canvas.addObj(&gButtons[1]);
+	canvas.addObj(&gButtons[2]);
+	canvas.addObj(&gButtons[3]);
 
     audioSource.addMusic( "./resources/beat.wav" );
 
@@ -373,17 +380,9 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( gRenderer );
 
                 tileMap.render( camera, gRenderer );
-				player.render( camera, gRenderer );
+				player.render ( camera, gRenderer );
 
-				for( int i = 0; i < 4; ++i )
-				{
-					gButtons[ i ].render(gRenderer);
-				}
-
-                promtText.render(gRenderer);
-                FPSText.render(gRenderer);
-
-				field.render(gRenderer); 
+                canvas.render(gRenderer);
 
 				SDL_RenderPresent( gRenderer );
 

@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
-#include "./game_object.h"
+#include "./ui_object.h"
 
 class Canvas
 {
@@ -12,10 +12,10 @@ class Canvas
 
         void render(SDL_Renderer* renderer);
 
-        void addObj(GameObject* obj);
+        void addObj(UIObject* obj);
 
     private:
-        std::vector<GameObject*> objs;
+        std::vector<UIObject*> objs;
 };
 
 #endif // CANVAS_H

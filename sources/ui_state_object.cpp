@@ -87,3 +87,8 @@ bool UIStateObject::isToggled()
 {
 	return toggle;
 }
+
+void UIStateObject::setToggle(bool state)
+{
+	toggle = state;
+}

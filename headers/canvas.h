@@ -12,10 +12,13 @@ class Canvas
 
         void render(SDL_Renderer* renderer);
 
+        void setActive(bool state);
+
         void addObj(UIObject* obj);
 
     private:
         std::vector<UIObject*> objs;
+        bool isActive = true;
 };
 
 #endif // CANVAS_H

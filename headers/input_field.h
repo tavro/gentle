@@ -20,6 +20,8 @@ class InputField : public UIStateObject
             text.render(renderer);
         }
 
+        Text& getText();
+        
         void setText(std::string content);
 
         void appendToText(std::string content);
@@ -29,8 +31,6 @@ class InputField : public UIStateObject
         void removeChar();
 
         void loadTextTexture(SDL_Renderer* renderer);
-
-        Text& getText();
 
         std::string getContent();
 

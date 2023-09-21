@@ -7,6 +7,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 #include "./headers/texture.h"
 #include "./headers/particle.h"
@@ -19,6 +20,7 @@
 #include "./headers/text.h"
 #include "./headers/input_field.h"
 #include "./headers/canvas.h"
+#include "./headers/image.h"
 
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
@@ -27,13 +29,25 @@ bool init();
 bool loadMedia();
 void close();
 
-SDL_Window*     gWindow = NULL;
+SDL_Window*     gWindow   = NULL;
 SDL_Renderer*   gRenderer = NULL;
 
 Canvas canvas;
-Button gButtons[ 4 ];
+Canvas selectionCanvas;
+
+Button startButton  {"Start",   SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT + 16};
+Button optionsButton{"Options", SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 2 + 32};
+Button quitButton   {"Quit",    SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 3 + 48};
+
+Button dirtButton {"Dirt",  0,						SCREEN_HEIGHT - BUTTON_HEIGHT};
+Button stoneButton{"Stone", BUTTON_WIDTH + 16,		SCREEN_HEIGHT - BUTTON_HEIGHT};
+Button grassButton{"Grass", BUTTON_WIDTH * 2 + 32,	SCREEN_HEIGHT - BUTTON_HEIGHT};
+
+Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
-Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
+Text promtText{"Main Menu", SCREEN_WIDTH / 2 - (8*14) / 2, 0};
+Text selectedText{"Selected Tile: ", BUTTON_WIDTH * 3 + 48, SCREEN_HEIGHT - BUTTON_HEIGHT};
 InputField field{0, 48, 96, 28, 20};
 
 Player player;
@@ -103,36 +117,43 @@ bool loadMedia()
 {
 	bool success = true;
 
+	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", gRenderer );
+	canvas.addObj(&mainMenuImg);
+
     success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
     
-	field.getText().loadFont( "./resources/lazy.ttf", 28 );
+	field.getText().loadFont( "./resources/font.ttf", 28 );
 
-    success = promtText.loadFont( "./resources/lazy.ttf", 28 );
+	startButton.getText().loadFont( "./resources/font.ttf", 28 );
+	optionsButton.getText().loadFont( "./resources/font.ttf", 28 );
+	quitButton.getText().loadFont( "./resources/font.ttf", 28 );
+
+	dirtButton.getText().loadFont( "./resources/font.ttf", 28 );
+	stoneButton.getText().loadFont( "./resources/font.ttf", 28 );
+	grassButton.getText().loadFont( "./resources/font.ttf", 28 );
+
+    success = promtText.loadFont( "./resources/font.ttf", 28 );
     success = promtText.loadTexture( gRenderer );
 	canvas.addObj(&promtText);
 
-    success = FPSText.loadFont( "./resources/lazy.ttf", 28 );
+	success = selectedText.loadFont( "./resources/font.ttf", 28 );
+    success = selectedText.loadTexture( gRenderer );
+	selectionCanvas.addObj(&selectedText);
+
+    success = FPSText.loadFont( "./resources/font.ttf", 28 );
     success = FPSText.loadTexture( gRenderer );
 	canvas.addObj(&FPSText);
 
-    for(int x = 0; x < 4; x++ ) {
-		field.getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer );
-        if( !gButtons[x].getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
-        {
-            printf( "Failed to load button sprite texture!\n" );
-            success = false;
-        }
-        else
-        {
-            for( int i = 0; i < 4; ++i )
-            {
-                gButtons[x].getSpriteClip( i ).x = 0;
-                gButtons[x].getSpriteClip( i ).y = i * BUTTON_HEIGHT;
-                gButtons[x].getSpriteClip( i ).w = BUTTON_WIDTH;
-                gButtons[x].getSpriteClip( i ).h = BUTTON_HEIGHT;
-            }
-        }
-    }
+	field.getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer );
+
+    startButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+    optionsButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+    quitButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	
+	dirtButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	stoneButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	grassButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	
 	for( int i = 0; i < 4; ++i )
 	{
 		field.getSpriteClip( i ).x = 0;
@@ -140,17 +161,16 @@ bool loadMedia()
         field.getSpriteClip( i ).w = BUTTON_WIDTH;
         field.getSpriteClip( i ).h = BUTTON_HEIGHT;
 	}
-	canvas.addObj(&field);
+	//canvas.addObj(&field);
 
-    gButtons[ 0 ].setPosition( 0, 0 );
-    gButtons[ 1 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, 0 );
-    gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
-    gButtons[ 3 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, SCREEN_HEIGHT - BUTTON_HEIGHT );
+	canvas.addObj(&startButton);
+	canvas.addObj(&optionsButton);
+	canvas.addObj(&quitButton);
 
-	canvas.addObj(&gButtons[0]);
-	canvas.addObj(&gButtons[1]);
-	canvas.addObj(&gButtons[2]);
-	canvas.addObj(&gButtons[3]);
+	selectionCanvas.addObj(&dirtButton);
+	selectionCanvas.addObj(&stoneButton);
+	selectionCanvas.addObj(&grassButton);
+	selectionCanvas.setActive(false);
 
     audioSource.addMusic( "./resources/beat.wav" );
 
@@ -221,13 +241,18 @@ void close()
 
 	FPSText.getTexture().free();
 	promtText.getTexture().free();
+	selectedText.getTexture().free();
 	// gInputTextTexture.free();
 	player.getTexture().free();
 	tileMap.getTexture().free();
 
-    for(int x = 0; x < 4; x++ ) {
-	    gButtons[x].getTexture().free();
-    }
+	startButton.getTexture().free();
+	optionsButton.getTexture().free();
+	quitButton.getTexture().free();
+
+	dirtButton.getTexture().free();
+	stoneButton.getTexture().free();
+	grassButton.getTexture().free();
 
 	//TTF_CloseFont( globalFont );
 	// globalFont = NULL;
@@ -265,6 +290,8 @@ int main( int argc, char* args[] )
 			Timer capTimer;
 
 			std::stringstream timeText;
+
+			int currentTile = 0;
 
 			int countedFrames = 0;
 			fpsTimer.start();
@@ -352,14 +379,71 @@ int main( int argc, char* args[] )
 							field.appendToText(e.text.text);
 						}
 					}
-
-					for( int i = 0; i < 4; ++i )
+					else
 					{
-						gButtons[ i ].handleEvent( &e );
+						switch( e.type )
+						{
+							case SDL_MOUSEBUTTONDOWN:
+							int mouseX, mouseY;
+							SDL_GetMouseState( &mouseX, &mouseY );
+							int tileX = (mouseX / TILE_WIDTH);
+							int tileY = (mouseY / TILE_HEIGHT);
+							int index = tileMap.getTileFromScreenPosition(mouseX, mouseY);
+							Tile* t = new Tile( tileX*TILE_WIDTH, tileY*TILE_HEIGHT, currentTile );
+							tileMap.setTile(index, t);
+							break;
+						}
 					}
+
+					startButton.handleEvent( &e );
+					optionsButton.handleEvent( &e );
+					quitButton.handleEvent( &e );
+
+					dirtButton.handleEvent( &e );
+					stoneButton.handleEvent( &e );
+					grassButton.handleEvent( &e );
 
 					field.handleEvent( &e );
 					player.handleEvent( e );
+				}
+
+				if(startButton.isToggled())
+				{
+					canvas.setActive(false);
+					selectionCanvas.setActive(true);
+				}
+
+				if(quitButton.isToggled())
+				{
+					quit = true;
+				}
+
+				if(dirtButton.isToggled())
+				{
+					selectedText.updateContent("Selected Tile: Dirt");
+                	selectedText.loadTexture(gRenderer);
+					dirtButton.setToggle(false);
+					stoneButton.setToggle(false);
+					grassButton.setToggle(false);
+					currentTile = TILE_RED;
+				}
+				else if(stoneButton.isToggled())
+				{
+					selectedText.updateContent("Selected Tile: Stone");
+                	selectedText.loadTexture(gRenderer);
+					dirtButton.setToggle(false);
+					stoneButton.setToggle(false);
+					grassButton.setToggle(false);
+					currentTile = TILE_BLUE;
+				}
+				else if(grassButton.isToggled())
+				{
+					selectedText.updateContent("Selected Tile: Grass");
+                	selectedText.loadTexture(gRenderer);
+					dirtButton.setToggle(false);
+					stoneButton.setToggle(false);
+					grassButton.setToggle(false);
+					currentTile = TILE_GREEN;
 				}
 
 				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
@@ -369,7 +453,7 @@ int main( int argc, char* args[] )
 				}
 
 				timeText.str( "" );
-				timeText << "Average Frames Per Second (With Cap) " << avgFPS;
+				timeText << "Average FPS: " << avgFPS;
                 FPSText.updateContent(timeText.str());
                 FPSText.loadTexture(gRenderer);
 
@@ -380,9 +464,11 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( gRenderer );
 
                 tileMap.render( camera, gRenderer );
+
 				player.render ( camera, gRenderer );
 
                 canvas.render(gRenderer);
+				selectionCanvas.render(gRenderer);
 
 				SDL_RenderPresent( gRenderer );
 

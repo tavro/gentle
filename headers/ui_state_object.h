@@ -38,6 +38,8 @@ class UIStateObject : public UIObject
 
         bool isToggled();
 
+        void setToggle(bool state);
+
 	private:
         std::vector<SDL_Rect> spriteClips;
 		UIState currentState;

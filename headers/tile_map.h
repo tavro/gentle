@@ -38,6 +38,9 @@ class TileMap
         Texture& getTexture();
         Tile** getTiles();
 
+        void setTile(int index, Tile* t);
+        int getTileFromScreenPosition(int x, int y);
+
     private:
         Tile* tiles[ TOTAL_TILES ];
         SDL_Rect clips[ TOTAL_TILE_SPRITES ];

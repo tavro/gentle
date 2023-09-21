@@ -4,10 +4,11 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 TileMap::TileMap()
 {
-    setTiles("./resources/lazy.map");
+    setTiles("./resources/empty.map");
 }
 
 bool TileMap::setTiles(std::string mapPath)
@@ -160,4 +161,16 @@ void TileMap::deleteTiles()
 bool TileMap::loadTexture( SDL_Renderer* renderer, std::string path )
 {
     return sheetTexture.loadFromFile( path, renderer );
+}
+
+void TileMap::setTile(int index, Tile* t)
+{
+	tiles[index] = t;
+}
+
+int TileMap::getTileFromScreenPosition(int x, int y)
+{
+	int tileX = (x / TILE_WIDTH);
+	int tileY = (y / TILE_HEIGHT);
+	return (tileY * (WIDTH / TILE_WIDTH) + tileX);
 }

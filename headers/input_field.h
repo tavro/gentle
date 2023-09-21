@@ -22,6 +22,8 @@ class InputField : public UIStateObject
 
         void setText(std::string content);
 
+        void appendToText(std::string content);
+
         void updateText(std::string content);
 
         void removeChar();
@@ -30,10 +32,11 @@ class InputField : public UIStateObject
 
         Text& getText();
 
+        std::string getContent();
+
     private:
         Text text{" ", 0, 0};
         
-        bool isActive;
         bool hasUpdate;
 
         std::string textStr;

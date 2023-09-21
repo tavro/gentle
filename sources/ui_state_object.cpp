@@ -1,4 +1,5 @@
 #include "../headers/ui_state_object.h"
+#include <iostream>
 
 UIStateObject::UIStateObject( int x, int y, int w, int h ) : UIObject( x, y, w, h )
 {
@@ -51,6 +52,7 @@ void UIStateObject::handleEvent( SDL_Event* e )
 			
 				case SDL_MOUSEBUTTONDOWN:
 				currentState = UI_MOUSE_DOWN;
+				toggle = !toggle;
 				break;
 				
 				case SDL_MOUSEBUTTONUP:
@@ -79,4 +81,9 @@ SDL_Rect& UIStateObject::getSpriteClip( int index )
 UIState UIStateObject::getCurrentState()
 {
 	return currentState;
+}
+
+bool UIStateObject::isToggled()
+{
+	return toggle;
 }

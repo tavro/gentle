@@ -34,7 +34,7 @@ Button gButtons[ 4 ];
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Sample Text", SCREEN_WIDTH / 2, 0};
 
-InputField field{0, 0, SCREEN_WIDTH, 28, 20};
+InputField field{0, 28, 96, 28, 20};
 
 Player player;
 TileMap tileMap;
@@ -114,6 +114,7 @@ bool loadMedia()
     success = FPSText.loadTexture( gRenderer );
 
     for(int x = 0; x < 4; x++ ) {
+		field.getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer );
         if( !gButtons[x].getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer ) )
         {
             printf( "Failed to load button sprite texture!\n" );
@@ -130,6 +131,15 @@ bool loadMedia()
             }
         }
     }
+	for( int i = 0; i < 4; ++i )
+	{
+		field.getSpriteClip( i ).x = 0;
+		field.getSpriteClip( i ).y = i * BUTTON_HEIGHT;
+        field.getSpriteClip( i ).w = BUTTON_WIDTH;
+        field.getSpriteClip( i ).h = BUTTON_HEIGHT;
+	}
+    gButtons[ 0 ].setPosition( 0, 28 );
+
     gButtons[ 0 ].setPosition( 0, 0 );
     gButtons[ 1 ].setPosition( SCREEN_WIDTH - BUTTON_WIDTH, 0 );
     gButtons[ 2 ].setPosition( 0, SCREEN_HEIGHT - BUTTON_HEIGHT );
@@ -252,13 +262,9 @@ int main( int argc, char* args[] )
 			int countedFrames = 0;
 			fpsTimer.start();
 
-            // Current animation frame
-			int frame = 0;
-
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
-			std::string inputText = "Sample Text";
-			field.setText(inputText);
+			field.setText("Sample Text");
 			field.loadTextTexture(gRenderer);
 
 			SDL_StartTextInput();
@@ -284,12 +290,11 @@ int main( int argc, char* args[] )
 						}
 						else if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
 						{
-							SDL_SetClipboardText( inputText.c_str() );
+							SDL_SetClipboardText( field.getContent().c_str() );
 						}
 						else if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
 						{
-							inputText = SDL_GetClipboardText();
-							// renderText = true;
+							field.updateText(SDL_GetClipboardText());
 						}
 
 						switch( e.key.keysym.sym )
@@ -337,7 +342,7 @@ int main( int argc, char* args[] )
 					{
 						if(!(SDL_GetModState() & KMOD_CTRL))
 						{
-							field.updateText(e.text.text);
+							field.appendToText(e.text.text);
 						}
 					}
 
@@ -346,6 +351,7 @@ int main( int argc, char* args[] )
 						gButtons[ i ].handleEvent( &e );
 					}
 
+					field.handleEvent( &e );
 					player.handleEvent( e );
 				}
 
@@ -382,7 +388,6 @@ int main( int argc, char* args[] )
 				SDL_RenderPresent( gRenderer );
 
 				++countedFrames;
-
 				int frameTicks = capTimer.getTicks();
 				if( frameTicks < SCREEN_TICK_PER_FRAME )
 				{

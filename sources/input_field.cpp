@@ -6,6 +6,10 @@ InputField::InputField( int x, int y, int w, int h, int max ) : UIStateObject( x
     maxCharacters = max;
     text.setPosition(x, y);
     textStr = "Sample Text";
+    addSpriteClip( { 0, 0, 96, 32 } );
+    addSpriteClip( { 0, 0, 96, 32 } );
+    addSpriteClip( { 0, 0, 96, 32 } );
+    addSpriteClip( { 0, 0, 96, 32 } );
 }
 
 void InputField::setText(std::string content)
@@ -18,20 +22,36 @@ void InputField::loadTextTexture(SDL_Renderer* renderer)
     text.loadTexture(renderer);
 }
 
+void InputField::appendToText(std::string content)
+{
+    if(isToggled()) {
+        if( !( content[ 0 ] == 'c' || content[ 0 ] == 'C' || content[ 0 ] == 'v' || content[ 0 ] == 'V' ) )
+        {
+            if( content != "" )
+            {
+                textStr += content;
+                std::string tmp = textStr;
+                if(textStr.length() > maxCharacters) {
+                    tmp = textStr.substr(textStr.length() - maxCharacters, textStr.length());
+                }
+                text.updateContent(tmp);
+                hasUpdate = true;
+            }
+        }
+    }
+}
+
 void InputField::updateText(std::string content)
 {
-    if( !( content[ 0 ] == 'c' || content[ 0 ] == 'C' || content[ 0 ] == 'v' || content[ 0 ] == 'V' ) )
+    if( content != "" )
     {
-        if( content != "" )
-        {
-            textStr += content;
-            std::string tmp = textStr;
-            if(textStr.length() > maxCharacters) {
-                tmp = textStr.substr(textStr.length() - maxCharacters, textStr.length());
-            }
-            text.updateContent(tmp);
-            hasUpdate = true;
+        textStr = content;
+        std::string tmp = textStr;
+        if(textStr.length() > maxCharacters) {
+            tmp = textStr.substr(textStr.length() - maxCharacters, textStr.length());
         }
+        text.updateContent(tmp);
+        hasUpdate = true;
     }
 }
 
@@ -52,4 +72,9 @@ void InputField::removeChar()
 Text& InputField::getText()
 {
     return text;
+}
+
+std::string InputField::getContent()
+{
+    return textStr;
 }

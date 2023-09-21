@@ -36,9 +36,12 @@ class UIStateObject : public UIObject
             getTexture().render( getPosition().getX(), getPosition().getY(), &spriteClips[ currentState ], 0.0, NULL, SDL_FLIP_NONE, renderer );
         }
 
+        bool isToggled();
+
 	private:
         std::vector<SDL_Rect> spriteClips;
 		UIState currentState;
+        bool toggle;
 };
 
 #endif // UI_STATE_OBJECT_H

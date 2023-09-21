@@ -6,6 +6,42 @@
 #include <sstream>
 #include <iostream>
 
+/*
+string generateRandomFileName() {
+    const string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    const int nameLength = 4;
+    std::string randomName;
+
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    for (int i = 0; i < nameLength; ++i) {
+        int randomIndex = rand() % charset.length();
+        randomName += charset[randomIndex];
+    }
+
+    return randomName;
+}
+*/
+
+void TileMap::saveTilesToFile(std::string name)
+{
+    std::string fileName = name + ".map";
+
+    std::ofstream outFile(fileName);
+
+    if (!outFile) {
+        std::cerr << "Error: Unable to open the file for writing." << std::endl;
+    }
+
+    for (int i = 0; i < TOTAL_TILES; ++i) {
+        outFile << tiles[i]->getType() << std::endl;
+    }
+
+    outFile.close();
+
+    std::cout << "Array content written to file: " << fileName << std::endl;
+}
+
 TileMap::TileMap()
 {
     setTiles("./resources/empty.map");

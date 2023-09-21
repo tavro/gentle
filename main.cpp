@@ -43,6 +43,8 @@ Button dirtButton {"Dirt",  0,						SCREEN_HEIGHT - BUTTON_HEIGHT};
 Button stoneButton{"Stone", BUTTON_WIDTH + 16,		SCREEN_HEIGHT - BUTTON_HEIGHT};
 Button grassButton{"Grass", BUTTON_WIDTH * 2 + 32,	SCREEN_HEIGHT - BUTTON_HEIGHT};
 
+Button saveButton{"Save", BUTTON_WIDTH + 16, 48};
+
 Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
@@ -132,6 +134,8 @@ bool loadMedia()
 	stoneButton.getText().loadFont( "./resources/font.ttf", 28 );
 	grassButton.getText().loadFont( "./resources/font.ttf", 28 );
 
+	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
+
     success = promtText.loadFont( "./resources/font.ttf", 28 );
     success = promtText.loadTexture( gRenderer );
 	canvas.addObj(&promtText);
@@ -153,6 +157,8 @@ bool loadMedia()
 	dirtButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
 	stoneButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
 	grassButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+
+	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
 	
 	for( int i = 0; i < 4; ++i )
 	{
@@ -161,12 +167,13 @@ bool loadMedia()
         field.getSpriteClip( i ).w = BUTTON_WIDTH;
         field.getSpriteClip( i ).h = BUTTON_HEIGHT;
 	}
-	//canvas.addObj(&field);
+	selectionCanvas.addObj(&field);
 
 	canvas.addObj(&startButton);
 	canvas.addObj(&optionsButton);
 	canvas.addObj(&quitButton);
 
+	selectionCanvas.addObj(&saveButton);
 	selectionCanvas.addObj(&dirtButton);
 	selectionCanvas.addObj(&stoneButton);
 	selectionCanvas.addObj(&grassButton);
@@ -253,6 +260,8 @@ void close()
 	dirtButton.getTexture().free();
 	stoneButton.getTexture().free();
 	grassButton.getTexture().free();
+
+	saveButton.getTexture().free();
 
 	//TTF_CloseFont( globalFont );
 	// globalFont = NULL;
@@ -397,8 +406,9 @@ int main( int argc, char* args[] )
 
 					startButton.handleEvent( &e );
 					optionsButton.handleEvent( &e );
-					quitButton.handleEvent( &e );
+					//quitButton.handleEvent( &e );
 
+					saveButton.handleEvent( &e );
 					dirtButton.handleEvent( &e );
 					stoneButton.handleEvent( &e );
 					grassButton.handleEvent( &e );
@@ -444,6 +454,12 @@ int main( int argc, char* args[] )
 					stoneButton.setToggle(false);
 					grassButton.setToggle(false);
 					currentTile = TILE_GREEN;
+				}
+
+				if(saveButton.isToggled())
+				{
+					saveButton.setToggle(false);
+					tileMap.saveTilesToFile(field.getContent());
 				}
 
 				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );

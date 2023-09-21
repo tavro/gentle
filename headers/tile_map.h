@@ -4,6 +4,14 @@
 #include <SDL2/SDL.h>
 #include "./tile.h"
 
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+
+using namespace std;
+
 const int TOTAL_TILES = 300;
 const int TOTAL_TILE_SPRITES = 12;
 
@@ -28,6 +36,7 @@ class TileMap
         TileMap();
 
         bool setTiles(std::string mapPath);
+        void saveTilesToFile(std::string name);
 
 		void render( SDL_Rect& camera, SDL_Renderer* renderer );
 

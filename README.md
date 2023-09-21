@@ -11,3 +11,12 @@ Compile with following flags:
 * -lSDL2 
 * -lSDL2_image
 * -lSDL2_mixer
+
+## TODO
+* scene class
+* canvas class
+* custom width for input fields
+* transitions between scenes
+* animator class
+* transforms
+* math & physics library

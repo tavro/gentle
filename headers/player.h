@@ -33,11 +33,17 @@ class Player : public GameObject
 
 		void render( SDL_Rect& camera, SDL_Renderer* gRenderer );
 
-        Animation& getAnimation();
+		void addAnimation(std::string path, SDL_Renderer* renderer);
+        
+		Animation* getAnimation();
 
 		Particle* particles[ TOTAL_PARTICLES ];
     private:
-        Animation animation;
+		std::vector<Animation*> animations;
+        Animation* activeAnimation;
+
+		bool playAnimation = false;
+
 		void renderParticles(SDL_Renderer* gRenderer);
 };
 

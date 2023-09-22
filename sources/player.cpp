@@ -1,4 +1,5 @@
 #include "../headers/player.h"
+#include "../headers/tile_map.h"
 
 bool checkCollision2( SDL_Rect a, SDL_Rect b )
 {
@@ -40,12 +41,29 @@ bool checkCollision2( SDL_Rect a, SDL_Rect b )
     return true;
 }
 
+bool isSolid(Tile* t)
+{
+    switch(t->getType())
+    {
+        case (int)TileType::WALL_BOTTOM:
+        case (int)TileType::WALL_BOTTOM_LEFT:
+        case (int)TileType::WALL_BOTTOM_RIGHT:
+        case (int)TileType::WALL_TOP:
+        case (int)TileType::WALL_TOP_LEFT:
+        case (int)TileType::WALL_TOP_RIGHT:
+        case (int)TileType::WALL_CENTER:
+        case (int)TileType::WALL_LEFT:
+        case (int)TileType::WALL_RIGHT:
+            return true;
+    }
+    return false;
+}
+
 bool touchesWall( SDL_Rect box, Tile* tiles[] )
 {
     for( int i = 0; i < 300; ++i )
     {
-                                    // TILE_CENTER                       // TILE_TOPLEFT
-        if( ( tiles[ i ]->getType() >= 3 ) && ( tiles[ i ]->getType() <= 11 ) )
+        if( isSolid(tiles[ i ]) )
         {
             if( checkCollision2( box, tiles[ i ]->toBox() ) )
             {
@@ -69,7 +87,6 @@ Player::Player()
     }
 }
 
-
 Player::~Player()
 {
     for( int i = 0; i < TOTAL_PARTICLES; ++i )
@@ -78,26 +95,62 @@ Player::~Player()
     }
 }
 
+void Player::addAnimation(std::string path, SDL_Renderer* renderer)
+{
+    Animation* anim = new Animation{};
+    anim->loadTexture( renderer, path );
+    activeAnimation = anim;
+    animations.push_back(anim);
+}
+
 void Player::handleEvent( SDL_Event& e )
 {
 	if( e.type == SDL_KEYDOWN && e.key.repeat == 0 )
     {
         switch( e.key.keysym.sym )
         {
-            case SDLK_UP: getVelocity().decreaseY(VELOCITY); break;
-            case SDLK_DOWN: getVelocity().increaseY(VELOCITY); break;
-            case SDLK_LEFT: getVelocity().decreaseX(VELOCITY); break;
-            case SDLK_RIGHT: getVelocity().increaseX(VELOCITY); break;
+            case SDLK_UP: 
+                getVelocity().decreaseY(VELOCITY);
+                activeAnimation = animations[2]; 
+                playAnimation = true;
+            break;
+            case SDLK_DOWN: 
+                getVelocity().increaseY(VELOCITY); 
+                activeAnimation = animations[1]; 
+                playAnimation = true;
+            break;
+            case SDLK_LEFT: 
+                getVelocity().decreaseX(VELOCITY); 
+                activeAnimation = animations[3]; 
+                playAnimation = true;
+            break;
+            case SDLK_RIGHT: 
+                getVelocity().increaseX(VELOCITY); 
+                activeAnimation = animations[0]; 
+                playAnimation = true;
+            break;
         }
     }
     else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
     {
         switch( e.key.keysym.sym )
         {
-            case SDLK_UP: getVelocity().increaseY(VELOCITY); break;
-            case SDLK_DOWN: getVelocity().decreaseY(VELOCITY); break;
-            case SDLK_LEFT: getVelocity().increaseX(VELOCITY); break;
-            case SDLK_RIGHT: getVelocity().decreaseX(VELOCITY); break;
+            case SDLK_UP: 
+                getVelocity().increaseY(VELOCITY); 
+                playAnimation = false;
+            break;
+            case SDLK_DOWN: 
+                getVelocity().decreaseY(VELOCITY); 
+                playAnimation = false;
+            break;
+            case SDLK_LEFT: 
+                getVelocity().increaseX(VELOCITY); 
+                playAnimation = false;
+            break;
+            case SDLK_RIGHT: 
+                getVelocity().decreaseX(VELOCITY); 
+                playAnimation = false;
+            break;
         }
     }
 }
@@ -148,8 +201,14 @@ void Player::setCamera( SDL_Rect& camera )
 
 void Player::render( SDL_Rect& camera, SDL_Renderer* gRenderer )
 {
-    animation.render({getPosition().getX() - camera.x, getPosition().getY() - camera.y}, gRenderer);
-	//getTexture().render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);
+    if(playAnimation)
+    {
+        activeAnimation->render({getPosition().getX() - camera.x, getPosition().getY() - camera.y}, gRenderer);
+    }
+    else
+    {
+	    getTexture().render( getPosition().getX() - camera.x, getPosition().getY() - camera.y, NULL, 0.0, NULL, SDL_FLIP_NONE, gRenderer);
+    }
 	renderParticles(gRenderer);
 }
 
@@ -170,7 +229,7 @@ void Player::renderParticles(SDL_Renderer* gRenderer)
     }
 }
 
-Animation& Player::getAnimation()
+Animation* Player::getAnimation()
 {
-    return animation;
+    return activeAnimation;
 }

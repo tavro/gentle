@@ -13,7 +13,7 @@ Animation::Animation() {
 
 void Animation::tick() {
     frame++;
-    if (frame / 4 >= frameAmount) {
+    if (frame / skipFrames >= frameAmount) {
         frame = 0;
     }
 }
@@ -23,7 +23,7 @@ void Animation::addFrame(SDL_Rect frame) {
 }
 
 SDL_Rect& Animation::getCurrentFrame() {
-    return frames[ frame / 4 ];
+    return frames[ frame / skipFrames ];
 }
 
 bool Animation::loadTexture(SDL_Renderer* gRenderer, std::string path) {

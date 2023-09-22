@@ -225,8 +225,12 @@ bool loadMedia()
     audioSource.addSound( "./resources/medium.wav" );
     audioSource.addSound( "./resources/low.wav" );
 	
-    success = player.loadTexture( gRenderer, "./resources/dot.bmp" );
-    success = player.getAnimation().loadTexture( gRenderer, "./resources/dotanim.png" );
+    success = player.loadTexture( gRenderer, "./resources/player.bmp" );
+
+	player.addAnimation("./resources/playeranim1.png", gRenderer);
+	player.addAnimation("./resources/playeranim2.png", gRenderer);
+	player.addAnimation("./resources/playeranim3.png", gRenderer);
+	player.addAnimation("./resources/playeranim4.png", gRenderer);
 
     for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
         if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )

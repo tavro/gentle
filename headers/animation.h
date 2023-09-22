@@ -31,6 +31,7 @@ class Animation
         Texture sheetTexture;
         
         int frameAmount;
+        int skipFrames = 8;
         int frame;
         
         std::vector<SDL_Rect> frames;

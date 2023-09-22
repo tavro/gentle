@@ -76,6 +76,7 @@ bool init()
 	tileTypeMap[TileType::WALL_BOTTOM_LEFT] = "W Bottom Left";
 	tileTypeMap[TileType::WALL_LEFT] = "W Left";
 	tileTypeMap[TileType::WALL_TOP_LEFT] = "W Top Left";
+	tileTypeMap[TileType::GOLD] = "Gold";
 
     int y = SCREEN_HEIGHT + BUTTON_HEIGHT;
 	for(int i = 0; i < tileButtonAmount; i++)
@@ -90,6 +91,8 @@ bool init()
 
 		tileButtons.push_back(new Button {tileTypeMap[(TileType)i], x, y});
 	}
+
+	player.setPosition(Vector2D{SCREEN_WIDTH/2, SCREEN_HEIGHT/2});
 
 	bool success = true;
 

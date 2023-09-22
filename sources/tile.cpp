@@ -48,8 +48,8 @@ Tile::Tile( int x, int y, int tileType )
 
     type = tileType;
 }
-
-void Tile::render( SDL_Rect& camera, SDL_Rect (&gTileClips)[12], SDL_Renderer* gRenderer, Texture& gTileTexture )
+                                                // HARDCODED VALUE
+void Tile::render( SDL_Rect& camera, SDL_Rect (&gTileClips)[13], SDL_Renderer* gRenderer, Texture& gTileTexture )
 {
     if( checkCollision( camera, toBox() ) )
     {

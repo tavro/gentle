@@ -12,26 +12,22 @@
 
 using namespace std;
 
-const int TOTAL_TILES = 300;
-const int TOTAL_TILE_SPRITES = 12;
-
 enum class TileType {
     DIRT,
-    GRASS,
-    STONE,
-    WALL_CENTER,
+    WALL_TOP_LEFT,
     WALL_TOP,
     WALL_TOP_RIGHT,
-    WALL_RIGHT,
-    WALL_BOTTOM_RIGHT,
-    WALL_BOTTOM,
-    WALL_BOTTOM_LEFT,
+    GRASS,
     WALL_LEFT,
-    WALL_TOP_LEFT,
+    WALL_CENTER,
+    WALL_RIGHT,
+    STONE,
+    WALL_BOTTOM_LEFT,
+    WALL_BOTTOM,
+    WALL_BOTTOM_RIGHT,
+    GOLD,
     AMOUNT
 };
-
-const int WIDTH = 512 + 128;
 
 class TileMap
 {
@@ -54,8 +50,12 @@ class TileMap
         int getTileFromScreenPosition(int x, int y);
 
     private:
+	    static const int TOTAL_TILE_TYPES   = (int)TileType::AMOUNT;
+        static const int TOTAL_TILES        = 20 /* WIDTH OF MAP */ * 15 /* HEIGHT OF MAP */;
+        static const int TOTAL_PIXEL_WIDTH  = 20 * TILE_WIDTH; 
+        
         Tile* tiles[ TOTAL_TILES ];
-        SDL_Rect clips[ TOTAL_TILE_SPRITES ];
+        SDL_Rect clips[ TOTAL_TILE_TYPES ];
         Texture sheetTexture;
 };
 

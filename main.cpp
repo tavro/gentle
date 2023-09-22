@@ -8,6 +8,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <vector>
+#include <map>
 
 #include "./headers/texture.h"
 #include "./headers/particle.h"
@@ -22,6 +24,7 @@
 #include "./headers/canvas.h"
 #include "./headers/image.h"
 
+const int UI_AREA = 256;
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
@@ -39,25 +42,55 @@ Button startButton  {"Start",   SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIG
 Button optionsButton{"Options", SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 2 + 32};
 Button quitButton   {"Quit",    SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 3 + 48};
 
-Button dirtButton {"Dirt",  0,						SCREEN_HEIGHT - BUTTON_HEIGHT};
-Button stoneButton{"Stone", BUTTON_WIDTH + 16,		SCREEN_HEIGHT - BUTTON_HEIGHT};
-Button grassButton{"Grass", BUTTON_WIDTH * 2 + 32,	SCREEN_HEIGHT - BUTTON_HEIGHT};
+std::vector<Button*> tileButtons;
+int tileButtonAmount = (int)TileType::AMOUNT;
 
-Button saveButton{"Save", BUTTON_WIDTH + 16, 48};
+Button saveButton{"Save", BUTTON_WIDTH + 16, SCREEN_HEIGHT + UI_AREA - BUTTON_HEIGHT};
 
 Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Main Menu", SCREEN_WIDTH / 2 - (8*14) / 2, 0};
-Text selectedText{"Selected Tile: ", BUTTON_WIDTH * 3 + 48, SCREEN_HEIGHT - BUTTON_HEIGHT};
-InputField field{0, 48, 96, 28, 20};
+Text selectedText{"Selected Tile: ", BUTTON_WIDTH * 3 + 48, SCREEN_HEIGHT + BUTTON_HEIGHT};
+InputField field{0,  SCREEN_HEIGHT + UI_AREA - BUTTON_HEIGHT, 96, 28, 20};
 
 Player player;
 TileMap tileMap;
 AudioSource audioSource;
 
+std::map<TileType, std::string> tileTypeMap;
+
+
 bool init()
 {
+
+	tileTypeMap[TileType::DIRT] = "Dirt";
+	tileTypeMap[TileType::GRASS] = "Grass";
+	tileTypeMap[TileType::STONE] = "Stone";
+	tileTypeMap[TileType::WALL_CENTER] = "W Center";
+	tileTypeMap[TileType::WALL_TOP] = "W Top";
+	tileTypeMap[TileType::WALL_TOP_RIGHT] = "W Top Right";
+	tileTypeMap[TileType::WALL_RIGHT] = "W Right";
+	tileTypeMap[TileType::WALL_BOTTOM_RIGHT] = "W Bottom Right";
+	tileTypeMap[TileType::WALL_BOTTOM] = "W Bottom";
+	tileTypeMap[TileType::WALL_BOTTOM_LEFT] = "W Bottom Left";
+	tileTypeMap[TileType::WALL_LEFT] = "W Left";
+	tileTypeMap[TileType::WALL_TOP_LEFT] = "W Top Left";
+
+    int y = SCREEN_HEIGHT + BUTTON_HEIGHT;
+	for(int i = 0; i < tileButtonAmount; i++)
+	{
+		int x = BUTTON_WIDTH * i + 16 * i;
+
+        if (x >= (SCREEN_WIDTH - BUTTON_WIDTH)) {
+			int result = x / (SCREEN_WIDTH - BUTTON_WIDTH);
+			x = (BUTTON_WIDTH * i + 16 * i) - (result * (SCREEN_WIDTH - BUTTON_WIDTH)); // FIX: a bit offset
+            y = SCREEN_HEIGHT + BUTTON_HEIGHT + (BUTTON_HEIGHT + 16) * result;
+        }
+
+		tileButtons.push_back(new Button {tileTypeMap[(TileType)i], x, y});
+	}
+
 	bool success = true;
 
 	if( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO ) < 0 )
@@ -72,7 +105,7 @@ bool init()
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}
 
-		gWindow = SDL_CreateWindow( "SDL Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
+		gWindow = SDL_CreateWindow( "SDL Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
 		if( gWindow == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -130,9 +163,10 @@ bool loadMedia()
 	optionsButton.getText().loadFont( "./resources/font.ttf", 28 );
 	quitButton.getText().loadFont( "./resources/font.ttf", 28 );
 
-	dirtButton.getText().loadFont( "./resources/font.ttf", 28 );
-	stoneButton.getText().loadFont( "./resources/font.ttf", 28 );
-	grassButton.getText().loadFont( "./resources/font.ttf", 28 );
+	for(int i = 0; i < tileButtonAmount; i++)
+	{
+		tileButtons[i]->getText().loadFont( "./resources/font.ttf", 28 );
+	}
 
 	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
 
@@ -154,9 +188,10 @@ bool loadMedia()
     optionsButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
     quitButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
 	
-	dirtButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
-	stoneButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
-	grassButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	for(int i = 0; i < tileButtonAmount; i++)
+	{
+		tileButtons[i]->loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	}
 
 	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
 	
@@ -174,9 +209,10 @@ bool loadMedia()
 	canvas.addObj(&quitButton);
 
 	selectionCanvas.addObj(&saveButton);
-	selectionCanvas.addObj(&dirtButton);
-	selectionCanvas.addObj(&stoneButton);
-	selectionCanvas.addObj(&grassButton);
+	for(int i = 0; i < tileButtonAmount; i++)
+	{
+		selectionCanvas.addObj(tileButtons[i]);
+	}
 	selectionCanvas.setActive(false);
 
     audioSource.addMusic( "./resources/beat.wav" );
@@ -257,9 +293,10 @@ void close()
 	optionsButton.getTexture().free();
 	quitButton.getTexture().free();
 
-	dirtButton.getTexture().free();
-	stoneButton.getTexture().free();
-	grassButton.getTexture().free();
+	for(int i = 0; i < tileButtonAmount; i++)
+	{
+		tileButtons[i]->getTexture().free();
+	}
 
 	saveButton.getTexture().free();
 
@@ -390,17 +427,20 @@ int main( int argc, char* args[] )
 					}
 					else
 					{
-						switch( e.type )
+						int mouseX, mouseY;
+						SDL_GetMouseState( &mouseX, &mouseY );
+						if(mouseY <= SCREEN_HEIGHT)
 						{
-							case SDL_MOUSEBUTTONDOWN:
-							int mouseX, mouseY;
-							SDL_GetMouseState( &mouseX, &mouseY );
-							int tileX = (mouseX / TILE_WIDTH);
-							int tileY = (mouseY / TILE_HEIGHT);
-							int index = tileMap.getTileFromScreenPosition(mouseX, mouseY);
-							Tile* t = new Tile( tileX*TILE_WIDTH, tileY*TILE_HEIGHT, currentTile );
-							tileMap.setTile(index, t);
-							break;
+							switch( e.type )
+							{
+								case SDL_MOUSEBUTTONDOWN:
+								int tileX = (mouseX / TILE_WIDTH);
+								int tileY = (mouseY / TILE_HEIGHT);
+								int index = tileMap.getTileFromScreenPosition(mouseX, mouseY);
+								Tile* t = new Tile( tileX*TILE_WIDTH, tileY*TILE_HEIGHT, currentTile );
+								tileMap.setTile(index, t);
+								break;
+							}
 						}
 					}
 
@@ -409,9 +449,12 @@ int main( int argc, char* args[] )
 					//quitButton.handleEvent( &e );
 
 					saveButton.handleEvent( &e );
-					dirtButton.handleEvent( &e );
-					stoneButton.handleEvent( &e );
-					grassButton.handleEvent( &e );
+
+					
+					for(int i = 0; i < tileButtonAmount; i++)
+					{
+						tileButtons[i]->handleEvent( &e );
+					}
 
 					field.handleEvent( &e );
 					player.handleEvent( e );
@@ -428,32 +471,22 @@ int main( int argc, char* args[] )
 					quit = true;
 				}
 
-				if(dirtButton.isToggled())
+
+				for(int i = 0; i < tileButtonAmount; i++)
 				{
-					selectedText.updateContent("Selected Tile: Dirt");
-                	selectedText.loadTexture(gRenderer);
-					dirtButton.setToggle(false);
-					stoneButton.setToggle(false);
-					grassButton.setToggle(false);
-					currentTile = TILE_RED;
-				}
-				else if(stoneButton.isToggled())
-				{
-					selectedText.updateContent("Selected Tile: Stone");
-                	selectedText.loadTexture(gRenderer);
-					dirtButton.setToggle(false);
-					stoneButton.setToggle(false);
-					grassButton.setToggle(false);
-					currentTile = TILE_BLUE;
-				}
-				else if(grassButton.isToggled())
-				{
-					selectedText.updateContent("Selected Tile: Grass");
-                	selectedText.loadTexture(gRenderer);
-					dirtButton.setToggle(false);
-					stoneButton.setToggle(false);
-					grassButton.setToggle(false);
-					currentTile = TILE_GREEN;
+					if(tileButtons[i]->isToggled())
+					{
+						selectedText.updateContent("Selected Tile: X");
+						selectedText.loadTexture(gRenderer);
+						
+						for(int j = 0; j < tileButtonAmount; j++)
+						{
+							tileButtons[j]->setToggle(false);
+						}
+						
+						currentTile = i;
+						break;
+					}
 				}
 
 				if(saveButton.isToggled())

@@ -15,18 +15,21 @@ using namespace std;
 const int TOTAL_TILES = 300;
 const int TOTAL_TILE_SPRITES = 12;
 
-const int TILE_RED = 0;
-const int TILE_GREEN = 1;
-const int TILE_BLUE = 2;
-const int TILE_CENTER = 3;
-const int TILE_TOP = 4;
-const int TILE_TOPRIGHT = 5;
-const int TILE_RIGHT = 6;
-const int TILE_BOTTOMRIGHT = 7;
-const int TILE_BOTTOM = 8;
-const int TILE_BOTTOMLEFT = 9;
-const int TILE_LEFT = 10;
-const int TILE_TOPLEFT = 11;
+enum class TileType {
+    DIRT,
+    GRASS,
+    STONE,
+    WALL_CENTER,
+    WALL_TOP,
+    WALL_TOP_RIGHT,
+    WALL_RIGHT,
+    WALL_BOTTOM_RIGHT,
+    WALL_BOTTOM,
+    WALL_BOTTOM_LEFT,
+    WALL_LEFT,
+    WALL_TOP_LEFT,
+    AMOUNT
+};
 
 const int WIDTH = 512 + 128;
 

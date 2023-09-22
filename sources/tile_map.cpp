@@ -33,8 +33,29 @@ void TileMap::saveTilesToFile(std::string name)
         std::cerr << "Error: Unable to open the file for writing." << std::endl;
     }
 
+	const int MAX_X = 20;
+	int x = 0;
     for (int i = 0; i < TOTAL_TILES; ++i) {
-        outFile << tiles[i]->getType() << std::endl;
+		std::stringstream ss;
+		ss << tiles[i]->getType();
+		if(ss.str().length() == 1) // num is one digit
+		{
+        	outFile << "0" + ss.str();
+		}
+		else
+		{
+        	outFile << tiles[i]->getType();
+		}
+		x++;
+		if(x >= MAX_X)
+		{
+			x = 0;
+			outFile << std::endl;
+		}
+		else
+		{
+			outFile << " ";
+		}
     }
 
     outFile.close();
@@ -98,65 +119,65 @@ bool TileMap::setTiles(std::string mapPath)
 		
 		if( tilesLoaded )
 		{
-			clips[ TILE_RED ].x = 0;
-			clips[ TILE_RED ].y = 0;
-			clips[ TILE_RED ].w = TILE_WIDTH;
-			clips[ TILE_RED ].h = TILE_HEIGHT;
+			clips[ (int)TileType::DIRT ].x = 0;
+			clips[ (int)TileType::DIRT ].y = 0;
+			clips[ (int)TileType::DIRT ].w = TILE_WIDTH;
+			clips[ (int)TileType::DIRT ].h = TILE_HEIGHT;
 
-			clips[ TILE_GREEN ].x = 0;
-			clips[ TILE_GREEN ].y = TILE_HEIGHT;
-			clips[ TILE_GREEN ].w = TILE_WIDTH;
-			clips[ TILE_GREEN ].h = TILE_HEIGHT;
+			clips[ (int)TileType::GRASS ].x = 0;
+			clips[ (int)TileType::GRASS ].y = TILE_HEIGHT;
+			clips[ (int)TileType::GRASS ].w = TILE_WIDTH;
+			clips[ (int)TileType::GRASS ].h = TILE_HEIGHT;
 
-			clips[ TILE_BLUE ].x = 0;
-			clips[ TILE_BLUE ].y = TILE_HEIGHT * 2;
-			clips[ TILE_BLUE ].w = TILE_WIDTH;
-			clips[ TILE_BLUE ].h = TILE_HEIGHT;
+			clips[ (int)TileType::STONE ].x = 0;
+			clips[ (int)TileType::STONE ].y = TILE_HEIGHT * 2;
+			clips[ (int)TileType::STONE ].w = TILE_WIDTH;
+			clips[ (int)TileType::STONE ].h = TILE_HEIGHT;
 
-			clips[ TILE_TOPLEFT ].x = TILE_WIDTH;
-			clips[ TILE_TOPLEFT ].y = 0;
-			clips[ TILE_TOPLEFT ].w = TILE_WIDTH;
-			clips[ TILE_TOPLEFT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_TOP_LEFT ].x = TILE_WIDTH;
+			clips[ (int)TileType::WALL_TOP_LEFT ].y = 0;
+			clips[ (int)TileType::WALL_TOP_LEFT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_TOP_LEFT ].h = TILE_HEIGHT;
 
-			clips[ TILE_LEFT ].x = TILE_WIDTH;
-			clips[ TILE_LEFT ].y = TILE_HEIGHT;
-			clips[ TILE_LEFT ].w = TILE_WIDTH;
-			clips[ TILE_LEFT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_LEFT ].x = TILE_WIDTH;
+			clips[ (int)TileType::WALL_LEFT ].y = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_LEFT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_LEFT ].h = TILE_HEIGHT;
 
-			clips[ TILE_BOTTOMLEFT ].x = TILE_WIDTH;
-			clips[ TILE_BOTTOMLEFT ].y = TILE_HEIGHT * 2;
-			clips[ TILE_BOTTOMLEFT ].w = TILE_WIDTH;
-			clips[ TILE_BOTTOMLEFT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_BOTTOM_LEFT ].x = TILE_WIDTH;
+			clips[ (int)TileType::WALL_BOTTOM_LEFT ].y = TILE_HEIGHT * 2;
+			clips[ (int)TileType::WALL_BOTTOM_LEFT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_BOTTOM_LEFT ].h = TILE_HEIGHT;
 
-			clips[ TILE_TOP ].x = TILE_WIDTH * 2;
-			clips[ TILE_TOP ].y = 0;
-			clips[ TILE_TOP ].w = TILE_WIDTH;
-			clips[ TILE_TOP ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_TOP ].x = TILE_WIDTH * 2;
+			clips[ (int)TileType::WALL_TOP ].y = 0;
+			clips[ (int)TileType::WALL_TOP ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_TOP ].h = TILE_HEIGHT;
 
-			clips[ TILE_CENTER ].x = TILE_WIDTH * 2;
-			clips[ TILE_CENTER ].y = TILE_HEIGHT;
-			clips[ TILE_CENTER ].w = TILE_WIDTH;
-			clips[ TILE_CENTER ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_CENTER ].x = TILE_WIDTH * 2;
+			clips[ (int)TileType::WALL_CENTER ].y = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_CENTER ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_CENTER ].h = TILE_HEIGHT;
 
-			clips[ TILE_BOTTOM ].x = TILE_WIDTH * 2;
-			clips[ TILE_BOTTOM ].y = TILE_HEIGHT * 2;
-			clips[ TILE_BOTTOM ].w = TILE_WIDTH;
-			clips[ TILE_BOTTOM ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_BOTTOM ].x = TILE_WIDTH * 2;
+			clips[ (int)TileType::WALL_BOTTOM ].y = TILE_HEIGHT * 2;
+			clips[ (int)TileType::WALL_BOTTOM ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_BOTTOM ].h = TILE_HEIGHT;
 
-			clips[ TILE_TOPRIGHT ].x = TILE_WIDTH * 3;
-			clips[ TILE_TOPRIGHT ].y = 0;
-			clips[ TILE_TOPRIGHT ].w = TILE_WIDTH;
-			clips[ TILE_TOPRIGHT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_TOP_RIGHT ].x = TILE_WIDTH * 3;
+			clips[ (int)TileType::WALL_TOP_RIGHT ].y = 0;
+			clips[ (int)TileType::WALL_TOP_RIGHT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_TOP_RIGHT ].h = TILE_HEIGHT;
 
-			clips[ TILE_RIGHT ].x = TILE_WIDTH * 3;
-			clips[ TILE_RIGHT ].y = TILE_HEIGHT;
-			clips[ TILE_RIGHT ].w = TILE_WIDTH;
-			clips[ TILE_RIGHT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_RIGHT ].x = TILE_WIDTH * 3;
+			clips[ (int)TileType::WALL_RIGHT ].y = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_RIGHT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_RIGHT ].h = TILE_HEIGHT;
 
-			clips[ TILE_BOTTOMRIGHT ].x = TILE_WIDTH * 3;
-			clips[ TILE_BOTTOMRIGHT ].y = TILE_HEIGHT * 2;
-			clips[ TILE_BOTTOMRIGHT ].w = TILE_WIDTH;
-			clips[ TILE_BOTTOMRIGHT ].h = TILE_HEIGHT;
+			clips[ (int)TileType::WALL_BOTTOM_RIGHT ].x = TILE_WIDTH * 3;
+			clips[ (int)TileType::WALL_BOTTOM_RIGHT ].y = TILE_HEIGHT * 2;
+			clips[ (int)TileType::WALL_BOTTOM_RIGHT ].w = TILE_WIDTH;
+			clips[ (int)TileType::WALL_BOTTOM_RIGHT ].h = TILE_HEIGHT;
 		}
 	}
 

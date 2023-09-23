@@ -1,20 +1,43 @@
 #include "../headers/button.h"
 
-Button::Button(std::string content, int x, int y): UIStateObject(x, y, BUTTON_WIDTH, BUTTON_HEIGHT)
+Button::Button(std::string content, int x, int y, int w, int h): UIStateObject(x, y, w, h)
 {
     setText(content);
 
     int fontSize = 14;
     int contentLength = (content.length()-1) * fontSize;
 
-    text.setPosition(x + BUTTON_WIDTH / 2 - contentLength / 2, y);
+    text.setPosition(x + getSize().getX() / 2 - contentLength / 2, y);
 
     setPosition(x, y);
     setCurrentState( UI_MOUSE_OUT );
-    addSpriteClip( { 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT } );
-    addSpriteClip( { 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT } );
-    addSpriteClip( { 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT } );
-    addSpriteClip( { 0, 0, BUTTON_WIDTH, BUTTON_HEIGHT } );
+
+    // Initialize left, middle, right sprite clips
+    for( int i = 0; i < 12; i++ ) 
+    {
+        addSpriteClip( { 0, 0, 0, 0 } );
+    }
+}
+
+Button::Button(std::string content, int x, int y): UIStateObject(x, y, 0, 0)
+{
+    setText(content);
+
+    int fontSize = 14;
+    int contentLength = (content.length()-1) * fontSize;
+
+    setSize(contentLength+MINIMUM_WIDTH, BH);
+
+    text.setPosition(x + getSize().getX() / 2 - contentLength / 2, y);
+
+    setPosition(x, y);
+    setCurrentState( UI_MOUSE_OUT );
+
+    // Initialize left, middle, right sprite clips
+    for( int i = 0; i < 12; i++ ) 
+    {
+        addSpriteClip( { 0, 0, 0, 0 } );
+    }
 }
 
 Text& Button::getText()
@@ -35,11 +58,18 @@ void Button::loadTextTexture(SDL_Renderer* renderer)
 void Button::loadSpriteSheet(std::string path, SDL_Renderer* renderer)
 {
     getTexture().loadFromFile( path, renderer );
-    for( int i = 0; i < 4; ++i )
+    spriteSheet2.loadFromFile( "./resources/buttonsheet-middle.png", renderer );
+
+    // Update size and position for sprite clips
+    for( int j = 0; j < 3; j++ )
     {
-        getSpriteClip( i ).x = 0;
-        getSpriteClip( i ).y = i * BUTTON_HEIGHT;
-        getSpriteClip( i ).w = BUTTON_WIDTH;
-        getSpriteClip( i ).h = BUTTON_HEIGHT;
+        for( int i = 0; i < 4; ++i )
+        {
+            getSpriteClip( i + j*4).x = BH*j;
+            getSpriteClip( i + j*4).y = i * getSize().getY();
+            getSpriteClip( i + j*4).w = getSize().getY();
+            getSpriteClip( i + j*4).h = getSize().getY();
+        }
     }
+
 }

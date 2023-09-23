@@ -13,6 +13,8 @@ class UIObject
 
 		void setPosition( int x, int y );
 
+        void setSize( int w, int h );
+
         virtual void handleEvent(SDL_Event* e)
         {
 

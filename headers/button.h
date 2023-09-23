@@ -6,12 +6,10 @@
 #include "./ui_state_object.h"
 #include "./text.h"
 
-const int BUTTON_WIDTH = 96;
-const int BUTTON_HEIGHT = 32;
-
 class Button : public UIStateObject
 {
 	public:
+		Button(std::string content, int x, int y, int w, int h);
 		Button(std::string content, int x, int y);
 		
 		Text& getText();
@@ -22,9 +20,20 @@ class Button : public UIStateObject
 
 		void render(SDL_Renderer* renderer) override
         {
-			// TODO: Set width based on text amount => getSpriteClip(getCurrentState()).w = BUTTON_WIDTH * 2;
-			// Do this for InputField as well
-            getTexture().render( getPosition().getX(), getPosition().getY(), &getSpriteClip(getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+			if(getSize().getX() <= MINIMUM_WIDTH)
+			{
+            	getTexture().render( getPosition().getX(), 	getPosition().getY(), &getSpriteClip(getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+            	getTexture().render( getPosition().getX()+BH, 	getPosition().getY(), &getSpriteClip(8 + getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+			}
+			else
+			{
+				const int MIDDLE_WIDTH = getSize().getX() - MINIMUM_WIDTH;
+				getSpriteClip(4 + getCurrentState()).w = MIDDLE_WIDTH;
+            	getTexture().render( getPosition().getX(), 	getPosition().getY(), &getSpriteClip(getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+            	spriteSheet2.render( getPosition().getX()+BH, 		getPosition().getY(), &getSpriteClip(4 + getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+            	getTexture().render( getPosition().getX()+MIDDLE_WIDTH+BH, 	getPosition().getY(), &getSpriteClip(8 + getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
+			}
+
 			text.loadTexture(renderer);
             text.render(renderer);
         }
@@ -32,6 +41,11 @@ class Button : public UIStateObject
 		void loadSpriteSheet(std::string path, SDL_Renderer* renderer);
 
 	private:
+		static const int BH = 32;
+		static const int MINIMUM_WIDTH = BH*2;
+
+		Texture spriteSheet2; // TODO: Fix this. This is just because I'm lazy and want to move foward.
+
 		Text text{" ", 0, 0};
 };
 

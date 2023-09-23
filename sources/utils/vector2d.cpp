@@ -32,6 +32,12 @@ void Vector2D::setY(float y)
     this->y = y;
 }
 
+void Vector2D::set(float x, float y)
+{
+    this->x = x;
+    this->y = y;
+}
+
 Vector2D Vector2D::operator+(const Vector2D& v2) const
 {
     return Vector2D(x + v2.x, y + v2.y);

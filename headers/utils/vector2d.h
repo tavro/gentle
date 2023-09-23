@@ -12,6 +12,8 @@ class Vector2D {
         void setX(float x);
         void setY(float y);
 
+        void set(float x, float y);
+
         void increaseX(float amount);
         void increaseY(float amount);
 

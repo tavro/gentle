@@ -28,6 +28,9 @@ const int UI_AREA = 256;
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
+const int BUTTON_WIDTH = 96;
+const int BUTTON_HEIGHT = 32;
+
 bool init();
 bool loadMedia();
 void close();
@@ -38,14 +41,14 @@ SDL_Renderer*   renderer = NULL;
 Canvas canvas;
 Canvas selectionCanvas;
 
-Button startButton  {"Start",   SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT + 16};
-Button optionsButton{"Options", SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 2 + 32};
-Button quitButton   {"Quit",    SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 3 + 48};
+Button startButton  {"Start",   SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT + 16, 	 96, BUTTON_HEIGHT};
+Button optionsButton{"Options", SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 2 + 32, 96, BUTTON_HEIGHT};
+Button quitButton   {"Quit",    SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 3 + 48, 96, BUTTON_HEIGHT};
 
 std::vector<Button*> tileButtons;
 int tileButtonAmount = (int)TileType::AMOUNT;
 
-Button saveButton{"Save", BUTTON_WIDTH + 16, SCREEN_HEIGHT + UI_AREA - BUTTON_HEIGHT};
+Button saveButton{"Save", BUTTON_WIDTH + 16, SCREEN_HEIGHT + UI_AREA - BUTTON_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
 
 Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 

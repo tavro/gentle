@@ -54,6 +54,7 @@ bool isSolid(Tile* t)
         case (int)TileType::WALL_CENTER:
         case (int)TileType::WALL_LEFT:
         case (int)TileType::WALL_RIGHT:
+        case (int)TileType::GOLD:
             return true;
     }
     return false;
@@ -174,6 +175,7 @@ void Player::move( Tile *tiles[] )
         // move back
         getPosition().decreaseY(getVelocity().getY());
     }
+
 }
 
 void Player::setCamera( SDL_Rect& camera )

@@ -14,6 +14,10 @@ class Canvas
 
         void setActive(bool state);
 
+        void handleEvent(SDL_Event* e);
+
+        void freeTextures();
+
         void addObj(UIObject* obj);
 
     private:

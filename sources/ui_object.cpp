@@ -27,3 +27,8 @@ Vector2D& UIObject::getSize()
 {
     return size;
 }
+
+void UIObject::freeTexture()
+{
+    texture.free();   
+}

@@ -16,6 +16,25 @@ void Canvas::render(SDL_Renderer* renderer)
     }
 }
 
+void Canvas::handleEvent(SDL_Event* e)
+{
+    if (isActive)
+    {
+        for (auto* obj: objs)
+        {
+            obj->handleEvent(e);
+        }
+    }
+}
+
+void Canvas::freeTextures()
+{
+    for (auto* obj: objs)
+    {
+        obj->freeTexture();
+    }
+}
+
 void Canvas::addObj(UIObject* obj)
 {
     objs.push_back(obj);

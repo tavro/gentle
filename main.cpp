@@ -32,8 +32,8 @@ bool init();
 bool loadMedia();
 void close();
 
-SDL_Window*     gWindow   = NULL;
-SDL_Renderer*   gRenderer = NULL;
+SDL_Window*     window 	 = NULL;
+SDL_Renderer*   renderer = NULL;
 
 Canvas canvas;
 Canvas selectionCanvas;
@@ -60,10 +60,8 @@ AudioSource audioSource;
 
 std::map<TileType, std::string> tileTypeMap;
 
-
 bool init()
 {
-
 	tileTypeMap[TileType::DIRT] = "Dirt";
 	tileTypeMap[TileType::GRASS] = "Grass";
 	tileTypeMap[TileType::STONE] = "Stone";
@@ -108,23 +106,23 @@ bool init()
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}
 
-		gWindow = SDL_CreateWindow( "SDL Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
-		if( gWindow == NULL )
+		window = SDL_CreateWindow( "SDL Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
+		if( window == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
 			success = false;
 		}
 		else
 		{
-			gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-			if( gRenderer == NULL )
+			renderer = SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
+			if( renderer == NULL )
 			{
 				printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
 				success = false;
 			}
 			else
 			{
-				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
+				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 
 				int imgFlags = IMG_INIT_PNG;
 				if( !( IMG_Init( imgFlags ) & imgFlags ) )
@@ -155,10 +153,10 @@ bool loadMedia()
 {
 	bool success = true;
 
-	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", gRenderer );
+	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
 	canvas.addObj(&mainMenuImg);
 
-    success = tileMap.loadTexture( gRenderer, "./resources/tilesheet.png" );
+    success = tileMap.loadTexture( renderer, "./resources/tilesheet.png" );
     
 	field.getText().loadFont( "./resources/font.ttf", 28 );
 
@@ -174,29 +172,29 @@ bool loadMedia()
 	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
 
     success = promtText.loadFont( "./resources/font.ttf", 28 );
-    success = promtText.loadTexture( gRenderer );
+    success = promtText.loadTexture( renderer );
 	canvas.addObj(&promtText);
 
 	success = selectedText.loadFont( "./resources/font.ttf", 28 );
-    success = selectedText.loadTexture( gRenderer );
+    success = selectedText.loadTexture( renderer );
 	selectionCanvas.addObj(&selectedText);
 
     success = FPSText.loadFont( "./resources/font.ttf", 28 );
-    success = FPSText.loadTexture( gRenderer );
+    success = FPSText.loadTexture( renderer );
 	canvas.addObj(&FPSText);
 
-	field.getTexture().loadFromFile( "./resources/buttonsheet.png", gRenderer );
+	field.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
 
-    startButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
-    optionsButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
-    quitButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+    startButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+    optionsButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+    quitButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
 	
 	for(int i = 0; i < tileButtonAmount; i++)
 	{
-		tileButtons[i]->loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+		tileButtons[i]->loadSpriteSheet( "./resources/buttonsheet.png", renderer );
 	}
 
-	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", gRenderer );
+	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
 	
 	for( int i = 0; i < 4; ++i )
 	{
@@ -225,33 +223,33 @@ bool loadMedia()
     audioSource.addSound( "./resources/medium.wav" );
     audioSource.addSound( "./resources/low.wav" );
 	
-    success = player.loadTexture( gRenderer, "./resources/player.bmp" );
+    success = player.loadTexture( renderer, "./resources/player.bmp" );
 
-	player.addAnimation("./resources/playeranim1.png", gRenderer);
-	player.addAnimation("./resources/playeranim2.png", gRenderer);
-	player.addAnimation("./resources/playeranim3.png", gRenderer);
-	player.addAnimation("./resources/playeranim4.png", gRenderer);
+	player.addAnimation("./resources/playeranim1.png", renderer);
+	player.addAnimation("./resources/playeranim2.png", renderer);
+	player.addAnimation("./resources/playeranim3.png", renderer);
+	player.addAnimation("./resources/playeranim4.png", renderer);
 
     for(int i = 0; i < player.TOTAL_PARTICLES; i++) {
-        if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", gRenderer ) )
+        if( !player.particles[i]->redTexture.loadFromFile( "./resources/red.bmp", renderer ) )
         {
             printf( "Failed to load red texture!\n" );
             success = false;
         }
 
-        if( !player.particles[i]->greenTexture.loadFromFile( "./resources/green.bmp", gRenderer ) )
+        if( !player.particles[i]->greenTexture.loadFromFile( "./resources/green.bmp", renderer ) )
         {
             printf( "Failed to load green texture!\n" );
             success = false;
         }
 
-        if( !player.particles[i]->blueTexture.loadFromFile( "./resources/blue.bmp", gRenderer ) )
+        if( !player.particles[i]->blueTexture.loadFromFile( "./resources/blue.bmp", renderer ) )
         {
             printf( "Failed to load blue texture!\n" );
             success = false;
         }
 
-        if( !player.particles[i]->shimmerTexture.loadFromFile( "./resources/shimmer.bmp", gRenderer ) )
+        if( !player.particles[i]->shimmerTexture.loadFromFile( "./resources/shimmer.bmp", renderer ) )
         {
             printf( "Failed to load shimmer texture!\n" );
             success = false;
@@ -289,31 +287,19 @@ void close()
         player.particles[i]->shimmerTexture.free();
     }
 
-	FPSText.getTexture().free();
-	promtText.getTexture().free();
-	selectedText.getTexture().free();
-	// gInputTextTexture.free();
+	canvas.freeTextures();
+	selectionCanvas.freeTextures();
+
 	player.getTexture().free();
 	tileMap.getTexture().free();
-
-	startButton.getTexture().free();
-	optionsButton.getTexture().free();
-	quitButton.getTexture().free();
-
-	for(int i = 0; i < tileButtonAmount; i++)
-	{
-		tileButtons[i]->getTexture().free();
-	}
-
-	saveButton.getTexture().free();
 
 	//TTF_CloseFont( globalFont );
 	// globalFont = NULL;
 
-	SDL_DestroyRenderer( gRenderer );
-	SDL_DestroyWindow( gWindow );
-	gWindow = NULL;
-	gRenderer = NULL;
+	SDL_DestroyRenderer( renderer );
+	SDL_DestroyWindow( window );
+	window = NULL;
+	renderer = NULL;
 
 	Mix_Quit();
 	TTF_Quit();
@@ -352,7 +338,7 @@ int main( int argc, char* args[] )
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 			field.setText("Sample Text");
-			field.loadTextTexture(gRenderer);
+			field.loadTextTexture(renderer);
 
 			SDL_StartTextInput();
 
@@ -451,20 +437,9 @@ int main( int argc, char* args[] )
 						}
 					}
 
-					startButton.handleEvent( &e );
-					optionsButton.handleEvent( &e );
-					//quitButton.handleEvent( &e );
+					canvas.handleEvent( &e );
+					selectionCanvas.handleEvent( &e );
 
-					saveButton.handleEvent( &e );
-
-					
-					for(int i = 0; i < tileButtonAmount; i++)
-					{
-						tileButtons[i]->handleEvent( &e );
-					}
-
-					field.handleEvent( &e );
-					player.handleEvent( e );
 				}
 
 				if(startButton.isToggled())
@@ -478,13 +453,12 @@ int main( int argc, char* args[] )
 					quit = true;
 				}
 
-
 				for(int i = 0; i < tileButtonAmount; i++)
 				{
 					if(tileButtons[i]->isToggled())
 					{
 						selectedText.updateContent("Selected Tile: X");
-						selectedText.loadTexture(gRenderer);
+						selectedText.loadTexture(renderer);
 						
 						for(int j = 0; j < tileButtonAmount; j++)
 						{
@@ -511,22 +485,22 @@ int main( int argc, char* args[] )
 				timeText.str( "" );
 				timeText << "Average FPS: " << avgFPS;
                 FPSText.updateContent(timeText.str());
-                FPSText.loadTexture(gRenderer);
+                FPSText.loadTexture(renderer);
 
 				player.move( tileMap.getTiles() );
 				player.setCamera( camera );
 
-				SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-				SDL_RenderClear( gRenderer );
+				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
+				SDL_RenderClear( renderer );
 
-                tileMap.render( camera, gRenderer );
+                tileMap.render( camera, renderer );
 
-				player.render ( camera, gRenderer );
+				player.render ( camera, renderer );
 
-                canvas.render(gRenderer);
-				selectionCanvas.render(gRenderer);
+                canvas.render(renderer);
+				selectionCanvas.render(renderer);
 
-				SDL_RenderPresent( gRenderer );
+				SDL_RenderPresent( renderer );
 
 				++countedFrames;
 				int frameTicks = capTimer.getTicks();

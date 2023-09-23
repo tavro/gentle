@@ -22,6 +22,8 @@ class Button : public UIStateObject
 
 		void render(SDL_Renderer* renderer) override
         {
+			// TODO: Set width based on text amount => getSpriteClip(getCurrentState()).w = BUTTON_WIDTH * 2;
+			// Do this for InputField as well
             getTexture().render( getPosition().getX(), getPosition().getY(), &getSpriteClip(getCurrentState()), 0.0, NULL, SDL_FLIP_NONE, renderer );
 			text.loadTexture(renderer);
             text.render(renderer);

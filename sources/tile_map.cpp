@@ -48,7 +48,7 @@ void TileMap::saveTilesToFile(std::string name)
 
 TileMap::TileMap()
 {
-    setTiles("./resources/dkg2.map");
+    setTiles("./resources/dkg-gold.map");
 }
 
 bool TileMap::setTiles(std::string mapPath)

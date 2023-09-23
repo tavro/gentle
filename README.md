@@ -8,7 +8,7 @@ Install following SDL packages with your package manager:
 * SDL_mixer
 
 Compile with following flags:
-* -lSDL2 
+* -lSDL2_ttf
 * -lSDL2_image
 * -lSDL2_mixer
 

@@ -24,7 +24,7 @@
 #include "./headers/canvas.h"
 #include "./headers/image.h"
 
-const int UI_AREA = 256;
+const int UI_AREA = 256+64;
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
 
@@ -54,7 +54,6 @@ Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 Text promtText{"Main Menu", SCREEN_WIDTH / 2 - (8*14) / 2, 0};
-Text selectedText{"Selected Tile: ", BUTTON_WIDTH * 3 + 48, SCREEN_HEIGHT + BUTTON_HEIGHT};
 InputField field{0,  SCREEN_HEIGHT + UI_AREA - BUTTON_HEIGHT, 96, 28, 20};
 
 Player player;
@@ -79,18 +78,31 @@ bool init()
 	tileTypeMap[TileType::WALL_TOP_LEFT] = "W Top Left";
 	tileTypeMap[TileType::GOLD] = "Gold";
 
+	int totalButtonWidth = 0;
+	const int BUTTON_OFFSET = 16;
     int y = SCREEN_HEIGHT + BUTTON_HEIGHT;
+	int row = 0;
+
 	for(int i = 0; i < tileButtonAmount; i++)
 	{
-		int x = BUTTON_WIDTH * i + 16 * i;
+		Button* b = new Button(tileTypeMap[(TileType)i], 0, 0);
+		const int B_WIDTH = b->getSize().getX();
+		
+		int x = totalButtonWidth;
 
-        if (x >= (SCREEN_WIDTH - BUTTON_WIDTH)) {
-			int result = x / (SCREEN_WIDTH - BUTTON_WIDTH);
-			x = (BUTTON_WIDTH * i + 16 * i) - (result * (SCREEN_WIDTH - BUTTON_WIDTH)); // FIX: a bit offset
-            y = SCREEN_HEIGHT + BUTTON_HEIGHT + (BUTTON_HEIGHT + 16) * result;
+        if (x >= (SCREEN_WIDTH - B_WIDTH)) { // outside screen
+			row++;
+			totalButtonWidth = 0;
+			x = 0;
+            y = SCREEN_HEIGHT + BUTTON_HEIGHT + (BUTTON_HEIGHT + BUTTON_OFFSET) * row;
         }
+		
+		totalButtonWidth += B_WIDTH + BUTTON_OFFSET;
 
-		tileButtons.push_back(new Button {tileTypeMap[(TileType)i], x, y});
+		b->setPosition(x, y);
+		b->getText().setPosition(x + b->getSize().getX() / 2 - ((b->getText().getContent().length()-1) * 14) / 2, y);
+
+		tileButtons.push_back(b);
 	}
 
 	player.setPosition(Vector2D{SCREEN_WIDTH/2, SCREEN_HEIGHT/2});
@@ -177,10 +189,6 @@ bool loadMedia()
     success = promtText.loadFont( "./resources/font.ttf", 28 );
     success = promtText.loadTexture( renderer );
 	canvas.addObj(&promtText);
-
-	success = selectedText.loadFont( "./resources/font.ttf", 28 );
-    success = selectedText.loadTexture( renderer );
-	selectionCanvas.addObj(&selectedText);
 
     success = FPSText.loadFont( "./resources/font.ttf", 28 );
     success = FPSText.loadTexture( renderer );
@@ -442,6 +450,7 @@ int main( int argc, char* args[] )
 
 					canvas.handleEvent( &e );
 					selectionCanvas.handleEvent( &e );
+					player.handleEvent( e );
 
 				}
 
@@ -460,9 +469,6 @@ int main( int argc, char* args[] )
 				{
 					if(tileButtons[i]->isToggled())
 					{
-						selectedText.updateContent("Selected Tile: X");
-						selectedText.loadTexture(renderer);
-						
 						for(int j = 0; j < tileButtonAmount; j++)
 						{
 							tileButtons[j]->setToggle(false);

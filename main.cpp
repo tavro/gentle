@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 
+#include "./headers/editor/explorer.h"
+
 #include "./headers/texture.h"
 #include "./headers/particle.h"
 #include "./headers/player.h"
@@ -63,6 +65,8 @@ TileMap tileMap;
 AudioSource audioSource;
 
 std::map<TileType, std::string> tileTypeMap;
+
+Explorer explorer{""};
 
 bool init()
 {
@@ -148,6 +152,9 @@ bool init()
 bool loadMedia()
 {
 	bool success = true;
+
+	explorer.folderTexture.loadFromFile( "./resources/folder.png", renderer );
+	explorer.fileTexture.loadFromFile( "./resources/file.png", renderer );
 
 	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
 	canvas.addObj(&mainMenuImg);
@@ -493,6 +500,8 @@ int main( int argc, char* args[] )
 
                 canvas.render(renderer);
 				selectionCanvas.render(renderer);
+
+				explorer.render(renderer);
 
 				SDL_RenderPresent( renderer );
 

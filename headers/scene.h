@@ -1,14 +1,14 @@
-#ifndef CANVAS_H
-#define CANVAS_H
+#ifndef SCENE_H
+#define SCENE_H
 
 #include <SDL2/SDL.h>
 #include <vector>
 #include "./game_object.h"
 
-class Canvas
+class Scene
 {
 	public:
-		Canvas();
+		Scene();
 
         void render(SDL_Renderer* renderer);
 
@@ -23,4 +23,4 @@ class Canvas
         bool isActive = true;
 };
 
-#endif // CANVAS_H
+#endif // SCENE_H

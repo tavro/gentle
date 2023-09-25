@@ -1,6 +1,6 @@
 #include "../headers/ui_panel.h"
 
-UIPanel::UIPanel()
+UIPanel::UIPanel(int x, int y, int w, int h) : UIObject( x, y, w, h )
 {
 
 }
@@ -8,10 +8,10 @@ UIPanel::UIPanel()
 void UIPanel::alignObjs()
 {
     int totalWidth = 0;
-    int y = getPostion().getY();
+    int y = getPosition().getY();
     int row = 0;
 
-    for(int i = 0; i < objs.length(); i++)
+    for(int i = 0; i < objs.size(); i++)
     {
         const int OBJ_WIDTH = objs[i]->getSize().getX();
         int x = getPosition().getX() + totalWidth;

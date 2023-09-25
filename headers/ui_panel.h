@@ -11,7 +11,7 @@
 class UIPanel : public UIObject
 {
     public:
-        UIPanel();
+        UIPanel(int x, int y, int w, int h);
 
         void alignObjs();
 
@@ -23,7 +23,7 @@ class UIPanel : public UIObject
             }
         }
 
-        void render(SDL_Renderer* renderer)
+        void render(SDL_Renderer* renderer) override
         {
             // TODO: Render background if any
             for (auto* obj: objs) 
@@ -38,8 +38,8 @@ class UIPanel : public UIObject
 
     private:
         std::vector<UIObject*> objs;
-        int spaceBetween;
-        int uiObjMaxHeight;
-}
+        int spaceBetween = 16;
+        int uiObjMaxHeight = 32;
+};
 
 #endif // UI_PANEL_H

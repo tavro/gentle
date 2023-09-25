@@ -6,11 +6,6 @@ UIObject::UIObject( int x, int y, int w, int h )
     setSize(w, h);
 }
 
-void UIObject::setPosition( int x, int y )
-{
-    position.set(x, y);
-}
-
 void UIObject::setSize( int w, int h )
 {
     size.set(w, h);

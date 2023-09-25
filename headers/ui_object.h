@@ -11,7 +11,10 @@ class UIObject
 	public:
 		UIObject( int x, int y, int w, int h );
 
-		void setPosition( int x, int y );
+		virtual void setPosition( int x, int y )
+        {
+            position.set(x, y);
+        }
 
         void setSize( int w, int h );
 

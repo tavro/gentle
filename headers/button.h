@@ -18,6 +18,13 @@ class Button : public UIStateObject
         
 		void loadTextTexture(SDL_Renderer* renderer);
 
+		void setPosition( int x, int y ) override
+        {
+            getPosition().set(x, y);
+    		int contentLength = (getText().getContent().length()-1) * 14;
+    		text.setPosition(getPosition().getX() + getSize().getX() / 2 - contentLength / 2, y);
+        }
+
 		void render(SDL_Renderer* renderer) override
         {
 			if(getSize().getX() <= MINIMUM_WIDTH)

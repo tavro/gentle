@@ -23,6 +23,7 @@
 #include "./headers/input_field.h"
 #include "./headers/canvas.h"
 #include "./headers/image.h"
+#include "./headers/ui_panel.h"
 
 const int UI_AREA = 256+64;
 const int SCREEN_FPS = 60;
@@ -45,6 +46,7 @@ Button startButton  {"Start",   SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIG
 Button optionsButton{"Options", SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 2 + 32, 96, BUTTON_HEIGHT};
 Button quitButton   {"Quit",    SCREEN_WIDTH / 2 - BUTTON_WIDTH / 2, BUTTON_HEIGHT * 3 + 48, 96, BUTTON_HEIGHT};
 
+UIPanel buttonPanel { 0, SCREEN_HEIGHT+BUTTON_HEIGHT, SCREEN_WIDTH, 320 };
 std::vector<Button*> tileButtons;
 int tileButtonAmount = (int)TileType::AMOUNT;
 
@@ -78,30 +80,9 @@ bool init()
 	tileTypeMap[TileType::WALL_TOP_LEFT] = "W Top Left";
 	tileTypeMap[TileType::GOLD] = "Gold";
 
-	int totalButtonWidth = 0;
-	const int BUTTON_OFFSET = 16;
-    int y = SCREEN_HEIGHT + BUTTON_HEIGHT;
-	int row = 0;
-
 	for(int i = 0; i < tileButtonAmount; i++)
 	{
 		Button* b = new Button(tileTypeMap[(TileType)i], 0, 0);
-		const int B_WIDTH = b->getSize().getX();
-		
-		int x = totalButtonWidth;
-
-        if (x >= (SCREEN_WIDTH - B_WIDTH)) { // outside screen
-			row++;
-			totalButtonWidth = 0;
-			x = 0;
-            y = SCREEN_HEIGHT + BUTTON_HEIGHT + (BUTTON_HEIGHT + BUTTON_OFFSET) * row;
-        }
-		
-		totalButtonWidth += B_WIDTH + BUTTON_OFFSET;
-
-		b->setPosition(x, y);
-		b->getText().setPosition(x + b->getSize().getX() / 2 - ((b->getText().getContent().length()-1) * 14) / 2, y);
-
 		tileButtons.push_back(b);
 	}
 
@@ -221,10 +202,14 @@ bool loadMedia()
 	canvas.addObj(&quitButton);
 
 	selectionCanvas.addObj(&saveButton);
+	
 	for(int i = 0; i < tileButtonAmount; i++)
 	{
-		selectionCanvas.addObj(tileButtons[i]);
+		buttonPanel.addObj(tileButtons[i]);
 	}
+	buttonPanel.alignObjs();
+	selectionCanvas.addObj(&buttonPanel);
+
 	selectionCanvas.setActive(false);
 
     audioSource.addMusic( "./resources/beat.wav" );

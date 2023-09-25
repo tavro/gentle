@@ -3,12 +3,6 @@
 Button::Button(std::string content, int x, int y, int w, int h): UIStateObject(x, y, w, h)
 {
     setText(content);
-
-    int fontSize = 14;
-    int contentLength = (content.length()-1) * fontSize;
-
-    text.setPosition(x + getSize().getX() / 2 - contentLength / 2, y);
-
     setPosition(x, y);
     setCurrentState( UI_MOUSE_OUT );
 

@@ -51,10 +51,10 @@ class TileMap
 
     private:
 	    static const int TOTAL_TILE_TYPES   = (int)TileType::AMOUNT;
-        static const int TOTAL_TILES        = 20 /* WIDTH OF MAP */ * 15 /* HEIGHT OF MAP */;
+        static const int TOTAL_TILES        = 20 /* WIDTH OF MAP */ * 15 /* HEIGHT OF MAP */;   // TODO: Hardcoded values
         static const int TOTAL_PIXEL_WIDTH  = 20 * TILE_WIDTH; 
         
-        Tile* tiles[ TOTAL_TILES ];
+        Tile*    tiles[ TOTAL_TILES ];
         SDL_Rect clips[ TOTAL_TILE_TYPES ];
         Texture sheetTexture;
 };

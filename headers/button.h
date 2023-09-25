@@ -21,7 +21,7 @@ class Button : public UIStateObject
 		void setPosition( int x, int y ) override
         {
             getPosition().set(x, y);
-    		int contentLength = (getText().getContent().length()-1) * 14;
+    		int contentLength = (getText().getContent().length()-1) * 14; // TOD: Hardcoded value
     		text.setPosition(getPosition().getX() + getSize().getX() / 2 - contentLength / 2, y);
         }
 
@@ -48,7 +48,7 @@ class Button : public UIStateObject
 		void loadSpriteSheet(std::string path, SDL_Renderer* renderer);
 
 	private:
-		static const int BH = 32;
+		static const int BH = 32; // TODO: Hardcoded value
 		static const int MINIMUM_WIDTH = BH*2;
 
 		Texture spriteSheet2; // TODO: Fix this. This is just because I'm lazy and want to move foward.

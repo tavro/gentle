@@ -12,7 +12,7 @@ class Tile : public GameObject
 {
     public:
 		Tile( int x, int y, int tileType );
-												// HARDCODED VALUE
+												// TODO: HARDCODED VALUE
 		void render( SDL_Rect& camera, SDL_Rect (&gTileClips)[13], SDL_Renderer* gRenderer, Texture& gTileTexture );
 
 		int getType();

@@ -62,7 +62,7 @@ bool isSolid(Tile* t)
 
 bool touchesWall( SDL_Rect box, Tile* tiles[] )
 {
-    for( int i = 0; i < 300; ++i )
+    for( int i = 0; i < 300; ++i )  // TODO: Hardcoded value
     {
         if( isSolid(tiles[ i ]) )
         {

@@ -2,7 +2,7 @@
 
 Particle::Particle( int x, int y )
 {
-    getPosition().setX( x - 5 + ( rand() % 25 ) );
+    getPosition().setX( x - 5 + ( rand() % 25 ) );  // TODO: Hardcoded values
     getPosition().setY( y - 5 + ( rand() % 25 ) );
 
     frame = rand() % 5;
@@ -29,5 +29,5 @@ void Particle::render(SDL_Renderer* gRenderer)
 
 bool Particle::isDead()
 {
-    return frame > 10;
+    return frame > 10;  // TODO: Hardcoded value
 }

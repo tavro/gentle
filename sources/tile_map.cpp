@@ -16,7 +16,7 @@ void TileMap::saveTilesToFile(std::string name)
         std::cerr << "Error: Unable to open the file for writing." << std::endl;
     }
 
-	const int MAX_X = 20;
+	const int MAX_X = 20; // TODO: Hardcoded value, read from file
 	int x = 0;
     for (int i = 0; i < TOTAL_TILES; ++i) {
 		std::stringstream ss;
@@ -104,7 +104,7 @@ bool TileMap::setTiles(std::string mapPath)
 		{
 			for (int i = 0; i < TOTAL_TILE_TYPES; ++i)
 			{
-				clips[i].x = (i % (128 / TILE_WIDTH)) * TILE_WIDTH;
+				clips[i].x = (i % (128 / TILE_WIDTH)) * TILE_WIDTH;		// TODO: Hardcoded values
 				clips[i].y = (i / (128 / TILE_WIDTH)) * TILE_HEIGHT;
 				clips[i].w = TILE_WIDTH;
 				clips[i].h = TILE_HEIGHT;

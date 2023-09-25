@@ -8,16 +8,16 @@
 
 #include "./animation.h"
 
-const int LEVEL_WIDTH = 640;// + 128;
+const int LEVEL_WIDTH = 640;// + 128;	// TODO: Hardcoded values
 const int LEVEL_HEIGHT = 480;// + 128;
 
-const int SCREEN_WIDTH = 640;
+const int SCREEN_WIDTH = 640;	// TODO: Place in globals header
 const int SCREEN_HEIGHT = 480;
 
 class Player : public GameObject
 {
     public:
-		static const int WIDTH = 20;
+		static const int WIDTH = 20;			// TODO: Hardcoded values
 		static const int HEIGHT = 20;
 		static const int VELOCITY = 1;
         static const int TOTAL_PARTICLES = 20;

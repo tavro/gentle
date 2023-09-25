@@ -38,7 +38,7 @@ class UIPanel : public UIObject
 
     private:
         std::vector<UIObject*> objs;
-        int spaceBetween = 16;
+        int spaceBetween = 16;          // TODO: Hardcoded values
         int uiObjMaxHeight = 32;
 };
 

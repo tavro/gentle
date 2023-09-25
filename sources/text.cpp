@@ -4,7 +4,7 @@
 Text::Text(std::string content, int x, int y) : UIObject(x, y, 0, 0)
 {
     this->content = content;
-    color = { 0, 0, 0, 0xFF };
+    color = { 0, 0, 0, 0xFF }; // TODO: Hardcoded color
 }
 
 bool Text::loadFont(std::string path, int size)

@@ -2,7 +2,19 @@
 
 UIPanel::UIPanel(int x, int y, int w, int h) : UIObject( x, y, w, h )
 {
+    spaceBetween = 16; // TODO: Hardcoded value
 
+    // NOTE: For debugging
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> distribution(0, 0xFF);
+    int randomR = distribution(gen);
+    int randomG = distribution(gen);
+    int randomB = distribution(gen);
+    
+    randomUint8R = static_cast<uint8_t>(randomR);
+    randomUint8G = static_cast<uint8_t>(randomG);
+    randomUint8B = static_cast<uint8_t>(randomB);
 }
 
 void UIPanel::alignObjs()
@@ -16,7 +28,7 @@ void UIPanel::alignObjs()
         const int OBJ_WIDTH = objs[i]->getSize().getX();
         int x = getPosition().getX() + totalWidth;
 
-        if(x >= (getSize().getX() - OBJ_WIDTH))
+        if(x > (getSize().getX() - OBJ_WIDTH))
         {
             row++;
             totalWidth = 0;
@@ -42,4 +54,17 @@ void UIPanel::addObj(UIObject* obj)
 void UIPanel::clearObjs()
 {
     objs.clear();
+}
+
+void UIPanel::setMaxHeight()
+{
+    int max = 0;
+    for(int i = 0; i < objs.size(); i++)
+    {
+        if(objs[i]->getSize().getY() > max)
+        {
+            max = objs[i]->getSize().getY();
+        }
+    }
+    uiObjMaxHeight = max;
 }

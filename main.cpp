@@ -214,6 +214,7 @@ bool loadMedia()
 	{
 		buttonPanel.addObj(tileButtons[i]);
 	}
+	buttonPanel.setMaxHeight();
 	buttonPanel.alignObjs();
 	selectionCanvas.addObj(&buttonPanel);
 

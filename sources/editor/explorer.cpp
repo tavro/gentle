@@ -65,7 +65,7 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
         panel.clearObjs();
         for(int i = 0; i < folders.size(); i++)     // TODO: This is a mess and is not working
         {                                           // probably something wrong in UIPanel -> alignObjs
-            UIPanel* folderPanel = new UIPanel{33*i, 0, 33, 33};
+            UIPanel* folderPanel = new UIPanel{0, 0, 33, 33};
             Text* text = new Text{folders[i], 0, 0};
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
@@ -75,12 +75,14 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
 
             folderPanel->addObj(image);
             folderPanel->addObj(text);
+            folderPanel->setMaxHeight();
             folderPanel->alignObjs();
+
             panel.addObj(folderPanel);
         }
         for(int i = 0; i < files.size(); i++)
         {
-            UIPanel* filePanel = new UIPanel{33*i, 0, 33, 33};
+            UIPanel* filePanel = new UIPanel{0, 0, 33, 33};
             Text* text = new Text{files[i], 0, 0};
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
@@ -88,11 +90,13 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             Image* image = new Image{0, 0, 32, 32};
             image->getTexture() = fileTexture;
 
-            filePanel->addObj(image);
             filePanel->addObj(text);
+            filePanel->addObj(image);
+            filePanel->setMaxHeight();
             filePanel->alignObjs();
             panel.addObj(filePanel);
         }
+        panel.setMaxHeight();
         panel.alignObjs();
 
         directoryChanged = false;

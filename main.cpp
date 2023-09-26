@@ -376,6 +376,17 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_KEYDOWN )
 					{
+						// For heirarchy
+						switch( e.key.keysym.sym )
+						{
+							case SDLK_UP: 
+								heirarchy.decreaseIndex();
+							break;
+							case SDLK_DOWN: 
+								heirarchy.increaseIndex();
+							break;
+						}
+
 						if( e.key.keysym.sym == SDLK_BACKSPACE)
 						{
 							field.removeChar();

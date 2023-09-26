@@ -25,7 +25,13 @@ class Heirarchy
 
         void render(SDL_Renderer* renderer);
 
+        void increaseIndex();
+
+        void decreaseIndex();
+
     private:
+        Texture texture;
+
         UIPanel panel{0, 0, 256, 256};
 
         Scene* activeScene;

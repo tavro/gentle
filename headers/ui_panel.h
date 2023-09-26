@@ -27,10 +27,10 @@ class UIPanel : public UIObject
 
         void render(SDL_Renderer* renderer) override
         {
-            SDL_Rect box = { getPosition().getX(), getPosition().getY(), getSize().getX(), getSize().getY() };
-            getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
-            getTexture().setColor( randomUint8R, randomUint8G, randomUint8B );
-            getTexture().render( getPosition().getX(), getPosition().getY(), &box, 0.0, NULL, SDL_FLIP_NONE, renderer );
+            //SDL_Rect box = { getPosition().getX(), getPosition().getY(), getSize().getX(), getSize().getY() };
+            //getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
+            //getTexture().setColor( randomUint8R, randomUint8G, randomUint8B );
+            //getTexture().render( getPosition().getX(), getPosition().getY(), &box, 0.0, NULL, SDL_FLIP_NONE, renderer );
             
             for (auto* obj: objs) 
             {
@@ -55,9 +55,9 @@ class UIPanel : public UIObject
         int spaceBetween;
         int uiObjMaxHeight;
 
-        uint8_t randomUint8R;
-        uint8_t randomUint8G;
-        uint8_t randomUint8B;
+        //uint8_t randomUint8R;
+        //uint8_t randomUint8G;
+        //uint8_t randomUint8B;
 };
 
 #endif // UI_PANEL_H

@@ -5,6 +5,7 @@ UIPanel::UIPanel(int x, int y, int w, int h) : UIObject( x, y, w, h )
     spaceBetween = 16; // TODO: Hardcoded value
 
     // NOTE: For debugging
+    /*
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<int> distribution(0, 0xFF);
@@ -15,6 +16,7 @@ UIPanel::UIPanel(int x, int y, int w, int h) : UIObject( x, y, w, h )
     randomUint8R = static_cast<uint8_t>(randomR);
     randomUint8G = static_cast<uint8_t>(randomG);
     randomUint8B = static_cast<uint8_t>(randomB);
+    */
 }
 
 void UIPanel::alignObjs()

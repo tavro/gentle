@@ -54,25 +54,48 @@ void Explorer::loadCurrentPath()
     } catch (const std::filesystem::filesystem_error& ex) {
         std::cerr << "Error: " << ex.what() << "\n";
     }
+
+    directoryChanged = true;
 }
 
 void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be vastly improved
 {
-    UIPanel panel{0, 0, 256, 256};
-
-    for(int i = 0; i < folders.size(); i++)
+    if(directoryChanged)
     {
-        Image* image = new Image{0, 0, 32, 32}; // TODO: This should be UIStateObject
-	    image->getTexture() = folderTexture;
-        panel.addObj(image);
-    }
-    for(int i = 0; i < files.size(); i++)
-    {
-        Image* image = new Image{0, 0, 32, 32};
-	    image->getTexture() = fileTexture;
-        panel.addObj(image);
-    }
+        panel.clearObjs();
+        for(int i = 0; i < folders.size(); i++)     // TODO: This is a mess and is not working
+        {                                           // probably something wrong in UIPanel -> alignObjs
+            UIPanel* folderPanel = new UIPanel{33*i, 0, 33, 33};
+            Text* text = new Text{folders[i], 0, 0};
+            text->loadFont( "./resources/font.ttf", 12 );
+            text->loadTexture(renderer);
 
-    panel.alignObjs();
+            Image* image = new Image{0, 0, 32, 32}; // TODO: This should be UIStateObject
+            image->getTexture() = folderTexture;
+
+            folderPanel->addObj(image);
+            folderPanel->addObj(text);
+            folderPanel->alignObjs();
+            panel.addObj(folderPanel);
+        }
+        for(int i = 0; i < files.size(); i++)
+        {
+            UIPanel* filePanel = new UIPanel{33*i, 0, 33, 33};
+            Text* text = new Text{files[i], 0, 0};
+            text->loadFont( "./resources/font.ttf", 12 );
+            text->loadTexture(renderer);
+
+            Image* image = new Image{0, 0, 32, 32};
+            image->getTexture() = fileTexture;
+
+            filePanel->addObj(image);
+            filePanel->addObj(text);
+            filePanel->alignObjs();
+            panel.addObj(filePanel);
+        }
+        panel.alignObjs();
+
+        directoryChanged = false;
+    }
     panel.render(renderer);
 }

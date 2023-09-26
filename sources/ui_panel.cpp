@@ -26,7 +26,6 @@ void UIPanel::alignObjs()
 
         totalWidth += OBJ_WIDTH + spaceBetween;
         objs[i]->setPosition(x, y);
-        // TODO: SET TEXT POSITION?
     }
 }
 
@@ -38,4 +37,9 @@ void UIPanel::setSpaceBetween(int space)
 void UIPanel::addObj(UIObject* obj)
 {
     objs.push_back(obj);
+}
+
+void UIPanel::clearObjs()
+{
+    objs.clear();
 }

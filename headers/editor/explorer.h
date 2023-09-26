@@ -10,6 +10,7 @@
 
 #include "../ui_panel.h"
 #include "../image.h"
+#include "../text.h"
 
 class Explorer
 {
@@ -28,13 +29,17 @@ class Explorer
 
         Texture folderTexture;
         Texture fileTexture;
-        
+
     private:
+        UIPanel panel{0, 0, 256, 256};
+
         std::vector<std::string> folders;
         std::vector<std::string> files;
 
         std::string projectRoot = "./";
         std::string currentPath;
+
+        bool directoryChanged;
 
 };
 

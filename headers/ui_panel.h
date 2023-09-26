@@ -36,6 +36,8 @@ class UIPanel : public UIObject
 
         void addObj(UIObject* obj);
 
+        void clearObjs();
+
     private:
         std::vector<UIObject*> objs;
         int spaceBetween = 16;          // TODO: Hardcoded values

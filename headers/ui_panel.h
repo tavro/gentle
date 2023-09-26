@@ -42,11 +42,15 @@ class UIPanel : public UIObject
 
         void addObj(UIObject* obj);
 
+        void addChildPanel(UIPanel* obj);
+
         void clearObjs();
 
         void setMaxHeight();
 
     private:
+        std::vector<UIPanel*> childPanels;
+
         std::vector<UIObject*> objs;
         int spaceBetween;
         int uiObjMaxHeight;

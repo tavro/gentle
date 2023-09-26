@@ -67,7 +67,7 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
         // TODO: Solution: alignObjs() should call alignObjs recursively for child panels
         for(int i = 0; i < folders.size(); i++)
         {
-            UIPanel* folderPanel = new UIPanel{0, 0, 33, 33};
+            UIPanel* folderPanel = new UIPanel{0, 0, 32, 48};
             Text* text = new Text{folders[i], 0, 0};
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
@@ -75,22 +75,15 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             Image* image = new Image{0, 0, 32, 32}; // TODO: This should be UIStateObject
             image->getTexture() = folderTexture;
 
-            std::cout << "image position before:" << image->getPosition().getX() << ", " << image->getPosition().getY() << std::endl; 
-            std::cout << "text position before:" << text->getPosition().getX() << ", " << text->getPosition().getY() << std::endl; 
-
             folderPanel->addObj(image);
             folderPanel->addObj(text);
             folderPanel->setMaxHeight();
-            folderPanel->alignObjs();
 
-            std::cout << "image position after:" << image->getPosition().getX() << ", " << image->getPosition().getY() << std::endl; 
-            std::cout << "text position after:" << text->getPosition().getX() << ", " << text->getPosition().getY() << std::endl; 
-            
-            panel.addObj(folderPanel);
+            panel.addChildPanel(folderPanel);
         }
         for(int i = 0; i < files.size(); i++)
         {
-            UIPanel* filePanel = new UIPanel{0, 0, 33, 33};
+            UIPanel* filePanel = new UIPanel{0, 0, 32, 48};
             Text* text = new Text{files[i], 0, 0};
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
@@ -98,11 +91,11 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             Image* image = new Image{0, 0, 32, 32};
             image->getTexture() = fileTexture;
 
-            filePanel->addObj(text);
             filePanel->addObj(image);
+            filePanel->addObj(text);
             filePanel->setMaxHeight();
-            filePanel->alignObjs();
-            panel.addObj(filePanel);
+
+            panel.addChildPanel(filePanel);
         }
         panel.setMaxHeight();
         panel.alignObjs();

@@ -28,7 +28,7 @@ void UIPanel::alignObjs()
         const int OBJ_WIDTH = objs[i]->getSize().getX();
         int x = getPosition().getX() + totalWidth;
 
-        if(x > (getSize().getX() - OBJ_WIDTH))
+        if(x > (getPosition().getX() /* <= hope i'm not stupid and hope that this doesnt cause any problems */ + getSize().getX() - OBJ_WIDTH))
         {
             row++;
             totalWidth = 0;
@@ -40,7 +40,10 @@ void UIPanel::alignObjs()
         objs[i]->setPosition(x, y);
     }
 
-    // TODO: Call alignObjs for children panels
+    for(int i = 0; i < childPanels.size(); i++)
+    {
+        childPanels[i]->alignObjs();
+    }
 }
 
 void UIPanel::setSpaceBetween(int space)
@@ -51,6 +54,12 @@ void UIPanel::setSpaceBetween(int space)
 void UIPanel::addObj(UIObject* obj)
 {
     objs.push_back(obj);
+}
+
+void UIPanel::addChildPanel(UIPanel* obj)
+{
+    addObj(obj);
+    childPanels.push_back(obj);
 }
 
 void UIPanel::clearObjs()

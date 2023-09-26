@@ -12,6 +12,7 @@
 #include <map>
 
 #include "./headers/editor/explorer.h"
+#include "./headers/editor/heirarchy.h"
 
 #include "./headers/texture.h"
 #include "./headers/particle.h"
@@ -26,6 +27,7 @@
 #include "./headers/canvas.h"
 #include "./headers/image.h"
 #include "./headers/ui_panel.h"
+#include "./headers/game_object.h"
 
 const int UI_AREA = 256+64;
 const int SCREEN_FPS = 60;
@@ -66,10 +68,21 @@ AudioSource audioSource;
 
 std::map<TileType, std::string> tileTypeMap;
 
-Explorer explorer{""};
+Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+
+Scene testScene{};
+
+GameObject a{};
+GameObject b{};
+GameObject c{};
 
 bool init()
 {
+	testScene.addObj(&a);
+	testScene.addObj(&b);
+	testScene.addObj(&c);
+
 	tileTypeMap[TileType::DIRT] = "Dirt";
 	tileTypeMap[TileType::GRASS] = "Grass";
 	tileTypeMap[TileType::STONE] = "Stone";
@@ -152,6 +165,8 @@ bool init()
 bool loadMedia()
 {
 	bool success = true;
+
+	heirarchy.setActiveScene(&testScene, renderer);
 
 	explorer.folderTexture.loadFromFile( "./resources/folder.png", renderer );
 	explorer.fileTexture.loadFromFile( "./resources/file.png", renderer );
@@ -503,6 +518,7 @@ int main( int argc, char* args[] )
 				selectionCanvas.render(renderer);
 
 				explorer.render(renderer);
+				heirarchy.render(renderer);
 
 				SDL_RenderPresent( renderer );
 

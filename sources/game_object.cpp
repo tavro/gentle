@@ -1,7 +1,27 @@
 #include "../headers/game_object.h"
 
+#include <iostream>
+#include <string>
+#include <random>
+
+std::string getRandomName(int length) {
+    static const std::string charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    std::string result;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, charset.size() - 1);
+
+    for (int i = 0; i < length; ++i) {
+        result += charset[distribution(generator)];
+    }
+
+    return result;
+}
+
 GameObject::GameObject()
 {
+    name = getRandomName(8);
+
     position.setX(0);
     position.setY(0);
 
@@ -101,4 +121,14 @@ bool GameObject::hasCollision(GameObject& other)
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {
     return texture.loadFromFile(path, renderer);
+}
+
+std::string GameObject::getName()
+{
+    return name;
+}
+
+void GameObject::render(SDL_Renderer* renderer)
+{
+    
 }

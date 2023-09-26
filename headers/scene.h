@@ -18,6 +18,8 @@ class Scene
 
         void addObj(GameObject* obj);
 
+        std::vector<GameObject*> getObjs();
+
     private:
         std::vector<GameObject*> objs;
         bool isActive = true;

@@ -4,13 +4,15 @@
 
 #include "../../headers/editor/explorer.h"
 
-Explorer::Explorer(std::string path)
+Explorer::Explorer(std::string path, int x, int y, int width, int height)
 {
     if (!path.empty())
     {
         projectRoot = path;
     }
     goToProjectRoot();
+    panel.getPosition().set(x, y);
+    panel.getSize().set(width, height);
 }
 
 void Explorer::enterDirectory(std::string dirName)
@@ -63,8 +65,6 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
     if(directoryChanged)
     {
         panel.clearObjs();
-        // NOTE: The problem is that the UIPanel position gets set after the image and text position gets set.
-        // TODO: Solution: alignObjs() should call alignObjs recursively for child panels
         for(int i = 0; i < folders.size(); i++)
         {
             UIPanel* folderPanel = new UIPanel{0, 0, 32, 48};

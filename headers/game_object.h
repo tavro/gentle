@@ -16,6 +16,11 @@ class GameObject
         Vector2D& getSize();
         Vector2D& getVelocity();
 
+        virtual void handleEvent(SDL_Event* e)
+        {
+
+        }
+
         void setTexture(Texture texture);
 
         bool loadTexture(SDL_Renderer* renderer, std::string path);
@@ -32,11 +37,15 @@ class GameObject
 
         bool hasCollision(GameObject& other);
 
+        std::string getName();
+
     protected:
 
     private:
         Texture texture;
         std::string texturePath;
+
+        std::string name;
 
         Vector2D position;
         Vector2D velocity;

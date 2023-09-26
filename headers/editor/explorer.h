@@ -15,7 +15,7 @@
 class Explorer
 {
     public:
-        Explorer(std::string path);
+        Explorer(std::string path, int x, int y, int width, int height);
 
         void enterDirectory(std::string dirName);
 

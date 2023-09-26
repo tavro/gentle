@@ -36,3 +36,8 @@ void Scene::setActive(bool state)
 {
     isActive = state;
 }
+
+std::vector<GameObject*> Scene::getObjs()
+{
+    return objs;
+}

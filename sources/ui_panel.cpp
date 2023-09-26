@@ -39,6 +39,8 @@ void UIPanel::alignObjs()
         totalWidth += OBJ_WIDTH + spaceBetween;
         objs[i]->setPosition(x, y);
     }
+
+    // TODO: Call alignObjs for children panels
 }
 
 void UIPanel::setSpaceBetween(int space)

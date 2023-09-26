@@ -63,8 +63,10 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
     if(directoryChanged)
     {
         panel.clearObjs();
-        for(int i = 0; i < folders.size(); i++)     // TODO: This is a mess and is not working
-        {                                           // probably something wrong in UIPanel -> alignObjs
+        // NOTE: The problem is that the UIPanel position gets set after the image and text position gets set.
+        // TODO: Solution: alignObjs() should call alignObjs recursively for child panels
+        for(int i = 0; i < folders.size(); i++)
+        {
             UIPanel* folderPanel = new UIPanel{0, 0, 33, 33};
             Text* text = new Text{folders[i], 0, 0};
             text->loadFont( "./resources/font.ttf", 12 );
@@ -73,11 +75,17 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             Image* image = new Image{0, 0, 32, 32}; // TODO: This should be UIStateObject
             image->getTexture() = folderTexture;
 
+            std::cout << "image position before:" << image->getPosition().getX() << ", " << image->getPosition().getY() << std::endl; 
+            std::cout << "text position before:" << text->getPosition().getX() << ", " << text->getPosition().getY() << std::endl; 
+
             folderPanel->addObj(image);
             folderPanel->addObj(text);
             folderPanel->setMaxHeight();
             folderPanel->alignObjs();
 
+            std::cout << "image position after:" << image->getPosition().getX() << ", " << image->getPosition().getY() << std::endl; 
+            std::cout << "text position after:" << text->getPosition().getX() << ", " << text->getPosition().getY() << std::endl; 
+            
             panel.addObj(folderPanel);
         }
         for(int i = 0; i < files.size(); i++)

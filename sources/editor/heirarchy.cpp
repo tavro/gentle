@@ -36,11 +36,15 @@ void Heirarchy::setActiveScene(Scene* scene, SDL_Renderer* renderer)
     texture.loadFromFile( "./resources/main-menu-background.png", renderer );
     texture.setColor( 0xFF, 165, 0 );
 
+    texture2.loadFromFile( "./resources/heirarchy.png", renderer );
+
     maxIndex = names.size();
 }
 
 void Heirarchy::render(SDL_Renderer* renderer)
 {
+    texture2.render( panel.getPosition().getX(), panel.getPosition().getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+    
     SDL_Rect box = { 0, 0, panel.getSize().getX(), 28 };
     texture.render( panel.getPosition().getX(), panel.getPosition().getY() + ((28 + 16) * index), &box, 0.0, NULL, SDL_FLIP_NONE, renderer );
     
@@ -63,4 +67,14 @@ void Heirarchy::decreaseIndex()
     {
         index = maxIndex-1;
     }
+}
+
+Scene* Heirarchy::getActiveScene()
+{
+    return activeScene;
+}
+
+std::string Heirarchy::getActiveObjName()
+{
+    return names[index];
 }

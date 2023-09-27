@@ -62,6 +62,7 @@ void Explorer::loadCurrentPath()
 
 void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be vastly improved
 {
+    texture.render(panel.getPosition().getX(), panel.getPosition().getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer);
     if(directoryChanged)
     {
         panel.clearObjs();

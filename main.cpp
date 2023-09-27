@@ -13,6 +13,7 @@
 
 #include "./headers/editor/explorer.h"
 #include "./headers/editor/heirarchy.h"
+#include "./headers/editor/inspector.h"
 
 #include "./headers/texture.h"
 #include "./headers/particle.h"
@@ -70,12 +71,13 @@ std::map<TileType, std::string> tileTypeMap;
 
 Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+Inspector inspector{SCREEN_WIDTH, 0};
 
 Scene testScene{};
 
 GameObject a{};
-GameObject b{};
-GameObject c{};
+GameObject b{20, 20, 20, 20};
+GameObject c{0, 0, 20, 20};
 
 bool init()
 {
@@ -119,7 +121,7 @@ bool init()
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}
 
-		window = SDL_CreateWindow( "SDL Game", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
+		window = SDL_CreateWindow( "gentle game engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH + UI_AREA, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
 		if( window == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -168,8 +170,12 @@ bool loadMedia()
 
 	heirarchy.setActiveScene(&testScene, renderer);
 
+	inspector.setActiveObj(&a);
+	inspector.loadFont(renderer);
+
 	explorer.folderTexture.loadFromFile( "./resources/folder.png", renderer );
 	explorer.fileTexture.loadFromFile( "./resources/file.png", renderer );
+	explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
 	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
 	canvas.addObj(&mainMenuImg);
@@ -381,9 +387,11 @@ int main( int argc, char* args[] )
 						{
 							case SDLK_UP: 
 								heirarchy.decreaseIndex();
+								inspector.setActiveObj(testScene.getObjFromName(heirarchy.getActiveObjName()));
 							break;
 							case SDLK_DOWN: 
 								heirarchy.increaseIndex();
+								inspector.setActiveObj(testScene.getObjFromName(heirarchy.getActiveObjName()));
 							break;
 						}
 
@@ -530,6 +538,7 @@ int main( int argc, char* args[] )
 
 				explorer.render(renderer);
 				heirarchy.render(renderer);
+				inspector.render(renderer);
 
 				SDL_RenderPresent( renderer );
 

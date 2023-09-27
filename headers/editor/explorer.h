@@ -29,6 +29,7 @@ class Explorer
 
         Texture folderTexture;
         Texture fileTexture;
+        Texture texture;
 
     private:
         UIPanel panel{0, 0, 256, 256};

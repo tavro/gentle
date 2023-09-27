@@ -23,14 +23,19 @@ class Heirarchy
 
         void setActiveScene(Scene* scene, SDL_Renderer* renderer);
 
+        Scene* getActiveScene();
+
         void render(SDL_Renderer* renderer);
 
         void increaseIndex();
 
         void decreaseIndex();
 
+        std::string getActiveObjName();
+
     private:
         Texture texture;
+        Texture texture2;
 
         UIPanel panel{0, 0, 256, 256};
 

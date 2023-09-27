@@ -41,3 +41,14 @@ std::vector<GameObject*> Scene::getObjs()
 {
     return objs;
 }
+
+GameObject* Scene::getObjFromName(std::string name)
+{
+    for (auto* obj: objs)
+    {
+        if(obj->getName() == name)
+        {
+            return obj;
+        }
+    }
+}

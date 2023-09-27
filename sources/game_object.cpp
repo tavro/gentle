@@ -32,6 +32,21 @@ GameObject::GameObject()
     size.setY(0);
 }
 
+GameObject::GameObject(int x, int y, int w, int h)
+{
+    name = getRandomName(8);
+
+    position.setX(x);
+    position.setY(y);
+
+    velocity.setX(0);
+    velocity.setY(0);
+
+    size.setX(w);
+    size.setY(h);
+}
+
+
 Vector2D& GameObject::getPosition()
 {
     return position;

@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <vector>
+#include <string>
 #include "./game_object.h"
 
 class Scene
@@ -19,6 +20,8 @@ class Scene
         void addObj(GameObject* obj);
 
         std::vector<GameObject*> getObjs();
+
+        GameObject* getObjFromName(std::string name);
 
     private:
         std::vector<GameObject*> objs;

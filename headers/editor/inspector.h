@@ -8,21 +8,25 @@
 
 #include "../game_object.h"
 #include "../text.h"
+#include "../texture.h"
 
 class Inspector
 {
     public:
-        Inspector();
+        Inspector(int x, int y);
 
         void setActiveObj(GameObject* gameObject);
 
         void render(SDL_Renderer* renderer);
         
-        void loadFont();
-        
+        void loadFont(SDL_Renderer* renderer);
+
     private:
+        Vector2D position;
+
         GameObject* activeObj;
-        Canvas canvas;
+
+        Texture texture;
 
         Text nameText{"Name: ''", 0, 0};
         Text posText {"Position: (X:, Y:)", 0, 0};

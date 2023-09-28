@@ -175,8 +175,8 @@ bool loadMedia()
 	inspector.setActiveObj(&a);
 	inspector.loadFont(renderer);
 
-	explorer.folderTexture.loadFromFile( "./resources/folder.png", renderer );
-	explorer.fileTexture.loadFromFile( "./resources/file.png", renderer );
+	explorer.folderTexture.loadFromFile( "./resources/folderSheet.png", renderer );
+	explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
 	explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
 	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
@@ -479,6 +479,7 @@ int main( int argc, char* args[] )
 
 					canvas.handleEvent( &e );
 					selectionCanvas.handleEvent( &e );
+					explorer.handleEvent( &e );
 					player.handleEvent( e );
 
 				}

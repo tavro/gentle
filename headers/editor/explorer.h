@@ -9,6 +9,7 @@
 #include <filesystem>
 
 #include "../ui_panel.h"
+#include "../ui_state_object.h"
 #include "../image.h"
 #include "../text.h"
 
@@ -26,6 +27,8 @@ class Explorer
         void loadCurrentPath();
 
         void render(SDL_Renderer* renderer);
+
+        void handleEvent( SDL_Event* e );
 
         Texture folderTexture;
         Texture fileTexture;

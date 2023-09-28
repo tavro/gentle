@@ -46,10 +46,10 @@ void Explorer::loadCurrentPath()
     try {
         for (const auto& entry : std::filesystem::directory_iterator(currentPath)) {
             if (entry.is_directory()) {
-                std::cout << "Directory: " << entry.path().filename() << "\n";
+                //std::cout << "Directory: " << entry.path().filename() << "\n";
                 folders.push_back(entry.path().filename());
             } else if (entry.is_regular_file()) {
-                std::cout << "File: " << entry.path().filename() << "\n";
+                //std::cout << "File: " << entry.path().filename() << "\n";
                 files.push_back(entry.path().filename());
             }
         }
@@ -73,10 +73,15 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
 
-            Image* image = new Image{0, 0, 32, 32}; // TODO: This should be UIStateObject
-            image->getTexture() = folderTexture;
+            UIStateObject* uiStateObj = new UIStateObject{0, 0, 32, 32};
+            uiStateObj->getTexture() = folderTexture;
 
-            folderPanel->addObj(image);
+            uiStateObj->addSpriteClip( { 0, 0, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 32, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 64, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 96, 32, 32 } );
+
+            folderPanel->addObj(uiStateObj);
             folderPanel->addObj(text);
             folderPanel->setMaxHeight();
 
@@ -89,10 +94,15 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             text->loadFont( "./resources/font.ttf", 12 );
             text->loadTexture(renderer);
 
-            Image* image = new Image{0, 0, 32, 32};
-            image->getTexture() = fileTexture;
+            UIStateObject* uiStateObj = new UIStateObject{0, 0, 32, 32};
+            uiStateObj->getTexture() = fileTexture;
 
-            filePanel->addObj(image);
+            uiStateObj->addSpriteClip( { 0, 0, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 32, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 64, 32, 32 } );
+            uiStateObj->addSpriteClip( { 0, 96, 32, 32 } );
+
+            filePanel->addObj(uiStateObj);
             filePanel->addObj(text);
             filePanel->setMaxHeight();
 
@@ -104,4 +114,9 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
         directoryChanged = false;
     }
     panel.render(renderer);
+}
+
+void Explorer::handleEvent( SDL_Event* e )
+{
+    panel.handleEvent(e);
 }

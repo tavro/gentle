@@ -1,0 +1,24 @@
+[
+Type:GameObject;
+Name:TestObj;
+Texture:./resources/gameobject.png;
+Position:(0, 0);
+Size:(32, 32);
+Velocity:(0, 0);
+]
+[
+Type:GameObject;
+Name:TestObj2;
+Texture:./resources/gameobject.png;
+Position:(64, 0);
+Size:(32, 32);
+Velocity:(0, 0);
+]
+[
+Type:GameObject;
+Name:TestObj3;
+Texture:./resources/gameobject.png;
+Position:(64, 64);
+Size:(16, 16);
+Velocity:(0, 0);
+]

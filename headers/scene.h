@@ -2,6 +2,9 @@
 #define SCENE_H
 
 #include <SDL2/SDL.h>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
 #include <string>
 #include "./game_object.h"
@@ -10,6 +13,7 @@ class Scene
 {
 	public:
 		Scene();
+		Scene(std::string path);
 
         void render(SDL_Renderer* renderer);
 
@@ -18,6 +22,8 @@ class Scene
         void handleEvent(SDL_Event* e);
 
         void addObj(GameObject* obj);
+
+        void load(std::string path);
 
         std::vector<GameObject*> getObjs();
 

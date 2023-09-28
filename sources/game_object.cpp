@@ -46,6 +46,15 @@ GameObject::GameObject(int x, int y, int w, int h)
     size.setY(h);
 }
 
+GameObject::GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path)
+{
+    position = pos;
+    size = s;
+    velocity = vel;
+    name = n;
+    texturePath = path;
+}
+
 
 Vector2D& GameObject::getPosition()
 {
@@ -136,6 +145,11 @@ bool GameObject::hasCollision(GameObject& other)
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {
     return texture.loadFromFile(path, renderer);
+}
+
+bool GameObject::loadTexture(SDL_Renderer* renderer)
+{
+    return texture.loadFromFile(texturePath, renderer);
 }
 
 std::string GameObject::getName()

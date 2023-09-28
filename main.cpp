@@ -81,9 +81,9 @@ GameObject c{0, 0, 20, 20};
 
 bool init()
 {
-	testScene.addObj(&a);
-	testScene.addObj(&b);
-	testScene.addObj(&c);
+	//testScene.addObj(&a);
+	//testScene.addObj(&b);
+	//testScene.addObj(&c);
 
 	tileTypeMap[TileType::DIRT] = "Dirt";
 	tileTypeMap[TileType::GRASS] = "Grass";
@@ -167,6 +167,8 @@ bool init()
 bool loadMedia()
 {
 	bool success = true;
+
+	testScene.load("./test.scene");
 
 	heirarchy.setActiveScene(&testScene, renderer);
 

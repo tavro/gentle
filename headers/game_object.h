@@ -10,6 +10,7 @@ class GameObject
     public:
         GameObject();
         GameObject(int x, int y, int w, int h);
+        GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path);
 
         Texture& getTexture();
 
@@ -25,6 +26,7 @@ class GameObject
         void setTexture(Texture texture);
 
         bool loadTexture(SDL_Renderer* renderer, std::string path);
+        bool loadTexture(SDL_Renderer* renderer);
 
         void freeTexture();
 

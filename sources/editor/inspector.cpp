@@ -9,14 +9,21 @@ Inspector::Inspector(int x, int y)
     sizeText.setPosition(x, (28+16)*2);
     velocityText.setPosition(x, (28+16)*3);
 
-    //TODO
-    //nameField.setPosition(x+,0);
-    //posXField.setPosition(x+,28+16);
-    //posYField.setPosition(x+,28+16);
-    //velXField.setPosition(x+,(28+16)*2);
-    //velYField.setPosition(x+,(28+16)*2);
-    //sizeXField.setPosition(x+, (28+16)*3);
-    //sizeYField.setPosition(x+, (28+16)*3);
+    nameField.setPosition(x+96,0);
+    posXField.setPosition(x+96,28+16);
+    posYField.setPosition(x+96+96,28+16);
+    velXField.setPosition(x+96,(28+16)*2);
+    velYField.setPosition(x+96+96,(28+16)*2);
+    sizeXField.setPosition(x+96, (28+16)*3);
+    sizeYField.setPosition(x+96+96, (28+16)*3);
+
+    fields.push_back(&nameField);
+    fields.push_back(&posXField);
+    fields.push_back(&posYField);
+    fields.push_back(&velXField);
+    fields.push_back(&velYField);
+    fields.push_back(&sizeXField);
+    fields.push_back(&sizeYField);
 }
 
 void Inspector::setActiveObj(GameObject* gameObject)
@@ -31,21 +38,21 @@ void Inspector::loadFont(SDL_Renderer* renderer)
     sizeText.loadFont    ( "./resources/font.ttf", 28 );
     velocityText.loadFont( "./resources/font.ttf", 28 );
 
-    //TODO: For each field... may be a good idea to create buttonCanvas or something like that
-    /*
-    .getText().loadFont( "./resources/font.ttf", 28 );
-	.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
-	for( int i = 0; i < 4; ++i )
-	{
-		.getSpriteClip( i ).x = 0;
-		.getSpriteClip( i ).y = i * BUTTON_HEIGHT;
-        .getSpriteClip( i ).w = BUTTON_WIDTH;
-        .getSpriteClip( i ).h = BUTTON_HEIGHT;
-	}
+    for (auto* field: fields)
+    {
+        field->getText().loadFont( "./resources/font.ttf", 28 );
+        field->getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
+        for( int i = 0; i < 4; ++i )
+        {
+            field->getSpriteClip( i ).x = 0;
+            field->getSpriteClip( i ).y = i * 32;
+            field->getSpriteClip( i ).w = 96;
+            field->getSpriteClip( i ).h = 32;
+        }
 
-    .setText("sample.scene");
-	.loadTextTexture(renderer);
-    */
+        field->setText("xx");
+        field->loadTextTexture(renderer);
+    }
 
     texture.loadFromFile( "./resources/inspector.png", renderer );
 }
@@ -84,4 +91,9 @@ void Inspector::render(SDL_Renderer* renderer)
     nameText.render(renderer);
     sizeText.render(renderer);
     velocityText.render(renderer);
+
+    for (auto* field: fields)
+    {
+        field->render(renderer);
+    }
 }

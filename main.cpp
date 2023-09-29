@@ -57,7 +57,10 @@ Inspector inspector{SCREEN_WIDTH, 0};
 Scene* testScene = new Scene{};
 
 Button saveButton{"Save", 0, SCREEN_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
-InputField field{BUTTON_WIDTH*2,  SCREEN_HEIGHT, 96, 28, 20};
+Button cdButton{"cd ..", BUTTON_WIDTH*2+16*2, SCREEN_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Button createButton{"Create Empty Obj", BUTTON_WIDTH*3+16*3, SCREEN_HEIGHT};
+
+InputField field{BUTTON_WIDTH+16,  SCREEN_HEIGHT, 96, 28, 8};
 
 GameObject a{};
 
@@ -143,6 +146,14 @@ bool loadMedia()
 	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
 	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
 	canvas.addObj(&saveButton);
+
+	createButton.getText().loadFont( "./resources/font.ttf", 28 );
+	createButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+	canvas.addObj(&createButton);
+
+	cdButton.getText().loadFont( "./resources/font.ttf", 28 );
+	cdButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+	canvas.addObj(&cdButton);
 
 	field.getText().loadFont( "./resources/font.ttf", 28 );
 	field.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
@@ -278,7 +289,19 @@ int main( int argc, char* args[] )
 
 				if(saveButton.isToggled())
 				{
+					testScene->save("");
 					saveButton.setToggle(false);
+				}
+				if(createButton.isToggled())
+				{
+					testScene->createEmptyObject();
+					heirarchy.setActiveScene(testScene, renderer);
+					createButton.setToggle(false);
+				}
+				if(cdButton.isToggled())
+				{
+					explorer.goBack();
+					cdButton.setToggle(false);
 				}
 
 				if(explorer.fileHasChanged())

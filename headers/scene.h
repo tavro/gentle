@@ -26,7 +26,9 @@ class Scene
         void loadTextures(SDL_Renderer* renderer);
         void load(std::string path);
 
-        //TODO: void save(std::string path);
+        void createEmptyObject();
+
+        void save(std::string path);
 
         std::vector<GameObject*> getObjs();
 

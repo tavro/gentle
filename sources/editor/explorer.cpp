@@ -17,14 +17,24 @@ void Explorer::enterDirectory(std::string dirName)
     loadCurrentPath();
 }
 
-void Explorer::goBack()
-{
-    size_t index = currentPath.find_last_of('/');
+size_t findNextToLastDelimiter(const std::string &str, char delimiter) {
+    size_t lastPos = str.find(delimiter);
+    size_t nextToLastPos = std::string::npos;
 
-    if (index != std::string::npos) {
-        currentPath = currentPath.substr(0, index);
+    while (lastPos != std::string::npos) {
+        nextToLastPos = lastPos;
+        lastPos = str.find(delimiter, lastPos + 1);
     }
 
+    return nextToLastPos;
+}
+
+void Explorer::goBack()
+{
+    if(currentPath.length() > 2) {
+        size_t index = findNextToLastDelimiter(currentPath.substr(0, currentPath.length()-1), '/');
+        currentPath = currentPath.substr(0, index+1);
+    }
     loadCurrentPath();
 }
 

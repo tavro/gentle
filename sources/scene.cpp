@@ -189,3 +189,25 @@ void Scene::load(std::string path)
     // Close the file
     file.close();
 }
+
+void Scene::createEmptyObject()
+{
+    addObj(new GameObject{{0, 0}, {10, 10}, {0, 0}, "Empty Object", "./resources/gameobject.png"});
+}
+
+void Scene::save(std::string path)
+{
+    std::string objStr = "";
+    for (auto* obj: objs)
+    {
+        objStr += "[\n";
+        objStr += "Type:GameObject;\n";
+        objStr += "Name:" + obj->getName() + ";\n";
+        objStr += "Texture:./resources/gameobject.png;\n";
+        objStr += "Position:(" + std::to_string(obj->getPosition().getX()) + "," + std::to_string(obj->getPosition().getY()) + ");\n";
+        objStr += "Size:(" + std::to_string(obj->getSize().getX()) + "," + std::to_string(obj->getSize().getY()) + ");\n";
+        objStr += "Velocity:" + std::to_string(obj->getVelocity().getX()) + "," + std::to_string(obj->getVelocity().getY()) + ");\n";
+        objStr += "]\n";
+        // TODO: Save object to file and clear string.
+    }
+}

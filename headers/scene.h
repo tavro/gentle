@@ -23,7 +23,10 @@ class Scene
 
         void addObj(GameObject* obj);
 
+        void loadTextures(SDL_Renderer* renderer);
         void load(std::string path);
+
+        //TODO: void save(std::string path);
 
         std::vector<GameObject*> getObjs();
 

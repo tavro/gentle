@@ -98,7 +98,7 @@ class UIStateObject : public UIObject
 	private:
         std::vector<SDL_Rect> spriteClips;
 		UIState currentState;
-        bool toggle;
+        bool toggle = false;
 };
 
 #endif // UI_STATE_OBJECT_H

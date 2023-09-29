@@ -58,8 +58,18 @@ GameObject* Scene::getObjFromName(std::string name)
     }
 }
 
+void Scene::loadTextures(SDL_Renderer* renderer)
+{
+    for (auto* obj: objs)
+    {
+        obj->loadTexture(renderer);
+    }
+}
+
 void Scene::load(std::string path)
 {
+    std::cout << "load:" << path << std::endl;
+    objs.clear();
     std::ifstream file(path);
     if (!file.is_open()) 
     {

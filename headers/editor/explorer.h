@@ -30,12 +30,21 @@ class Explorer
 
         void handleEvent( SDL_Event* e );
 
+        bool fileHasChanged();
+
+        void toggleFileChanged();
+
         Texture folderTexture;
         Texture fileTexture;
         Texture texture;
 
+        std::string currentFile;
+
     private:
         UIPanel panel{0, 0, 256, 256};
+
+        std::vector<UIStateObject*> folderPtrs;
+        std::vector<UIStateObject*> filePtrs;
 
         std::vector<std::string> folders;
         std::vector<std::string> files;
@@ -44,7 +53,7 @@ class Explorer
         std::string currentPath;
 
         bool directoryChanged;
-
+        bool fileChanged;
 };
 
 #endif // EXPLORER_H

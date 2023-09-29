@@ -159,5 +159,5 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
-    
+    texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
 }

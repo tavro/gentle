@@ -1,7 +1,3 @@
-// TODO: Implement
-// * List GameObjects in active scene
-// * Select GameObject to show in inspector
-
 #ifndef HEIRARCHY_H
 #define HEIRARCHY_H
 
@@ -16,6 +12,8 @@
 #include "../ui_panel.h"
 #include "../game_object.h"
 
+// TODO: Add empty GameObject
+
 class Heirarchy
 {
     public:
@@ -28,6 +26,10 @@ class Heirarchy
         void render(SDL_Renderer* renderer);
 
         void increaseIndex();
+
+        void loadTextures(SDL_Renderer* renderer);
+
+        void reset();
 
         void decreaseIndex();
 

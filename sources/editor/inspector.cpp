@@ -1,6 +1,3 @@
-// TODO: Implement
-// Show visual representation of fields of selected object from heirarchy
-
 #include "../../headers/editor/inspector.h"
 
 Inspector::Inspector(int x, int y)
@@ -11,6 +8,15 @@ Inspector::Inspector(int x, int y)
     posText.setPosition(x, 28+16);
     sizeText.setPosition(x, (28+16)*2);
     velocityText.setPosition(x, (28+16)*3);
+
+    //TODO
+    //nameField.setPosition(x+,0);
+    //posXField.setPosition(x+,28+16);
+    //posYField.setPosition(x+,28+16);
+    //velXField.setPosition(x+,(28+16)*2);
+    //velYField.setPosition(x+,(28+16)*2);
+    //sizeXField.setPosition(x+, (28+16)*3);
+    //sizeYField.setPosition(x+, (28+16)*3);
 }
 
 void Inspector::setActiveObj(GameObject* gameObject)
@@ -24,6 +30,22 @@ void Inspector::loadFont(SDL_Renderer* renderer)
     posText.loadFont     ( "./resources/font.ttf", 28 );
     sizeText.loadFont    ( "./resources/font.ttf", 28 );
     velocityText.loadFont( "./resources/font.ttf", 28 );
+
+    //TODO: For each field... may be a good idea to create buttonCanvas or something like that
+    /*
+    .getText().loadFont( "./resources/font.ttf", 28 );
+	.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
+	for( int i = 0; i < 4; ++i )
+	{
+		.getSpriteClip( i ).x = 0;
+		.getSpriteClip( i ).y = i * BUTTON_HEIGHT;
+        .getSpriteClip( i ).w = BUTTON_WIDTH;
+        .getSpriteClip( i ).h = BUTTON_HEIGHT;
+	}
+
+    .setText("sample.scene");
+	.loadTextTexture(renderer);
+    */
 
     texture.loadFromFile( "./resources/inspector.png", renderer );
 }

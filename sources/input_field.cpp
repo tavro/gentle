@@ -5,7 +5,7 @@ InputField::InputField( int x, int y, int w, int h, int max ) : UIStateObject( x
 {
     maxCharacters = max;
     text.setPosition(x, y);
-    textStr = "Sample Text";
+    textStr = "sample.scene";
     addSpriteClip( { 0, 0, 96, 32 } );  // TODO: Hardcoded values, TODO: Update state object with automatic sizing
     addSpriteClip( { 0, 0, 96, 32 } );
     addSpriteClip( { 0, 0, 96, 32 } );

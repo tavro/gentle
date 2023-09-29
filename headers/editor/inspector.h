@@ -1,12 +1,10 @@
-// TODO: Implement
-// Show visual representation of fields of selected object from heirarchy
-
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
 
 #include <string>
 
 #include "../game_object.h"
+#include "../input_field.h"
 #include "../text.h"
 #include "../texture.h"
 
@@ -32,6 +30,15 @@ class Inspector
         Text posText {"Position: (X:, Y:)", 0, 0};
         Text sizeText{"Size: (X:, Y:)", 0, 0};
         Text velocityText{"Velocity: (X:, Y:)", 0, 0};
+
+        // TODO
+        //InputField nameField{0,  0, 96, 28, 20};
+        //InputField posXField{0,  0, 96, 28, 20};
+        //InputField posYField{0,  0, 96, 28, 20};
+        //InputField velXField{0,  0, 96, 28, 20};
+        //InputField velYField{0,  0, 96, 28, 20};
+        //InputField sizeXField{0,  0, 96, 28, 20};
+        //InputField sizeYField{0,  0, 96, 28, 20};
 };
 
 #endif // INSPECTOR_H

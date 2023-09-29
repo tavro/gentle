@@ -1,7 +1,3 @@
-// TODO: Implement
-// * List standing directory
-// * Be able to navigate
-
 #include "../../headers/editor/explorer.h"
 
 Explorer::Explorer(std::string path, int x, int y, int width, int height)
@@ -17,7 +13,7 @@ Explorer::Explorer(std::string path, int x, int y, int width, int height)
 
 void Explorer::enterDirectory(std::string dirName)
 {
-    currentPath = currentPath + "/" + dirName + "/";
+    currentPath = currentPath + dirName + "/";
     loadCurrentPath();
 }
 
@@ -42,6 +38,8 @@ void Explorer::loadCurrentPath()
 {
     folders.clear();
     files.clear();
+    folderPtrs.clear();
+    filePtrs.clear();
 
     try {
         for (const auto& entry : std::filesystem::directory_iterator(currentPath)) {
@@ -80,6 +78,7 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             uiStateObj->addSpriteClip( { 0, 32, 32, 32 } );
             uiStateObj->addSpriteClip( { 0, 64, 32, 32 } );
             uiStateObj->addSpriteClip( { 0, 96, 32, 32 } );
+            folderPtrs.push_back(uiStateObj);
 
             folderPanel->addObj(uiStateObj);
             folderPanel->addObj(text);
@@ -101,6 +100,7 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
             uiStateObj->addSpriteClip( { 0, 32, 32, 32 } );
             uiStateObj->addSpriteClip( { 0, 64, 32, 32 } );
             uiStateObj->addSpriteClip( { 0, 96, 32, 32 } );
+            filePtrs.push_back(uiStateObj);
 
             filePanel->addObj(uiStateObj);
             filePanel->addObj(text);
@@ -118,5 +118,36 @@ void Explorer::render(SDL_Renderer* renderer)   // TODO: This function should be
 
 void Explorer::handleEvent( SDL_Event* e )
 {
-    panel.handleEvent(e);
+    for(int i = 0; i < folderPtrs.size(); i++)
+    {
+        folderPtrs[i]->handleEvent(e);
+        if(folderPtrs[i]->isToggled())
+        {
+            enterDirectory(folders[i]);
+            folderPtrs[i]->setToggle(false);
+            return;
+        }
+    }
+
+    for(int i = 0; i < filePtrs.size(); i++)
+    {
+        filePtrs[i]->handleEvent(e);
+        if(filePtrs[i]->isToggled())
+        {
+            currentFile = currentPath + files[i];
+            fileChanged = true;
+            filePtrs[i]->setToggle(false);
+            return;
+        }
+    }
+}
+
+bool Explorer::fileHasChanged()
+{
+    return fileChanged;
+}
+
+void Explorer::toggleFileChanged()
+{
+    fileChanged = !fileChanged;
 }

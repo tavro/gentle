@@ -56,9 +56,6 @@ Inspector inspector{SCREEN_WIDTH, 0};
 
 Scene* testScene = new Scene{};
 
-Button saveButton{"Save", 0, SCREEN_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
-InputField field{BUTTON_WIDTH*2,  SCREEN_HEIGHT, 96, 28, 20};
-
 GameObject a{};
 
 bool init()
@@ -125,7 +122,6 @@ bool loadMedia()
 	bool success = true;
 
 	testScene->load("./test.scene");
-	testScene->loadTextures(renderer);
 
 	heirarchy.loadTextures(renderer);
 	heirarchy.setActiveScene(testScene, renderer);
@@ -140,23 +136,8 @@ bool loadMedia()
 	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
 	canvas.addObj(&mainMenuImg);
 
-	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
-	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
-	canvas.addObj(&saveButton);
-
-	field.getText().loadFont( "./resources/font.ttf", 28 );
-	field.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
-	for( int i = 0; i < 4; ++i )
-	{
-		field.getSpriteClip( i ).x = 0;
-		field.getSpriteClip( i ).y = i * BUTTON_HEIGHT;
-        field.getSpriteClip( i ).w = BUTTON_WIDTH;
-        field.getSpriteClip( i ).h = BUTTON_HEIGHT;
-	}
-	canvas.addObj(&field);
-
-    success = !FPSText.loadFont( "./resources/font.ttf", 28 );
-    success = !FPSText.loadTexture( renderer );
+    success = FPSText.loadFont( "./resources/font.ttf", 28 );
+    success = FPSText.loadTexture( renderer );
 	canvas.addObj(&FPSText);
 
 	return success;
@@ -216,10 +197,7 @@ int main( int argc, char* args[] )
 			fpsTimer.start();
 
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
-			
-			field.setText("sample.scene");
-			field.loadTextTexture(renderer);
-			
+
 			SDL_StartTextInput();
 
 			SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
@@ -249,26 +227,6 @@ int main( int argc, char* args[] )
 								inspector.setActiveObj(testScene->getObjFromName(heirarchy.getActiveObjName()));
 							break;
 						}
-
-						if( e.key.keysym.sym == SDLK_BACKSPACE)
-						{
-							field.removeChar();
-						}
-						else if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
-						{
-							SDL_SetClipboardText( field.getContent().c_str() );
-						}
-						else if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
-						{
-							field.updateText(SDL_GetClipboardText());
-						}
-					}
-					else if( e.type == SDL_TEXTINPUT )
-					{
-						if(!(SDL_GetModState() & KMOD_CTRL))
-						{
-							field.appendToText(e.text.text);
-						}
 					}
 
 					canvas.handleEvent( &e );
@@ -276,15 +234,9 @@ int main( int argc, char* args[] )
 
 				}
 
-				if(saveButton.isToggled())
-				{
-					saveButton.setToggle(false);
-				}
-
 				if(explorer.fileHasChanged())
 				{
 					testScene->load(explorer.currentFile); // TODO: Check if scene
-					testScene->loadTextures(renderer);
 					heirarchy.setActiveScene(testScene, renderer);
 					explorer.toggleFileChanged();
 				}
@@ -305,7 +257,6 @@ int main( int argc, char* args[] )
 
                 canvas.render(renderer);
 
-				testScene->render(renderer);
 				explorer.render(renderer);
 				heirarchy.render(renderer);
 				inspector.render(renderer);

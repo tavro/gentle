@@ -1,7 +1,3 @@
-// TODO: Implement
-// * List GameObjects in active scene
-// * Select GameObject to show in inspector
-
 #include "../../headers/editor/heirarchy.h"
 
 Heirarchy::Heirarchy(int x, int y, int w, int h)
@@ -10,8 +6,19 @@ Heirarchy::Heirarchy(int x, int y, int w, int h)
     panel.getSize().set(w, h);
 }
 
+void Heirarchy::loadTextures(SDL_Renderer* renderer)
+{
+    texture.loadFromFile( "./resources/main-menu-background.png", renderer );
+    texture.setColor( 0xFF, 165, 0 );
+
+    texture2.loadFromFile( "./resources/heirarchy.png", renderer );
+}
+
 void Heirarchy::setActiveScene(Scene* scene, SDL_Renderer* renderer)
 {
+    names.clear();
+    panel.clearObjs();
+
     activeScene = scene;
     index = 0;
 
@@ -32,11 +39,6 @@ void Heirarchy::setActiveScene(Scene* scene, SDL_Renderer* renderer)
     }
     panel.setMaxHeight();
     panel.alignObjs();
-
-    texture.loadFromFile( "./resources/main-menu-background.png", renderer );
-    texture.setColor( 0xFF, 165, 0 );
-
-    texture2.loadFromFile( "./resources/heirarchy.png", renderer );
 
     maxIndex = names.size();
 }

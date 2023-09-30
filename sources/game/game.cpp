@@ -3,10 +3,7 @@
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
 #include "../../headers/text.h"
-
-// TODO: remove when global variables get own header
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+#include "../../headers/utils/constants.h"
 
 Text fpsText{"", 0, SCREEN_HEIGHT - 28};
 

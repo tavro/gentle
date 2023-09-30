@@ -6,13 +6,9 @@
 #include "./particle.h"
 #include "./texture.h"
 
+#include "./utils/constants.h"
+
 #include "./animation.h"
-
-const int LEVEL_WIDTH = 640;// + 128;	// TODO: Hardcoded values
-const int LEVEL_HEIGHT = 480;// + 128;
-
-const int SCREEN_WIDTH = 640;	// TODO: Place in globals header
-const int SCREEN_HEIGHT = 480;
 
 class Player : public GameObject
 {

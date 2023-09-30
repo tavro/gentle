@@ -2,6 +2,7 @@
 #define GAMEOBJECT_H
 
 #include <SDL2/SDL.h>
+#include <cmath>
 #include "./texture.h"
 #include "./utils/vector2d.h"
 
@@ -114,6 +115,23 @@ class GameObject
         
         std::string getName();
 
+        void setRotation(float value);
+
+        void increaseRotation(float amount);
+
+        void decreaseRotation(float amount);
+
+        virtual void move()
+        {
+            getPosition().increaseX(getVelocity().getX());
+            getPosition().increaseY(getVelocity().getY());
+        }
+
+        virtual void setHasFriction(bool state)
+        {
+            
+        }
+
     protected:
 
     private:
@@ -128,6 +146,8 @@ class GameObject
         Vector2D position;
         Vector2D velocity;
         Vector2D size;
+
+        float rotation;
 };
 
 #endif // GAMEOBJECT_H

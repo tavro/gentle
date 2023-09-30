@@ -1,6 +1,8 @@
 #ifndef VECTOR2D_H
 #define VECTOR2D_H
 
+#include <cmath>
+
 class Vector2D {
     public:
         Vector2D();
@@ -31,6 +33,8 @@ class Vector2D {
 
         Vector2D operator/(float scalar);
         Vector2D& operator/=(float scalar);
+
+        Vector2D getNormalizedVector();
 
     private:
         float x;

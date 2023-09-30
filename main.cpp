@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <random>
 
 #include "./headers/utils/constants.h"
 
@@ -31,6 +32,7 @@
 #include "./headers/image.h"
 #include "./headers/ui_panel.h"
 #include "./headers/game_object.h"
+#include "./headers/physics_object.h"
 
 const int UI_AREA = 256+64;
 const int SCREEN_FPS = 60;
@@ -54,8 +56,9 @@ Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 
 GameObject cursor{{SCREEN_WIDTH, SCREEN_HEIGHT}, {32, 32}, {0, 0}, "Cursor", "./resources/hand-point.png"};
 
-GameObject box{{0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"};
+GameObject box{{0, 0}, {32, 16}, {0, 0}, "Box", "./resources/gameobject2.png"};
 
+Scene* boxScene = new Scene{};
 Scene* testScene = new Scene{};
 
 GameObject a{};
@@ -119,13 +122,52 @@ bool init()
 	return success;
 }
 
+float getRandomAngle()
+{
+	std::random_device rd;
+    std::mt19937 gen(rd());
+
+    float lower_bound = 0.0; // Lower bound of the range
+    float upper_bound = 360.0; // Upper bound of the range
+
+    std::uniform_real_distribution<float> distribution(lower_bound, upper_bound);
+
+    float random_float = distribution(gen);
+	return random_float;
+}
+
 bool loadMedia()
 {
 	bool success = true;
 
 	testScene->load("./test.scene");
 
+	std::string result;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(0, SCREEN_HEIGHT);
+    std::uniform_int_distribution<int> distribution2(0, 10);
+    std::uniform_int_distribution<int> distribution3(1, 10);
+
+	for(int i = 0; i < 5; i++)
+	{
+		int xPos = distribution(generator);
+		int yPos = distribution(generator);
+
+		int xVel = distribution2(generator);
+		int yVel = distribution2(generator);
+
+		int mass = distribution3(generator);
+
+		PhysicsObject* tempObj = new PhysicsObject{{xPos, yPos}, {32, 16}, {xVel, yVel}, "Box", "./resources/gameobject2.png", mass};
+ 		tempObj->loadTexture(renderer);
+		tempObj->setRotation(getRandomAngle());
+		
+		boxScene->addObj(tempObj);
+	}
+
 	cursor.loadTexture(renderer);
+
 	box.loadTexture(renderer);
 
     success = !FPSText.loadFont( "./resources/font.ttf", 28 );
@@ -217,7 +259,7 @@ int main( int argc, char* args[] )
 					{
 						switch( e.key.keysym.sym )
 						{
-							case SDLK_UP: 
+							case SDLK_UP:
 							break;
 							case SDLK_DOWN:
 							break;
@@ -263,7 +305,14 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( renderer );
 
                 canvas.render(renderer);
-				box.render(renderer);
+				//box.render(renderer);
+
+				for (auto* obj: boxScene->getObjs())
+				{
+					obj->move();
+				}
+
+				boxScene->render(renderer);
 				cursor.render(renderer);
 
 				SDL_RenderPresent( renderer );

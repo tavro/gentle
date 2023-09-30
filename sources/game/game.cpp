@@ -2,44 +2,35 @@
 
 #include <vector>
 
-#include "../../headers/game/cursor.h"
-#include "../../headers/game/furniture.h"
-
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
-#include "../../headers/text.h"
 #include "../../headers/utils/constants.h"
-
-Text fpsText{"", 0, SCREEN_HEIGHT - 28};
-
-game::Cursor cursor = game::Cursor("Cursor");
-
-std::vector<game::Furniture *> furnitureList{
-    new game::Furniture({0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"),
-    new game::Furniture({32, 0}, {32, 32}, {0, 0}, "Box 2", "./resources/gameobject.png")
-};
 
 namespace game
 {
-    static void onMouseDown(int mouseX, int mouseY, SDL_Renderer *renderer)
+    Game::Game(SDL_Renderer *renderer) : renderer(renderer), cursor(Cursor("Cursor")), fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
-        cursor.isClosed = true;
-        cursor.draggedFurniture = cursor.hoveredFurniture;
+        furnitureList = {
+            new Furniture({0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"),
+            new Furniture({32, 0}, {32, 32}, {0, 0}, "Box 2", "./resources/gameobject.png")
+        };
     }
 
-    static void onMouseUp(int mouseX, int mouseY, SDL_Renderer *renderer)
+    Game::~Game()
     {
-        cursor.isClosed = false;
-        cursor.draggedFurniture = nullptr;
+        for (auto furniture : furnitureList)
+        {
+            free(furniture);
+        }
     }
 
-    bool loadMedia(SDL_Renderer *renderer, Canvas *canvas)
+    bool Game::loadMedia(Canvas &canvas)
     {
         bool success = true;
         
         success = !fpsText.loadFont("./resources/font.ttf", 28);
         success = !fpsText.loadTexture(renderer);
-	    canvas->addObj(&fpsText);
+	    canvas.addObj(&fpsText);
         
         for (auto furniture : furnitureList)
         {
@@ -50,7 +41,7 @@ namespace game
         return success;
     }
 
-    void update(SDL_Renderer *renderer, float avgFPS, SDL_Event *event)
+    void Game::update(float avgFPS, SDL_Event &event)
     {
         int mouseX, mouseY;
         SDL_GetMouseState(&mouseX, &mouseY);
@@ -68,13 +59,13 @@ namespace game
             }
         }
 
-        switch (event->type)
+        switch (event.type)
         {
         case SDL_MOUSEBUTTONDOWN:
-            onMouseDown(mouseX, mouseY, renderer);
+            onMouseDown(mouseX, mouseY);
             break;
         case SDL_MOUSEBUTTONUP:
-            onMouseUp(mouseX, mouseY, renderer);
+            onMouseUp(mouseX, mouseY);
             break;
         }
         
@@ -94,7 +85,7 @@ namespace game
         }
     }
 
-    void render(SDL_Renderer *renderer)
+    void Game::render()
     {
         fpsText.render(renderer);
 
@@ -103,5 +94,17 @@ namespace game
             furniture->render(renderer);
         }
         cursor.render(renderer);
+    }
+
+    void Game::onMouseDown(int mouseX, int mouseY)
+    {
+        cursor.isClosed = true;
+        cursor.draggedFurniture = cursor.hoveredFurniture;
+    }
+
+    void Game::onMouseUp(int mouseX, int mouseY)
+    {
+        cursor.isClosed = false;
+        cursor.draggedFurniture = nullptr;
     }
 }

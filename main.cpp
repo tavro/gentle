@@ -48,6 +48,7 @@ SDL_Window*     window 	 = NULL;
 SDL_Renderer*   renderer = NULL;
 
 Canvas canvas;
+game::Game *gameInstance = NULL;
 
 //Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
@@ -126,13 +127,15 @@ bool loadMedia()
 	//explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
 	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
-	success = game::loadMedia(renderer, &canvas);
+	success = gameInstance->loadMedia(canvas);
 
 	return success;
 }
 
 void close()
 {
+	free(gameInstance);
+
 	canvas.freeTextures();
 
 	SDL_DestroyRenderer( renderer );
@@ -154,6 +157,8 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
+		gameInstance = new game::Game(renderer);
+
 		if( !loadMedia() )
 		{
 			printf( "Failed to load media!\n" );
@@ -226,7 +231,7 @@ int main( int argc, char* args[] )
 					canvas.handleEvent( &e );
 					//explorer.handleEvent( &e );
 
-					game::update(renderer, avgFPS, &e);
+					gameInstance->update(avgFPS, e);
 				}
 
 				/*
@@ -244,7 +249,7 @@ int main( int argc, char* args[] )
 
                 canvas.render(renderer);
 
-				game::render(renderer);
+				gameInstance->render();
 
 				//explorer.render(renderer);
 				//heirarchy.render(renderer);

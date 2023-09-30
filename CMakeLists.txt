@@ -29,7 +29,8 @@ add_executable(ld54 main.cpp
     sources/canvas.cpp
     sources/image.cpp
     sources/ui_panel.cpp
-    sources/scene.cpp)
+    sources/scene.cpp
+    sources/game/game.cpp)
 
 target_link_libraries(ld54 ${SDL2_LIBRARIES})
 target_link_libraries(ld54 SDL2_ttf::SDL2_ttf)

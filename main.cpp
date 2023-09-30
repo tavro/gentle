@@ -31,6 +31,8 @@
 #include "./headers/game_object.h"
 #include "./headers/scene.h"
 
+#include "./headers/game/game.h"
+
 const int UI_AREA = 256+64;
 const int SCREEN_FPS = 60;
 const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
@@ -54,8 +56,6 @@ Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 //Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Inspector inspector{SCREEN_WIDTH, 0};
-
-Scene* testScene = new Scene{};
 
 GameObject a{};
 
@@ -122,8 +122,6 @@ bool loadMedia()
 {
 	bool success = true;
 
-	testScene->load("./test.scene");
-
 	//heirarchy.loadTextures(renderer);
 	//heirarchy.setActiveScene(testScene, renderer);
 
@@ -134,12 +132,13 @@ bool loadMedia()
 	//explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
 	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
-	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
 	canvas.addObj(&mainMenuImg);
 
     success = !FPSText.loadFont( "./resources/font.ttf", 28 );
     success = !FPSText.loadTexture( renderer );
 	canvas.addObj(&FPSText);
+
+	success = game::loadMedia(renderer);
 
 	return success;
 }
@@ -261,6 +260,8 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( renderer );
 
                 canvas.render(renderer);
+
+				game::render(renderer);
 
 				//explorer.render(renderer);
 				//heirarchy.render(renderer);

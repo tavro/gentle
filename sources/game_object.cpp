@@ -209,3 +209,8 @@ void GameObject::decreaseRotation(float amount)
     rotation-=amount;
     rotation = fmod(rotation, 360.0);
 }
+
+bool GameObject::isMoving()
+{
+    return (getVelocity().getX() != 0 || getVelocity().getY() != 0);
+}

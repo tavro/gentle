@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include <cmath>
+#include <vector>
 #include "./texture.h"
 #include "./utils/vector2d.h"
 
@@ -131,6 +132,13 @@ class GameObject
         {
             
         }
+
+        virtual void handleCollisions(std::vector<GameObject*> others)
+        {
+
+        }
+
+        bool isMoving();
 
     protected:
 

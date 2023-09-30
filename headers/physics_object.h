@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include "./game_object.h"
+#include "./utils/constants.h"
 
 class PhysicsObject : public GameObject
 {
@@ -28,14 +29,52 @@ class PhysicsObject : public GameObject
             getPosition().increaseX(getVelocity().getX());
             getPosition().increaseY(getVelocity().getY());
 
-            if(getVelocity().getX() <= 0.1)
+            if(getPosition().getX() >= SCREEN_WIDTH-32)
+            {
+                getVelocity().setX(getVelocity().getX()*-1);
+            }
+
+            if(getPosition().getX() <= 0)
+            {
+                getVelocity().setX(getVelocity().getX()*-1);
+            }
+
+            if(getPosition().getY() >= SCREEN_HEIGHT-32)
+            {
+                getVelocity().setY(getVelocity().getY()*-1);
+            }
+
+            if(getPosition().getY() <= 0)
+            {
+                getVelocity().setY(getVelocity().getY()*-1);
+            }
+
+            if(getVelocity().getX() <= 0.1 && getVelocity().getX() >= -0.1)
             {
                 getVelocity().setX(0);
             }
 
-            if(getVelocity().getY() <= 0.1) 
+            if(getVelocity().getY() <= 0.1 && getVelocity().getY() >= -0.1) 
             {
                 getVelocity().setY(0);
+            }
+        }
+
+        void handleCollisions(std::vector<GameObject*> others) override
+        {
+            if(isMoving())
+            {
+                for (auto* other: others)
+                {
+                    if(other != this)
+                    {
+                        if(hasCollision(*other))
+                        {
+                            other->getVelocity().set(getVelocity().getX(), getVelocity().getY());
+                            getVelocity()*=-1;
+                        }
+                    }
+                }
             }
         }
 

@@ -34,13 +34,6 @@
 #include "./headers/game_object.h"
 #include "./headers/physics_object.h"
 
-const int UI_AREA = 256+64;
-const int SCREEN_FPS = 60;
-const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
-
-const int BUTTON_WIDTH = 96;
-const int BUTTON_HEIGHT = 32;
-
 bool init();
 bool loadMedia();
 void close();
@@ -61,6 +54,8 @@ GameObject box{{0, 0}, {32, 16}, {0, 0}, "Box", "./resources/gameobject2.png"};
 Scene* boxScene = new Scene{};
 Scene* testScene = new Scene{};
 
+GameObject* activeObj;
+
 GameObject a{};
 
 bool init()
@@ -79,7 +74,7 @@ bool init()
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}
 
-		window = SDL_CreateWindow( "gentle game engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH + UI_AREA, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
+		window = SDL_CreateWindow( "gentle game engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( window == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -146,7 +141,7 @@ bool loadMedia()
     std::random_device rd;
     std::mt19937 generator(rd());
     std::uniform_int_distribution<int> distribution(0, SCREEN_HEIGHT);
-    std::uniform_int_distribution<int> distribution2(0, 10);
+    std::uniform_int_distribution<int> distribution2(-10, 10);
     std::uniform_int_distribution<int> distribution3(1, 10);
 
 	int xVel = distribution2(generator);
@@ -239,20 +234,25 @@ int main( int argc, char* args[] )
 			{
 				capTimer.start();
 
-				if(box.isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2))
+				for (auto* obj: boxScene->getObjs())
 				{
-					if(!isClosed)
+					if(obj->isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2))
 					{
-						cursor.setTexturePath("./resources/hand.png");
-						cursor.loadTexture(renderer);
+						if(!isClosed)
+						{
+							cursor.setTexturePath("./resources/hand.png");
+							cursor.loadTexture(renderer);
+							activeObj = obj;
+							break;
+						}
 					}
-				}
-				else
-				{
-					if(!isClosed)
+					else
 					{
-						cursor.setTexturePath("./resources/hand-point.png");
-						cursor.loadTexture(renderer);
+						if(!isClosed)
+						{
+							cursor.setTexturePath("./resources/hand-point.png");
+							cursor.loadTexture(renderer);
+						}
 					}
 				}
 
@@ -264,9 +264,16 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_KEYDOWN )
 					{
+						std::string result;
+						std::random_device rd;
+						std::mt19937 generator(rd());
+						std::uniform_int_distribution<int> distribution2(-10, 10);
+						int xVel = distribution2(generator);
+						int yVel = distribution2(generator);
 						switch( e.key.keysym.sym )
 						{
 							case SDLK_UP:
+								activeObj->getVelocity().set(xVel, yVel);
 							break;
 							case SDLK_DOWN:
 							break;
@@ -284,6 +291,12 @@ int main( int argc, char* args[] )
 							
 							case SDL_MOUSEBUTTONUP:
 								isClosed = false;
+							break;
+
+							case SDL_MOUSEWHEEL:
+                				int scroll = e.wheel.y * 5;
+								//std::cout << "Y:" << scroll << std::endl;
+								activeObj->increaseRotation(scroll);
 							break;
 						}
 					}
@@ -313,9 +326,17 @@ int main( int argc, char* args[] )
 
                 canvas.render(renderer);
 				//box.render(renderer);
+	
+				/*
+				if(activeObj != nullptr)
+				{
+					activeObj->handleCollisions(boxScene->getObjs());
+				}
+				*/
 
 				for (auto* obj: boxScene->getObjs())
 				{
+					obj->handleCollisions(boxScene->getObjs());
 					obj->move();
 				}
 

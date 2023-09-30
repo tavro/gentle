@@ -10,4 +10,4 @@ const int SCREEN_HEIGHT = 480;
 const int TILE_WIDTH = 32;
 const int TILE_HEIGHT = 32;
 
-#endif CONSTANTS_H
+#endif

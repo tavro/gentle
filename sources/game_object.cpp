@@ -161,3 +161,35 @@ void GameObject::render(SDL_Renderer* renderer)
 {
     texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
 }
+
+void GameObject::setTexturePath(std::string path)
+{
+    texturePath = path;
+}
+
+bool GameObject::isInside(int x, int y)
+{
+    bool inBoundX = x <= (getPosition().getX() + getSize().getX()) && x >= getPosition().getX();
+    bool inBoundY = y <= (getPosition().getY() + getSize().getY()) && y >= getPosition().getY();
+    return inBoundX && inBoundY;
+}
+
+bool GameObject::isToggled()
+{
+    return toggle;
+}
+
+void GameObject::setToggle(bool state)
+{
+    toggle = state;
+}
+
+void GameObject::setCurrentState( State state )
+{
+    currentState = state;
+}
+
+State GameObject::getCurrentState()
+{
+    return currentState;
+}

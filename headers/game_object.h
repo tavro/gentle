@@ -21,6 +21,7 @@ class GameObject
     public:
         GameObject();
         GameObject(int x, int y, int w, int h);
+        GameObject(Vector2D topLeft, Vector2D bottomRight);
         GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path);
 
         Texture& getTexture();

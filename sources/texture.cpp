@@ -124,3 +124,13 @@ int Texture::getHeight()
 {
 	return height;
 }
+
+int Texture::setWidth(int w)
+{
+	width = w;
+}
+
+int Texture::setHeight(int h)
+{
+	height = h;
+}

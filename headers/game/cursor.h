@@ -4,6 +4,7 @@
 #include <SDL2/SDL_render.h>
 
 #include "../game_object.h"
+#include "./furniture.h"
 
 namespace game
 {
@@ -13,7 +14,8 @@ namespace game
         Cursor(std::string name);
         void updateTexture(SDL_Renderer *renderer);
         bool isClosed = false;
-        bool isHovering = false;
+        Furniture *hoveredFurniture = nullptr;
+        Furniture *draggedFurniture = nullptr;
     };
 }
 

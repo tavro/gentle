@@ -1,5 +1,7 @@
 #include "../../headers/game/game.h"
 
+#include <vector>
+
 #include "../../headers/game/cursor.h"
 #include "../../headers/game/furniture.h"
 
@@ -11,20 +13,24 @@
 Text fpsText{"", 0, SCREEN_HEIGHT - 28};
 
 game::Cursor cursor = game::Cursor("Cursor");
-game::Furniture box = game::Furniture({0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png");
+
+std::vector<game::Furniture *> furnitureList{
+    new game::Furniture({0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"),
+    new game::Furniture({32, 0}, {32, 32}, {0, 0}, "Box 2", "./resources/gameobject.png")
+};
 
 namespace game
 {
     static void onMouseDown(int mouseX, int mouseY, SDL_Renderer *renderer)
     {
         cursor.isClosed = true;
-        box.isDragging = cursor.isHovering;
+        cursor.draggedFurniture = cursor.hoveredFurniture;
     }
 
     static void onMouseUp(int mouseX, int mouseY, SDL_Renderer *renderer)
     {
         cursor.isClosed = false;
-        box.isDragging = false;
+        cursor.draggedFurniture = nullptr;
     }
 
     bool loadMedia(SDL_Renderer *renderer, Canvas *canvas)
@@ -35,7 +41,10 @@ namespace game
         success = !fpsText.loadTexture(renderer);
 	    canvas->addObj(&fpsText);
         
-        box.loadTexture(renderer);
+        for (auto furniture : furnitureList)
+        {
+            furniture->loadTexture(renderer);
+        }
         cursor.loadTexture(renderer);
 
         return success;
@@ -47,7 +56,17 @@ namespace game
         SDL_GetMouseState(&mouseX, &mouseY);
         cursor.getPosition().set(mouseX - 32/2, mouseY - 32/2);
 
-        cursor.isHovering = box.isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2);
+        if (cursor.draggedFurniture == nullptr)
+        {
+            cursor.hoveredFurniture = nullptr;
+            for (auto furniture : furnitureList)
+            {
+                if (furniture->isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2)) {
+                    cursor.hoveredFurniture = furniture;
+                    break;
+                }
+            }
+        }
 
         switch (event->type)
         {
@@ -68,10 +87,10 @@ namespace game
         fpsText.updateContent(timeText.str());
         fpsText.loadTexture(renderer);
 
-        if (box.isDragging)
+        if (cursor.draggedFurniture != nullptr)
         {
             Vector2D &cursorPos = cursor.getPosition();
-            box.setPosition(cursorPos);
+            cursor.draggedFurniture->setPosition(cursorPos);
         }
     }
 
@@ -79,7 +98,10 @@ namespace game
     {
         fpsText.render(renderer);
 
-        box.render(renderer);
+        for (auto furniture : furnitureList)
+        {
+            furniture->render(renderer);
+        }
         cursor.render(renderer);
     }
 }

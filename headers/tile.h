@@ -4,9 +4,7 @@
 #include <SDL2/SDL.h>
 #include "./texture.h"
 #include "./game_object.h"
-
-const int TILE_WIDTH = 32;
-const int TILE_HEIGHT = 32;
+#include "./utils/constants.h"
 
 class Tile : public GameObject
 {

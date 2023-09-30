@@ -11,6 +11,8 @@
 #include <vector>
 #include <map>
 
+#include "./headers/utils/constants.h"
+
 #include "./headers/editor/explorer.h"
 #include "./headers/editor/heirarchy.h"
 #include "./headers/editor/inspector.h"

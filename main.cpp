@@ -149,22 +149,29 @@ bool loadMedia()
     std::uniform_int_distribution<int> distribution2(0, 10);
     std::uniform_int_distribution<int> distribution3(1, 10);
 
-	for(int i = 0; i < 5; i++)
-	{
-		int xPos = distribution(generator);
-		int yPos = distribution(generator);
+	int xVel = distribution2(generator);
+	int yVel = distribution2(generator);
 
-		int xVel = distribution2(generator);
-		int yVel = distribution2(generator);
-
-		int mass = distribution3(generator);
-
-		PhysicsObject* tempObj = new PhysicsObject{{xPos, yPos}, {32, 16}, {xVel, yVel}, "Box", "./resources/gameobject2.png", mass};
- 		tempObj->loadTexture(renderer);
-		tempObj->setRotation(getRandomAngle());
-		
-		boxScene->addObj(tempObj);
-	}
+	PhysicsObject* bed = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 16}, {xVel, yVel}, "bed", "./resources/furniture/0.png", 12};
+ 	bed->loadTexture(renderer);
+	bed->setRotation(getRandomAngle());
+	boxScene->addObj(bed);
+	PhysicsObject* sofa = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 16}, {xVel, yVel}, "sofa", "./resources/furniture/1.png", 10};
+ 	sofa->loadTexture(renderer);
+	sofa->setRotation(getRandomAngle());
+	boxScene->addObj(sofa);
+	PhysicsObject* piano = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 16}, {xVel, yVel}, "piano", "./resources/furniture/2.png", 20};
+ 	piano->loadTexture(renderer);
+	piano->setRotation(getRandomAngle());
+	boxScene->addObj(piano);
+	PhysicsObject* plant = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 16}, {xVel, yVel}, "plant", "./resources/furniture/3.png", 2};
+ 	plant->loadTexture(renderer);
+	plant->setRotation(getRandomAngle());
+	boxScene->addObj(plant);
+	PhysicsObject* oven = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 16}, {xVel, yVel}, "oven", "./resources/furniture/4.png", 15};
+ 	oven->loadTexture(renderer);
+	oven->setRotation(getRandomAngle());
+	boxScene->addObj(oven);
 
 	cursor.loadTexture(renderer);
 

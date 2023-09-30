@@ -17,9 +17,9 @@ class PhysicsObject : public GameObject
             if(hasFriction) 
             {
                 float localVel = getVelocity().getX()*getVelocity().getX() + getVelocity().getY()*getVelocity().getY();
-                Vector2D friction = (getVelocity().getNormalizedVector() * -1) * (float)(localVel * 0.25);
+                Vector2D friction = (getVelocity().getNormalizedVector() * -1) * (float)(localVel * 0.0025);
 
-                acceleration.set(friction.getX()/mass, friction.getY()/mass);
+                acceleration.set(friction.getX()*mass, friction.getY()*mass);
 
                 getVelocity().increaseX(acceleration.getX());
                 getVelocity().increaseY(acceleration.getY());

@@ -161,3 +161,15 @@ void GameObject::render(SDL_Renderer* renderer)
 {
     texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
 }
+
+void GameObject::setTexturePath(std::string path)
+{
+    texturePath = path;
+}
+
+bool GameObject::isInside(int x, int y)
+{
+    bool inBoundX = x <= (getPosition().getX() + getSize().getX()) && x >= getPosition().getX();
+    bool inBoundY = y <= (getPosition().getY() + getSize().getY()) && y >= getPosition().getY();
+    return inBoundX && inBoundY;
+}

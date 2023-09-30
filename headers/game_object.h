@@ -24,6 +24,7 @@ class GameObject
         }
 
         void setTexture(Texture texture);
+        void setTexturePath(std::string path);
 
         bool loadTexture(SDL_Renderer* renderer, std::string path);
         bool loadTexture(SDL_Renderer* renderer);
@@ -39,6 +40,8 @@ class GameObject
         SDL_Rect toBox();
 
         bool hasCollision(GameObject& other);
+
+        bool isInside(int x, int y);
 
         std::string getName();
 

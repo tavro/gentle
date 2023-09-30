@@ -50,11 +50,17 @@ Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 
 Text FPSText{"", 0, SCREEN_HEIGHT - 28};
 
-GameObject cursor{{SCREEN_WIDTH, SCREEN_HEIGHT}, {32, 32}, {0, 0}, "Cursor", "./resources/hand-point.png"};
-
-GameObject box{{0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"};
+Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+Inspector inspector{SCREEN_WIDTH, 0};
 
 Scene* testScene = new Scene{};
+
+Button saveButton{"Save", 0, SCREEN_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Button cdButton{"cd ..", BUTTON_WIDTH*2+16*2, SCREEN_HEIGHT, BUTTON_WIDTH, BUTTON_HEIGHT};
+Button createButton{"Create Empty Obj", BUTTON_WIDTH*3+16*3, SCREEN_HEIGHT};
+
+InputField field{BUTTON_WIDTH+16,  SCREEN_HEIGHT, 96, 28, 8};
 
 GameObject a{};
 
@@ -122,9 +128,43 @@ bool loadMedia()
 	bool success = true;
 
 	testScene->load("./test.scene");
+	testScene->loadTextures(renderer);
 
-	cursor.loadTexture(renderer);
-	box.loadTexture(renderer);
+	heirarchy.loadTextures(renderer);
+	heirarchy.setActiveScene(testScene, renderer);
+
+	inspector.setActiveObj(&a);
+	inspector.loadFont(renderer);
+
+	explorer.folderTexture.loadFromFile( "./resources/folderSheet.png", renderer );
+	explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
+	explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
+
+	mainMenuImg.getTexture().loadFromFile( "./resources/main-menu-background.png", renderer );
+	canvas.addObj(&mainMenuImg);
+
+	saveButton.getText().loadFont( "./resources/font.ttf", 28 );
+	saveButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+	canvas.addObj(&saveButton);
+
+	createButton.getText().loadFont( "./resources/font.ttf", 28 );
+	createButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+	canvas.addObj(&createButton);
+
+	cdButton.getText().loadFont( "./resources/font.ttf", 28 );
+	cdButton.loadSpriteSheet( "./resources/buttonsheet.png", renderer );
+	canvas.addObj(&cdButton);
+
+	field.getText().loadFont( "./resources/font.ttf", 28 );
+	field.getTexture().loadFromFile( "./resources/buttonsheet.png", renderer );
+	for( int i = 0; i < 4; ++i )
+	{
+		field.getSpriteClip( i ).x = 0;
+		field.getSpriteClip( i ).y = i * BUTTON_HEIGHT;
+        field.getSpriteClip( i ).w = BUTTON_WIDTH;
+        field.getSpriteClip( i ).h = BUTTON_HEIGHT;
+	}
+	canvas.addObj(&field);
 
     success = !FPSText.loadFont( "./resources/font.ttf", 28 );
     success = !FPSText.loadTexture( renderer );
@@ -135,7 +175,17 @@ bool loadMedia()
 
 void close()
 {
+	//gScratch = NULL; <------ TODO
+	//gHigh = NULL;
+	//gMedium = NULL;
+	//gLow = NULL;
+	
+	// gMusic = NULL;
+
 	canvas.freeTextures();
+
+	//TTF_CloseFont( globalFont );
+	// globalFont = NULL;
 
 	SDL_DestroyRenderer( renderer );
 	SDL_DestroyWindow( window );
@@ -177,33 +227,18 @@ int main( int argc, char* args[] )
 			fpsTimer.start();
 
 			SDL_Color textColor = { 0, 0, 0, 0xFF };
-
+			
+			field.setText("sample.scene");
+			field.loadTextTexture(renderer);
+			
 			SDL_StartTextInput();
 
 			SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-			bool isClosed = false;
 			// Game loop
 			while( !quit )
 			{
 				capTimer.start();
-
-				if(box.isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2))
-				{
-					if(!isClosed)
-					{
-						cursor.setTexturePath("./resources/hand.png");
-						cursor.loadTexture(renderer);
-					}
-				}
-				else
-				{
-					if(!isClosed)
-					{
-						cursor.setTexturePath("./resources/hand-point.png");
-						cursor.loadTexture(renderer);
-					}
-				}
 
 				while( SDL_PollEvent( &e ) != 0 )
 				{
@@ -213,36 +248,68 @@ int main( int argc, char* args[] )
 					}
 					else if( e.type == SDL_KEYDOWN )
 					{
+						// For heirarchy
 						switch( e.key.keysym.sym )
 						{
 							case SDLK_UP: 
+								heirarchy.decreaseIndex();
+								inspector.setActiveObj(testScene->getObjFromName(heirarchy.getActiveObjName()));
 							break;
-							case SDLK_DOWN:
+							case SDLK_DOWN: 
+								heirarchy.increaseIndex();
+								inspector.setActiveObj(testScene->getObjFromName(heirarchy.getActiveObjName()));
 							break;
 						}
-					}
-					else
-					{
-						switch( e.type )
+
+						if( e.key.keysym.sym == SDLK_BACKSPACE)
 						{
-							case SDL_MOUSEBUTTONDOWN:
-								cursor.setTexturePath("./resources/hand-closed.png");
-								cursor.loadTexture(renderer);
-								isClosed = true;
-							break;
-							
-							case SDL_MOUSEBUTTONUP:
-								isClosed = false;
-							break;
+							field.removeChar();
+						}
+						else if( e.key.keysym.sym == SDLK_c && SDL_GetModState() & KMOD_CTRL )
+						{
+							SDL_SetClipboardText( field.getContent().c_str() );
+						}
+						else if( e.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_CTRL )
+						{
+							field.updateText(SDL_GetClipboardText());
+						}
+					}
+					else if( e.type == SDL_TEXTINPUT )
+					{
+						if(!(SDL_GetModState() & KMOD_CTRL))
+						{
+							field.appendToText(e.text.text);
 						}
 					}
 
 					canvas.handleEvent( &e );
+					explorer.handleEvent( &e );
 
-					int x, y;
-                	SDL_GetMouseState( &x, &y );
-					cursor.getPosition().set(x-32/2, y-32/2);
+				}
 
+				if(saveButton.isToggled())
+				{
+					testScene->save("");
+					saveButton.setToggle(false);
+				}
+				if(createButton.isToggled())
+				{
+					testScene->createEmptyObject();
+					heirarchy.setActiveScene(testScene, renderer);
+					createButton.setToggle(false);
+				}
+				if(cdButton.isToggled())
+				{
+					explorer.goBack();
+					cdButton.setToggle(false);
+				}
+
+				if(explorer.fileHasChanged())
+				{
+					testScene->load(explorer.currentFile); // TODO: Check if scene
+					testScene->loadTextures(renderer);
+					heirarchy.setActiveScene(testScene, renderer);
+					explorer.toggleFileChanged();
 				}
 
 				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
@@ -260,8 +327,11 @@ int main( int argc, char* args[] )
 				SDL_RenderClear( renderer );
 
                 canvas.render(renderer);
-				box.render(renderer);
-				cursor.render(renderer);
+
+				testScene->render(renderer);
+				explorer.render(renderer);
+				heirarchy.render(renderer);
+				inspector.render(renderer);
 
 				SDL_RenderPresent( renderer );
 

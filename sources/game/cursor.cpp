@@ -12,7 +12,7 @@ namespace game
         {
             setTexturePath("./resources/hand-closed.png");
         }
-        else if (hoveredFurniture != NULL)
+        else if (isHoveringBox || isHoveringFurn)
         {
             setTexturePath("./resources/hand.png");
         }

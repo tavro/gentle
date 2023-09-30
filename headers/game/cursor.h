@@ -14,8 +14,8 @@ namespace game
         Cursor(std::string name);
         void updateTexture(SDL_Renderer *renderer);
         bool isClosed = false;
-        Furniture *hoveredFurniture = nullptr;
-        Furniture *draggedFurniture = nullptr;
+        bool isHoveringBox = false;
+        bool isHoveringFurn = false;
     };
 }
 

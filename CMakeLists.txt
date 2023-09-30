@@ -31,6 +31,7 @@ add_executable(ld54 main.cpp
     sources/ui_panel.cpp
     sources/scene.cpp
     sources/game/game.cpp
+    sources/game/box.cpp
     sources/game/cursor.cpp
     sources/game/furniture.cpp)
 

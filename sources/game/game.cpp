@@ -10,15 +10,23 @@ namespace game
 {
     Game::Game(SDL_Renderer *renderer) : renderer(renderer), cursor(Cursor("Cursor")), fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
-        furnitureList = {
-            new Furniture({0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"),
-            new Furniture({32, 0}, {32, 32}, {0, 0}, "Box 2", "./resources/gameobject.png")
+        boxes = {
+            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png"),
+            new Box({32, 0}, "Box 2", "./resources/folder.png", "Furn 2", "./resources/gameobject.png")
         };
     }
 
     Game::~Game()
     {
-        for (auto furniture : furnitureList)
+        for (auto box : boxes)
+        {
+            free(box);
+        }
+        if (currFurniture != nullptr)
+        {
+            free(currFurniture);
+        }
+        for (auto furniture : placedFurniture)
         {
             free(furniture);
         }
@@ -32,9 +40,10 @@ namespace game
         success = !fpsText.loadTexture(renderer);
 	    canvas.addObj(&fpsText);
         
-        for (auto furniture : furnitureList)
+        for (auto box : boxes)
         {
-            furniture->loadTexture(renderer);
+            box->loadTexture(renderer);
+            box->furniture->loadTexture(renderer);
         }
         cursor.loadTexture(renderer);
 
@@ -47,17 +56,18 @@ namespace game
         SDL_GetMouseState(&mouseX, &mouseY);
         cursor.getPosition().set(mouseX - 32/2, mouseY - 32/2);
 
-        if (cursor.draggedFurniture == nullptr)
+        hoveredBox = nullptr;
+        for (auto box : boxes)
         {
-            cursor.hoveredFurniture = nullptr;
-            for (auto furniture : furnitureList)
+            if (box->isInside(cursor.getPosition().getX() + 32/2, cursor.getPosition().getY() + 32/2))
             {
-                if (furniture->isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2)) {
-                    cursor.hoveredFurniture = furniture;
-                    break;
-                }
+                hoveredBox = box;
+                break;
             }
         }
+        cursor.isHoveringBox = hoveredBox != nullptr;
+
+        cursor.isHoveringFurn = currFurniture != nullptr && currFurniture->isInside(cursor.getPosition().getX() + 32/2, cursor.getPosition().getY() + 32/2);
 
         switch (event.type)
         {
@@ -78,10 +88,10 @@ namespace game
         fpsText.updateContent(timeText.str());
         fpsText.loadTexture(renderer);
 
-        if (cursor.draggedFurniture != nullptr)
+        if (currFurniture != nullptr && currFurniture->isDragging)
         {
             Vector2D &cursorPos = cursor.getPosition();
-            cursor.draggedFurniture->setPosition(cursorPos);
+            currFurniture->setPosition(cursorPos);
         }
     }
 
@@ -89,7 +99,15 @@ namespace game
     {
         fpsText.render(renderer);
 
-        for (auto furniture : furnitureList)
+        for (auto box : boxes)
+        {
+            box->render(renderer);
+        }
+        if (currFurniture != nullptr)
+        {
+            currFurniture->render(renderer);
+        }
+        for (auto furniture : placedFurniture)
         {
             furniture->render(renderer);
         }
@@ -99,12 +117,36 @@ namespace game
     void Game::onMouseDown(int mouseX, int mouseY)
     {
         cursor.isClosed = true;
-        cursor.draggedFurniture = cursor.hoveredFurniture;
+        
+        if (currFurniture != nullptr && cursor.isHoveringFurn)
+        {
+            currFurniture->isDragging = true;
+        }
+        else if (currFurniture == nullptr && hoveredBox != nullptr)
+        {
+            currFurniture = hoveredBox->furniture;
+            for (auto iter = boxes.begin(); iter != boxes.end(); iter++)
+            {
+                if (*iter == hoveredBox)
+                {
+                    boxes.erase(iter);
+                    break;
+                }
+            }
+            
+            currFurniture->setPosition(hoveredBox->getPosition());
+
+            free(hoveredBox);
+            hoveredBox = nullptr;
+        }
     }
 
     void Game::onMouseUp(int mouseX, int mouseY)
     {
         cursor.isClosed = false;
-        cursor.draggedFurniture = nullptr;
+        if (currFurniture != nullptr)
+        {
+            currFurniture->isDragging = false;
+        }
     }
 }

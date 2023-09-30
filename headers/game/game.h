@@ -6,6 +6,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_events.h>
 
+#include "../../headers/game/box.h"
 #include "../../headers/game/cursor.h"
 #include "../../headers/game/furniture.h"
 
@@ -30,7 +31,11 @@ namespace game
         
         Text fpsText;
         Cursor cursor;
-        std::vector<Furniture *> furnitureList;
+
+        Box *hoveredBox;
+        std::vector<Box *> boxes;
+        Furniture *currFurniture;
+        std::vector<Furniture *> placedFurniture;
     };
 }
 

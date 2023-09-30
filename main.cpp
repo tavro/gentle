@@ -183,6 +183,12 @@ int main( int argc, char* args[] )
 			{
 				capTimer.start();
 
+				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
+				if( avgFPS > 2000000 )
+				{
+					avgFPS = 0;
+				}
+
 				while( SDL_PollEvent( &e ) != 0 )
 				{
 					if( e.type == SDL_QUIT )
@@ -219,6 +225,8 @@ int main( int argc, char* args[] )
 
 					canvas.handleEvent( &e );
 					//explorer.handleEvent( &e );
+
+					game::update(renderer, avgFPS, &e);
 				}
 
 				/*
@@ -230,14 +238,6 @@ int main( int argc, char* args[] )
 					box.handleEvent( &e );
 				}
 				*/
-
-				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
-				if( avgFPS > 2000000 )
-				{
-					avgFPS = 0;
-				}
-
-				game::update(renderer, avgFPS);
 
 				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( renderer );

@@ -8,7 +8,7 @@
 namespace game
 {
     bool loadMedia(SDL_Renderer *renderer, Canvas *canvas);
-    void update(SDL_Renderer *renderer, float avgFPS); // TODO: implement deltaTime
+    void update(SDL_Renderer *renderer, float avgFPS, SDL_Event *event);
     void render(SDL_Renderer *renderer);
 }
 

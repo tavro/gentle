@@ -55,7 +55,6 @@ GameObject::GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, st
     texturePath = path;
 }
 
-
 Vector2D& GameObject::getPosition()
 {
     return position;
@@ -159,7 +158,7 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
-    texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+    texture.render( position.getX(), position.getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer );
 }
 
 void GameObject::setTexturePath(std::string path)
@@ -192,4 +191,21 @@ void GameObject::setCurrentState( State state )
 State GameObject::getCurrentState()
 {
     return currentState;
+}
+
+void GameObject::setRotation(float value)
+{
+    rotation = value;
+}
+
+void GameObject::increaseRotation(float amount)
+{
+    rotation+=amount;
+    rotation = fmod(rotation, 360.0);
+}
+
+void GameObject::decreaseRotation(float amount)
+{
+    rotation-=amount;
+    rotation = fmod(rotation, 360.0);
 }

@@ -109,3 +109,15 @@ void Vector2D::decreaseY(float amount)
 {
     y -= amount;
 }
+
+Vector2D Vector2D::getNormalizedVector()
+{
+    float length = std::sqrt(x * x + y * y);
+    float newX = x;
+    float newY = y;
+    if (length != 0.0) {
+        newX /= length;
+        newY /= length;
+    }
+    return {newX, newY};
+}

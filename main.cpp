@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <random>
 
 //#include "./headers/editor/explorer.h"
 //#include "./headers/editor/heirarchy.h"
@@ -30,6 +31,7 @@
 #include "./headers/ui_panel.h"
 #include "./headers/game_object.h"
 #include "./headers/scene.h"
+#include "./headers/physics_object.h"
 
 #include "./headers/game/game.h"
 
@@ -111,6 +113,20 @@ bool init()
 	}
 
 	return success;
+}
+
+float getRandomAngle()
+{
+	std::random_device rd;
+    std::mt19937 gen(rd());
+
+    float lower_bound = 0.0; // Lower bound of the range
+    float upper_bound = 360.0; // Upper bound of the range
+
+    std::uniform_real_distribution<float> distribution(lower_bound, upper_bound);
+
+    float random_float = distribution(gen);
+	return random_float;
 }
 
 bool loadMedia()
@@ -205,7 +221,7 @@ int main( int argc, char* args[] )
 					{
 						switch( e.key.keysym.sym )
 						{
-							case SDLK_UP: 
+							case SDLK_UP:
 							break;
 							case SDLK_DOWN:
 							break;

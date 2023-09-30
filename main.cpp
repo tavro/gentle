@@ -243,6 +243,7 @@ int main( int argc, char* args[] )
                 	SDL_GetMouseState( &x, &y );
 					cursor.getPosition().set(x-32/2, y-32/2);
 
+					box.handleEvent( &e );
 				}
 
 				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );

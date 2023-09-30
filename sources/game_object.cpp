@@ -173,3 +173,23 @@ bool GameObject::isInside(int x, int y)
     bool inBoundY = y <= (getPosition().getY() + getSize().getY()) && y >= getPosition().getY();
     return inBoundX && inBoundY;
 }
+
+bool GameObject::isToggled()
+{
+    return toggle;
+}
+
+void GameObject::setToggle(bool state)
+{
+    toggle = state;
+}
+
+void GameObject::setCurrentState( State state )
+{
+    currentState = state;
+}
+
+State GameObject::getCurrentState()
+{
+    return currentState;
+}

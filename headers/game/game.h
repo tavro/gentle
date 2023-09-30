@@ -3,9 +3,12 @@
 
 #include <SDL2/SDL_render.h>
 
+#include "../../headers/canvas.h"
+
 namespace game
 {
-    bool loadMedia(SDL_Renderer *renderer);
+    bool loadMedia(SDL_Renderer *renderer, Canvas *canvas);
+    void update(SDL_Renderer *renderer, float avgFPS); // TODO: implement deltaTime
     void render(SDL_Renderer *renderer);
 }
 

@@ -49,19 +49,9 @@ SDL_Renderer*   renderer = NULL;
 
 Canvas canvas;
 
-Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-
-Text FPSText{"", 0, SCREEN_HEIGHT - 28};
-
 //Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Inspector inspector{SCREEN_WIDTH, 0};
-
-GameObject cursor{{SCREEN_WIDTH, SCREEN_HEIGHT}, {32, 32}, {0, 0}, "Cursor", "./resources/hand-point.png"};
-
-GameObject box{{0, 0}, {32, 32}, {0, 0}, "Box", "./resources/gameobject.png"};
-
-GameObject a{};
 
 bool init()
 {
@@ -136,16 +126,7 @@ bool loadMedia()
 	//explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
 	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
-	canvas.addObj(&mainMenuImg);
-
-	cursor.loadTexture(renderer);
-	box.loadTexture(renderer);
-
-    success = !FPSText.loadFont( "./resources/font.ttf", 28 );
-    success = !FPSText.loadTexture( renderer );
-	canvas.addObj(&FPSText);
-
-	success = game::loadMedia(renderer);
+	success = game::loadMedia(renderer, &canvas);
 
 	return success;
 }
@@ -186,8 +167,6 @@ int main( int argc, char* args[] )
 			Timer fpsTimer;
 			Timer capTimer;
 
-			std::stringstream timeText;
-
 			int currentTile = 0;
 
 			int countedFrames = 0;
@@ -199,28 +178,10 @@ int main( int argc, char* args[] )
 
 			SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-			bool isClosed = false;
 			// Game loop
 			while( !quit )
 			{
 				capTimer.start();
-
-				if(box.isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2))
-				{
-					if(!isClosed)
-					{
-						cursor.setTexturePath("./resources/hand.png");
-						cursor.loadTexture(renderer);
-					}
-				}
-				else
-				{
-					if(!isClosed)
-					{
-						cursor.setTexturePath("./resources/hand-point.png");
-						cursor.loadTexture(renderer);
-					}
-				}
 
 				while( SDL_PollEvent( &e ) != 0 )
 				{
@@ -258,10 +219,6 @@ int main( int argc, char* args[] )
 
 					canvas.handleEvent( &e );
 					//explorer.handleEvent( &e );
-
-					int x, y;
-                	SDL_GetMouseState( &x, &y );
-					cursor.getPosition().set(x-32/2, y-32/2);
 				}
 
 				/*
@@ -280,10 +237,7 @@ int main( int argc, char* args[] )
 					avgFPS = 0;
 				}
 
-				timeText.str( "" );
-				timeText << "Average FPS: " << avgFPS;
-                FPSText.updateContent(timeText.str());
-                FPSText.loadTexture(renderer);
+				game::update(renderer, avgFPS);
 
 				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( renderer );
@@ -295,9 +249,6 @@ int main( int argc, char* args[] )
 				//explorer.render(renderer);
 				//heirarchy.render(renderer);
 				//inspector.render(renderer);
-
-				box.render(renderer);
-				cursor.render(renderer);
 
 				SDL_RenderPresent( renderer );
 

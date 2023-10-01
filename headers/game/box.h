@@ -11,7 +11,7 @@ namespace game
     {
     public:
         Box(Vector2D pos, std::string name, std::string texPath, std::string furnName, std::string furnTexPath);
-        Furniture *furniture;
+        Furniture *furniture = nullptr;
     };
 }
 

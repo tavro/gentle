@@ -32,15 +32,9 @@
 #include "./headers/game_object.h"
 #include "./headers/scene.h"
 #include "./headers/physics_object.h"
+#include "./headers/utils/constants.h"
 
 #include "./headers/game/game.h"
-
-const int UI_AREA = 256+64;
-const int SCREEN_FPS = 60;
-const int SCREEN_TICK_PER_FRAME = 1000 / SCREEN_FPS;
-
-const int BUTTON_WIDTH = 96;
-const int BUTTON_HEIGHT = 32;
 
 bool init();
 bool loadMedia();
@@ -55,6 +49,9 @@ game::Game *gameInstance = NULL;
 //Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
 //Inspector inspector{SCREEN_WIDTH, 0};
+
+GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
+GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
 
 bool init()
 {
@@ -72,7 +69,7 @@ bool init()
 			printf( "Warning: Linear texture filtering not enabled!" );
 		}
 
-		window = SDL_CreateWindow( "gentle game engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH + UI_AREA, SCREEN_HEIGHT + UI_AREA, SDL_WINDOW_SHOWN );
+		window = SDL_CreateWindow( "gentle game engine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
 		if( window == NULL )
 		{
 			printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
@@ -219,9 +216,16 @@ int main( int argc, char* args[] )
 					/*
 					else if( e.type == SDL_KEYDOWN )
 					{
+						std::string result;
+						std::random_device rd;
+						std::mt19937 generator(rd());
+						std::uniform_int_distribution<int> distribution2(-10, 10);
+						int xVel = distribution2(generator);
+						int yVel = distribution2(generator);
 						switch( e.key.keysym.sym )
 						{
 							case SDLK_UP:
+								activeObj->getVelocity().set(xVel, yVel);
 							break;
 							case SDLK_DOWN:
 							break;
@@ -239,6 +243,12 @@ int main( int argc, char* args[] )
 							
 							case SDL_MOUSEBUTTONUP:
 								isClosed = false;
+							break;
+
+							case SDL_MOUSEWHEEL:
+                				int scroll = e.wheel.y * 5;
+								//std::cout << "Y:" << scroll << std::endl;
+								activeObj->increaseRotation(scroll);
 							break;
 						}
 					}

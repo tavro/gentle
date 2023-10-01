@@ -46,6 +46,22 @@ GameObject::GameObject(int x, int y, int w, int h)
     size.setY(h);
 }
 
+GameObject::GameObject(Vector2D topLeft, Vector2D bottomRight)
+{
+    name = getRandomName(8);
+
+    position.setX(topLeft.getX());
+    position.setY(topLeft.getY());
+
+    velocity.setX(0);
+    velocity.setY(0);
+
+    size.setX(bottomRight.getX()-topLeft.getX());
+    size.setY(bottomRight.getY()-topLeft.getY());
+
+    texturePath = "./resources/black.png";
+}
+
 GameObject::GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path)
 {
     position = pos;
@@ -158,6 +174,8 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
+    texture.setWidth(size.getX());
+    texture.setHeight(size.getY());
     texture.render( position.getX(), position.getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer );
 }
 
@@ -208,4 +226,9 @@ void GameObject::decreaseRotation(float amount)
 {
     rotation-=amount;
     rotation = fmod(rotation, 360.0);
+}
+
+bool GameObject::isMoving()
+{
+    return (getVelocity().getX() != 0 || getVelocity().getY() != 0);
 }

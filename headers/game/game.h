@@ -27,14 +27,14 @@ namespace game
         void onMouseDown(int mouseX, int mouseY);
         void onMouseUp(int mouseX, int mouseY);
 
-        SDL_Renderer *renderer;
+        SDL_Renderer *renderer = nullptr;
         
         Text fpsText;
         Cursor cursor;
 
-        Box *hoveredBox;
+        Box *hoveredBox = nullptr;
         std::vector<Box *> boxes;
-        Furniture *currFurniture;
+        Furniture *currFurniture = nullptr;
         std::vector<Furniture *> placedFurniture;
     };
 }

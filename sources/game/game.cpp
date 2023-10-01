@@ -14,12 +14,26 @@ static Vector2D getMousePos()
 }
 
 /*
-std::map<std::string, int> furniture {
-    {"bed", 12}, {"sofa", 10}, {"piano", 20}, {"plant", 3}, {"oven", 15},
-    {"bathtub", 10}, {"bedsidetable", 6}, {"bookshelf", 7}, {"chair", 5}, 
-    {"coffeetable", 7}, {"dinnertable", 10}, {"dishwasher", 13}, {"dresser", 9}, 
-    {"fridge", 14}, {"lamp", 3}, {"sink", 12}, {"toilet", 7}, {"washingmachine", 13},
-    {"washingstation", 7}
+std::map<std::string, FurnitureMeta> furniture {
+    {"bed",  			{1 , 12, {"bedroom"}}}, 
+    {"sofa", 			{1 , 10, {"livingroom"}}}, 
+    {"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
+    {"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
+    {"oven", 			{1 , 15, {"kitchen"}}},
+    {"bathtub", 		{1 , 10, {"bathroom"}}}, 
+    {"bedsidetable",	{2 , 6 , {"bedroom"}}},
+    {"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
+    {"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
+    {"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
+    {"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
+    {"dishwasher", 		{1 , 13, {"kitchen"}}},
+    {"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
+    {"fridge", 			{1 , 14, {"kitchen"}}}, 
+    {"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
+    {"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
+    {"toilet", 			{1 , 7 , {"bathroom"}}}, 
+    {"washingmachine", 	{1 , 13, {"bathroom"}}},
+    {"washingstation", 	{1 , 7 , {"bathroom"}}}
 };
 */
 

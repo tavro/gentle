@@ -114,20 +114,6 @@ bool init()
 	return success;
 }
 
-float getRandomAngle()
-{
-	std::random_device rd;
-    std::mt19937 gen(rd());
-
-    float lower_bound = 0.0; // Lower bound of the range
-    float upper_bound = 360.0; // Upper bound of the range
-
-    std::uniform_real_distribution<float> distribution(lower_bound, upper_bound);
-
-    float random_float = distribution(gen);
-	return random_float;
-}
-
 bool loadMedia()
 {
 	bool success = true;

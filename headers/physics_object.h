@@ -5,6 +5,8 @@
 #include <iostream>
 #include "./game_object.h"
 #include "./utils/constants.h"
+#include <random>
+#include <functional>
 
 class PhysicsObject : public GameObject
 {
@@ -13,17 +15,59 @@ class PhysicsObject : public GameObject
         PhysicsObject(int x, int y, int w, int h, float m);
         PhysicsObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path, float m);
 
+        void rotate() override
+        {
+            if(rotationDirection != RotDir::NONE)
+            {
+                float localVel = rotationSpeed*rotationSpeed;
+                float friction = localVel * 0.0025;
+
+                rotationSpeed-=friction;
+
+                if(rotationSpeed <= 0.25 && rotationSpeed >= -0.25)
+                {
+                    rotationSpeed = 0;
+                    setRotationDirection(RotDir::NONE);
+                }
+
+                switch(rotationDirection)
+                {
+                    case RotDir::RIGHT:
+                        increaseRotation(rotationSpeed);
+                    break;
+                    case RotDir::LEFT:
+                        decreaseRotation(rotationSpeed);
+                    break;
+                }
+            }
+        }
+
         void move() override
         {
             if(hasFriction) 
             {
-                float localVel = getVelocity().getX()*getVelocity().getX() + getVelocity().getY()*getVelocity().getY();
-                Vector2D friction = (getVelocity().getNormalizedVector() * -1) * (float)(localVel * 0.0025);
+                float velSqrMagnitude = getVelocity().getX()*getVelocity().getX() + getVelocity().getY()*getVelocity().getY();
+                bool isNotMoving = velSqrMagnitude <= 1; // TODO: decide better value
 
-                acceleration.set(friction.getX()*mass, friction.getY()*mass);
+                if (isNotMoving)
+                {
+                    acceleration.setX(-getVelocity().getX());
+                    acceleration.setY(-getVelocity().getY());
+                    getVelocity().increaseX(acceleration.getX());
+                    getVelocity().increaseY(acceleration.getY());
+                }
+                else
+                {
+                    float fricCoefficient = 0.0025f * mass; // TODO: decide better value
+                    float fricMagnitude = fricCoefficient * 9.82f;
 
-                getVelocity().increaseX(acceleration.getX());
-                getVelocity().increaseY(acceleration.getY());
+                    Vector2D fricDirection = getVelocity().getNormalizedVector() * -1;
+                    Vector2D friction = fricDirection * fricMagnitude;
+                    acceleration.set(friction.getX(), friction.getY());
+
+                    getVelocity().increaseX(acceleration.getX());
+                    getVelocity().increaseY(acceleration.getY());
+                }
             }
 
             getPosition().increaseX(getVelocity().getX());
@@ -71,6 +115,20 @@ class PhysicsObject : public GameObject
                         if(hasCollision(other->getCorners()))
                         {
                             other->getVelocity().set(getVelocity().getX(), getVelocity().getY());
+                            auto gen = std::bind(std::uniform_int_distribution<>(0,1),std::default_random_engine());
+                            bool b = gen();
+
+                            if(b)
+                            {
+                                other->setRotationDirection(RotDir::LEFT);
+                                other->setRotationSpeed(1);
+                            }
+                            else
+                            {
+                                other->setRotationDirection(RotDir::RIGHT);
+                                other->setRotationSpeed(1);
+                            }
+                            
                             getVelocity()*=-1;
                         }
                     }

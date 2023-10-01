@@ -13,6 +13,14 @@ namespace game
         Furniture(std::string name, std::string texPath, float mass);
         bool isDragging = false;
     };
+
+    struct FurnitureMeta {
+        int maxAmount;
+        float weight;
+        std::vector<std::string> compatableRooms;
+
+        FurnitureMeta(int maxAmount, float weight, const std::vector<std::string>& rooms);
+    };
 }
 
 #endif

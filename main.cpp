@@ -230,29 +230,6 @@ int main( int argc, char* args[] )
 					{
 						quit = true;
 					}
-					/*
-					else
-					{
-						switch( e.type )
-						{
-							case SDL_MOUSEBUTTONDOWN:
-								cursor.setTexturePath("./resources/hand-closed.png");
-								cursor.loadTexture(renderer);
-								isClosed = true;
-							break;
-							
-							case SDL_MOUSEBUTTONUP:
-								isClosed = false;
-							break;
-
-							case SDL_MOUSEWHEEL:
-                				int scroll = e.wheel.y * 5;
-								//std::cout << "Y:" << scroll << std::endl;
-								activeObj->increaseRotation(scroll);
-							break;
-						}
-					}
-					*/
 
 					canvas.handleEvent( &e );
 

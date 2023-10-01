@@ -217,6 +217,8 @@ namespace game
             }
         }
 
+        harold->handleEvent(event);
+
         switch (event->type)
         {
         case SDL_MOUSEBUTTONDOWN:
@@ -300,5 +302,7 @@ namespace game
         }
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
+
+        harold->move();
     }
 }

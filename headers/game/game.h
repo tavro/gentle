@@ -15,6 +15,7 @@
 #include "../../headers/text.h"
 #include "../../headers/scene.h"
 #include "../../headers/image.h"
+#include "../../headers/audio_source.h"
 
 namespace game
 {
@@ -46,6 +47,14 @@ namespace game
 
         Image background{0, 0, 1080, 720};
         Image floor{240, 160, 600, 400};
+
+        int score = 0;
+        Text* scoreText = nullptr;
+
+        int furnitureAmount = 0;
+        Text* placedFurnText = nullptr;
+
+        AudioSource audioSource;
     };
 }
 

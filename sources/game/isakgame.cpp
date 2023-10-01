@@ -25,6 +25,10 @@ namespace game
         , cursor(Cursor("Cursor"))
         , fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
+        scoreText = new Text{"Score:0", 0, SCREEN_HEIGHT - 28*2};
+        placedFurnText = new Text{"Placed:0/0", 0, SCREEN_HEIGHT - 28*3};
+        audioSource.addMusic( "./resources/Gamejam.wav" );
+
         std::map<std::string, FurnitureMeta> furniture {
             {"bed",  			{1 , 12, {"Bedroom"}}}, 
             {"sofa", 			{1 , 10, {"Living Room"}}}, 
@@ -50,7 +54,7 @@ namespace game
         std::random_device rd;
         std::mt19937 generator(rd());
         std::uniform_int_distribution<int> xPositionDistribution(240, SCREEN_WIDTH-240);
-        std::uniform_int_distribution<int> yPositionDistribution(0, 160);
+        std::uniform_int_distribution<int> yPositionDistribution(0+32, 160-32);
         std::uniform_int_distribution<int> velocityDistribution(-10, 10);
 
         for (auto const& [key, val] : furniture)
@@ -73,6 +77,7 @@ namespace game
                     "Box", 
                     "./resources/box.png",
                     furniturePtr));
+                furnitureAmount++;
             }
         }
 
@@ -112,6 +117,14 @@ namespace game
         fpsText.loadTexture(renderer);
         canvas.addObj(&fpsText);
 
+        scoreText->loadFont("./resources/font.ttf", 28);
+        scoreText->loadTexture(renderer);
+        canvas.addObj(scoreText);
+
+        placedFurnText->loadFont("./resources/font.ttf", 28);
+        placedFurnText->loadTexture(renderer);
+        canvas.addObj(placedFurnText);
+
         cursor.loadTexture(renderer);
 
         for (auto box : boxes)
@@ -119,6 +132,11 @@ namespace game
             box->loadTexture(renderer);
             box->furniture->loadTexture(renderer);
         }
+
+        if( Mix_PlayingMusic() == 0 )
+		{
+			Mix_PlayMusic( audioSource.getMusic(0), -1 );
+		}
 
         return success;
     }
@@ -140,6 +158,8 @@ namespace game
             furniture->render(renderer);
 
         fpsText.render(renderer);
+        scoreText->render(renderer);
+        placedFurnText->render(renderer);
 
         cursor.updateTexture(renderer);
         cursor.render(renderer);
@@ -167,16 +187,21 @@ namespace game
             std::string roomName = activeRoom->getName();
             if(currFurn->compatableWith(roomName))
             {
-                std::cout << "YOU GET POINTS" << std::endl;
+                score += 10;
             }
             else
             {
-                std::cout << "WTF! NO POINTS FOR YOU!" << std::endl;
+                score -= 10;
             }
+            scoreText->updateContent("Score:" + std::to_string(score));
+            scoreText->loadTexture(renderer);
+
+            placedFurnText->updateContent("Placed:" + std::to_string(placedFurn.size()) + "/" + std::to_string(furnitureAmount));
+            placedFurnText->loadTexture(renderer);
 
             if(boxes.size() == 0)
             {
-                // NOTE: ALL FURNITURE PLACED!
+                // GAME OVER
             }
 
             currFurn = nullptr;

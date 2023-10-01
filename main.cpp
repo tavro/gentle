@@ -53,8 +53,6 @@ game::Game *gameInstance = NULL;
 GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
 GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
 
-
-
 bool init()
 {
 	bool success = true;
@@ -129,7 +127,101 @@ bool loadMedia()
 	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
 
 	success = gameInstance->loadMedia(canvas);
+	
+	/* ISAKS TESTGREJOR
+	std::vector<std::vector<int>> rooms;
+	rooms.push_back({0, 0, 292, 300}); 
+	rooms.push_back({0, 300, 292, 100}); 
+	rooms.push_back({292, 0, 307, 190}); 
+	rooms.push_back({292, 190, 223, 209}); 
+	rooms.push_back({516, 190, 83, 209}); 
+	rooms.push_back({0, 300, 58, 100}); 
+	rooms.push_back({58, 300, 175, 100}); 
+	rooms.push_back({233, 300, 58, 100});
+	
+	const int WALL_THICKNESS = 4;
+	for (auto room : rooms)
+	{
+		int x1 = room[0];
+		int y1 = room[1];
+		int x2 = room[2] + room[0];
+		int y2 = room[3] + room[1];
 
+		Vector2D startUpper{x1, y1};
+		Vector2D endUpper{x2, y1+WALL_THICKNESS};
+
+		Vector2D startLower{x1, y2-WALL_THICKNESS};
+		Vector2D endLower{x2, y2+WALL_THICKNESS};
+
+		Vector2D startLeft{x1, y1};
+		Vector2D endLeft{x1+WALL_THICKNESS, y2};
+
+		Vector2D startRight{x2-WALL_THICKNESS, y1};
+		Vector2D endRight{x2, y2};
+
+		GameObject* upperWall = new GameObject{startUpper, endUpper};
+		GameObject* lowerWall = new GameObject{startLower, endLower};
+		GameObject* leftWall  = new GameObject{startLeft , endLeft};
+		GameObject* rightWall = new GameObject{startRight, endRight};
+		
+		upperWall->loadTexture(renderer);
+		lowerWall->loadTexture(renderer);
+		leftWall->loadTexture(renderer);
+		rightWall->loadTexture(renderer);
+
+		wallScene->addObj(upperWall);
+		wallScene->addObj(lowerWall);
+		wallScene->addObj(leftWall);
+		wallScene->addObj(rightWall);
+	}
+
+	//EX:
+	//	
+	//	x = 0, y = 0, w = 292, h = 300
+	//	{0, 0, 292, 300}, => 	Upper wall: GameObject{x, y, w, y+WALL_THICKNESS}
+	//							Lower wall: GameObject{x, h-WALL_THICKNESS, w, h+WALL_THICKNESS}
+	//							Left wall:  GameObject{x, y, x+WALL_THICKNESS, h}
+	//							Right wall: GameObject{w-WALL_THICKNESS, y, w, h}
+	
+	std::string result;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+    std::uniform_int_distribution<int> distribution(64, SCREEN_HEIGHT-64);
+    std::uniform_int_distribution<int> distribution2(-10, 10);
+    std::uniform_int_distribution<int> distribution3(1, 10);
+
+	int xVel = distribution2(generator);
+	int yVel = distribution2(generator);
+
+	for (auto const& [key, val] : furniture)
+	{
+    	std::uniform_int_distribution<int> distribution4(1, val.maxAmount);
+		int amount = distribution4(generator);
+
+		for(int i = 0; i < amount; i++)
+		{
+			PhysicsObject* pObj = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, key, "./resources/furniture/" + key + ".png", val.weight};
+			pObj->loadTexture(renderer);
+			pObj->setRotation(getRandomAngle());
+			//pObj->debugMode = true;
+			boxScene->addObj(pObj);
+		}
+	}
+
+	//wall.loadTexture(renderer);
+	//wall2.loadTexture(renderer);
+	//wallScene->addObj(&wall);
+	//wallScene->addObj(&wall2);
+
+	cursor.loadTexture(renderer);
+
+	box.loadTexture(renderer);
+
+    success = !FPSText.loadFont( "./resources/font.ttf", 28 );
+    success = !FPSText.loadTexture( renderer );
+	canvas.addObj(&FPSText);
+	*/
+	
 	return success;
 }
 
@@ -269,6 +361,14 @@ int main( int argc, char* args[] )
 				//explorer.render(renderer);
 				//heirarchy.render(renderer);
 				//inspector.render(renderer);
+
+				/* ISAKS TESTGREJOR
+				boxScene->render(renderer);
+
+				wallScene->render(renderer);
+
+				cursor.render(renderer);
+				*/
 
 				SDL_RenderPresent( renderer );
 

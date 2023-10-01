@@ -60,6 +60,7 @@ GameObject::GameObject(Vector2D topLeft, Vector2D bottomRight)
     size.setY(bottomRight.getY()-topLeft.getY());
 
     texturePath = "./resources/black.png";
+    isStatic = true;
 }
 
 GameObject::GameObject(Vector2D pos, Vector2D s, Vector2D vel, std::string n, std::string path)
@@ -231,8 +232,11 @@ bool GameObject::hasCollision(std::vector<Vector2D> cornersB)
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {
     bool loaded = texture.loadFromFile(path, renderer);
-    size.setX(texture.getWidth());
-    size.setY(texture.getHeight());
+    if(!isStatic)
+    {
+        size.setX(texture.getWidth());
+        size.setY(texture.getHeight());
+    }
     return loaded;
 }
 
@@ -241,8 +245,11 @@ bool GameObject::loadTexture(SDL_Renderer* renderer)
     debugTexture.loadFromFile("./resources/debug.png", renderer);
 
     bool loaded = texture.loadFromFile(texturePath, renderer);
-    size.setX(texture.getWidth());
-    size.setY(texture.getHeight());
+    if(!isStatic)
+    {
+        size.setX(texture.getWidth());
+        size.setY(texture.getHeight());
+    }
     return loaded;
 }
 
@@ -253,8 +260,11 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
-    //texture.setWidth(size.getX()) ; TODO: for walls
-    //texture.setHeight(size.getY());
+    if(isStatic)
+    {
+        texture.setWidth(size.getX()) ;
+        texture.setHeight(size.getY());
+    }
     texture.render( position.getX(), position.getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer );
 
     if(debugMode)

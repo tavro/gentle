@@ -171,7 +171,7 @@ class GameObject
         bool debugMode = false;
 
     protected:
-        float rotation;
+        float rotation = 0.0f;
         float rotationSpeed = 1;
         RotDir rotationDirection = RotDir::NONE;
 

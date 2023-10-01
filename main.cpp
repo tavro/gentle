@@ -12,11 +12,9 @@
 #include <map>
 #include <random>
 
-#include "./headers/utils/constants.h"
-
-#include "./headers/editor/explorer.h"
-#include "./headers/editor/heirarchy.h"
-#include "./headers/editor/inspector.h"
+//#include "./headers/editor/explorer.h"
+//#include "./headers/editor/heirarchy.h"
+//#include "./headers/editor/inspector.h"
 
 #include "./headers/texture.h"
 #include "./headers/particle.h"
@@ -32,7 +30,11 @@
 #include "./headers/image.h"
 #include "./headers/ui_panel.h"
 #include "./headers/game_object.h"
+#include "./headers/scene.h"
 #include "./headers/physics_object.h"
+#include "./headers/utils/constants.h"
+
+#include "./headers/game/game.h"
 
 bool init();
 bool loadMedia();
@@ -42,22 +44,11 @@ SDL_Window*     window 	 = NULL;
 SDL_Renderer*   renderer = NULL;
 
 Canvas canvas;
+game::Game *gameInstance = NULL;
 
-Image mainMenuImg{0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
-
-Text FPSText{"", 0, SCREEN_HEIGHT - 28};
-
-GameObject cursor{{SCREEN_WIDTH, SCREEN_HEIGHT}, {32, 32}, {0, 0}, "Cursor", "./resources/hand-point.png"};
-
-GameObject box{{0, 0}, {32, 16}, {0, 0}, "Box", "./resources/gameobject2.png"};
-
-Scene* wallScene = new Scene{};
-Scene* boxScene = new Scene{};
-Scene* testScene = new Scene{};
-
-GameObject* activeObj;
-
-GameObject a{};
+//Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+//Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
+//Inspector inspector{SCREEN_WIDTH, 0};
 
 GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
 GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
@@ -121,57 +112,23 @@ bool init()
 	return success;
 }
 
-float getRandomAngle()
-{
-	std::random_device rd;
-    std::mt19937 gen(rd());
-
-    float lower_bound = 0.0; // Lower bound of the range
-    float upper_bound = 360.0; // Upper bound of the range
-
-    std::uniform_real_distribution<float> distribution(lower_bound, upper_bound);
-
-    float random_float = distribution(gen);
-	return random_float;
-}
-
-struct FurnitureMeta {
-    int maxAmount;
-    float weight;
-    std::vector<std::string> compatableRooms;
-
-    FurnitureMeta(int maxAmount, float weight, const std::vector<std::string>& rooms)
-        : maxAmount(maxAmount), weight(weight), compatableRooms(rooms) {}
-};
-
 bool loadMedia()
 {
 	bool success = true;
 
-	testScene->load("./test.scene");
+	//heirarchy.loadTextures(renderer);
+	//heirarchy.setActiveScene(testScene, renderer);
 
-	std::map<std::string, FurnitureMeta> furniture {
-		{"bed",  			{1 , 12, {"bedroom"}}}, 
-		{"sofa", 			{1 , 10, {"livingroom"}}}, 
-		{"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
-		{"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
-		{"oven", 			{1 , 15, {"kitchen"}}},
-		{"bathtub", 		{1 , 10, {"bathroom"}}}, 
-		{"bedsidetable",	{2 , 6 , {"bedroom"}}},
-		{"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
-		{"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
-		{"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
-		{"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
-		{"dishwasher", 		{1 , 13, {"kitchen"}}},
-		{"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
-		{"fridge", 			{1 , 14, {"kitchen"}}}, 
-		{"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
-		{"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
-		{"toilet", 			{1 , 7 , {"bathroom"}}}, 
-		{"washingmachine", 	{1 , 13, {"bathroom"}}},
-		{"washingstation", 	{1 , 7 , {"bathroom"}}}
-	};
+	//inspector.setActiveObj(&a);
+	//inspector.loadFont(renderer);
 
+	//explorer.folderTexture.loadFromFile( "./resources/folderSheet.png", renderer );
+	//explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
+	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
+
+	success = gameInstance->loadMedia(canvas);
+	
+	/* ISAKS TESTGREJOR
 	std::vector<std::vector<int>> rooms;
 	rooms.push_back({0, 0, 292, 300}); 
 	rooms.push_back({0, 300, 292, 100}); 
@@ -218,16 +175,14 @@ bool loadMedia()
 		wallScene->addObj(rightWall);
 	}
 
-	/*
-	EX:
-		
-		x = 0, y = 0, w = 292, h = 300
-		{0, 0, 292, 300}, => 	Upper wall: GameObject{x, y, w, y+WALL_THICKNESS}
-								Lower wall: GameObject{x, h-WALL_THICKNESS, w, h+WALL_THICKNESS}
-								Left wall:  GameObject{x, y, x+WALL_THICKNESS, h}
-								Right wall: GameObject{w-WALL_THICKNESS, y, w, h}
-	*/
-
+	//EX:
+	//	
+	//	x = 0, y = 0, w = 292, h = 300
+	//	{0, 0, 292, 300}, => 	Upper wall: GameObject{x, y, w, y+WALL_THICKNESS}
+	//							Lower wall: GameObject{x, h-WALL_THICKNESS, w, h+WALL_THICKNESS}
+	//							Left wall:  GameObject{x, y, x+WALL_THICKNESS, h}
+	//							Right wall: GameObject{w-WALL_THICKNESS, y, w, h}
+	
 	std::string result;
     std::random_device rd;
     std::mt19937 generator(rd());
@@ -253,12 +208,11 @@ bool loadMedia()
 		}
 	}
 
-	/*
-	wall.loadTexture(renderer);
-	wall2.loadTexture(renderer);
-	wallScene->addObj(&wall);
-	wallScene->addObj(&wall2);
-	*/
+	//wall.loadTexture(renderer);
+	//wall2.loadTexture(renderer);
+	//wallScene->addObj(&wall);
+	//wallScene->addObj(&wall2);
+
 	cursor.loadTexture(renderer);
 
 	box.loadTexture(renderer);
@@ -266,12 +220,15 @@ bool loadMedia()
     success = !FPSText.loadFont( "./resources/font.ttf", 28 );
     success = !FPSText.loadTexture( renderer );
 	canvas.addObj(&FPSText);
-
+	*/
+	
 	return success;
 }
 
 void close()
 {
+	free(gameInstance);
+
 	canvas.freeTextures();
 
 	SDL_DestroyRenderer( renderer );
@@ -293,6 +250,8 @@ int main( int argc, char* args[] )
 	}
 	else
 	{
+		gameInstance = new game::Game(renderer);
+
 		if( !loadMedia() )
 		{
 			printf( "Failed to load media!\n" );
@@ -306,8 +265,6 @@ int main( int argc, char* args[] )
 			Timer fpsTimer;
 			Timer capTimer;
 
-			std::stringstream timeText;
-
 			int currentTile = 0;
 
 			int countedFrames = 0;
@@ -319,32 +276,15 @@ int main( int argc, char* args[] )
 
 			SDL_Rect camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 
-			bool isClosed = false;
 			// Game loop
 			while( !quit )
 			{
 				capTimer.start();
 
-				for (auto* obj: boxScene->getObjs())
+				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
+				if( avgFPS > 2000000 )
 				{
-					if(obj->isInside(cursor.getPosition().getX()+32/2, cursor.getPosition().getY()+32/2))
-					{
-						if(!isClosed)
-						{
-							cursor.setTexturePath("./resources/hand.png");
-							cursor.loadTexture(renderer);
-							activeObj = obj;
-							break;
-						}
-					}
-					else
-					{
-						if(!isClosed)
-						{
-							cursor.setTexturePath("./resources/hand-point.png");
-							cursor.loadTexture(renderer);
-						}
-					}
+					avgFPS = 0;
 				}
 
 				while( SDL_PollEvent( &e ) != 0 )
@@ -353,6 +293,7 @@ int main( int argc, char* args[] )
 					{
 						quit = true;
 					}
+					/*
 					else if( e.type == SDL_KEYDOWN )
 					{
 						std::string result;
@@ -391,53 +332,43 @@ int main( int argc, char* args[] )
 							break;
 						}
 					}
+					*/
 
 					canvas.handleEvent( &e );
+					//explorer.handleEvent( &e );
 
-					int x, y;
-                	SDL_GetMouseState( &x, &y );
-					cursor.getPosition().set(x-32/2, y-32/2);
+					gameInstance->handleEvent(&e);
+				}
+				gameInstance->update(avgFPS);
 
+				/*
+				if(explorer.fileHasChanged())
+				{
+					testScene->load(explorer.currentFile); // TODO: Check if scene
+					heirarchy.setActiveScene(testScene, renderer);
+					explorer.toggleFileChanged();
 					box.handleEvent( &e );
 				}
-
-				float avgFPS = countedFrames / ( fpsTimer.getTicks() / 1000.f );
-				if( avgFPS > 2000000 )
-				{
-					avgFPS = 0;
-				}
-
-				timeText.str( "" );
-				timeText << "Average FPS: " << avgFPS;
-                FPSText.updateContent(timeText.str());
-                FPSText.loadTexture(renderer);
+				*/
 
 				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( renderer );
 
                 canvas.render(renderer);
-				//box.render(renderer);
-	
-				/*
-				if(activeObj != nullptr)
-				{
-					activeObj->handleCollisions(boxScene->getObjs());
-				}
-				*/
 
-				for (auto* obj: boxScene->getObjs())
-				{
-					obj->handleCollisions(boxScene->getObjs());
-					//obj->handleCollisions(wallScene->getObjs());
-					obj->move();
-					obj->rotate();
-				}
+				gameInstance->render();
 
+				//explorer.render(renderer);
+				//heirarchy.render(renderer);
+				//inspector.render(renderer);
+
+				/* ISAKS TESTGREJOR
 				boxScene->render(renderer);
 
 				wallScene->render(renderer);
 
 				cursor.render(renderer);
+				*/
 
 				SDL_RenderPresent( renderer );
 

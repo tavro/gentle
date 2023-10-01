@@ -27,6 +27,8 @@ namespace game
         void update(float avgFPS);
         void render();
     private:
+        void placeFurn();
+
         SDL_Renderer *renderer = nullptr;
         
         Text fpsText;

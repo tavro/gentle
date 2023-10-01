@@ -94,6 +94,15 @@ namespace game
         cursor.render(renderer);
     }
 
+    void Game::placeFurn()
+    {
+        if (currFurn)
+        {
+            placedFurn.push_back(currFurn);
+            currFurn = nullptr;
+        }
+    }
+
     void Game::handleEvent(SDL_Event *event)
     {
         Box *clickedBox = nullptr;
@@ -133,6 +142,13 @@ namespace game
                 currFurn->isDragging = true;
                 break;
             }
+
+            bool canRotate = currFurn->isDragging || currFurn->getCurrentState() != State::MOUSE_OUT;
+            if (event->type == SDL_MOUSEWHEEL && canRotate)
+            {
+                float rotationAmount = event->wheel.y * 5;
+                currFurn->increaseRotation(rotationAmount);
+            }
         }
 
         if (clickedBox)
@@ -160,6 +176,10 @@ namespace game
             cursor.isClosed = false;
             if (currFurn)
                 currFurn->isDragging = false;
+            break;
+        case SDL_KEYDOWN:
+            if (event->key.keysym.sym == SDLK_e)
+                placeFurn();
             break;
         }
     }
@@ -195,16 +215,33 @@ namespace game
         {
             Vector2D moveDir = mousePos - currFurn->getPosition();
 
-            float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead
+            float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
             currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
 
             // TODO: make unable to move out of bounds
         }
 
         if (currFurn)
+        {
             currFurn->move();
+            currFurn->rotate();
+            std::vector<GameObject *> others;
+            for (auto furn : placedFurn)
+                others.push_back(furn);
+            currFurn->handleCollisions(others);
+        }
         for (auto furn : placedFurn)
+        {
             furn->move();
+            furn->rotate();
+            std::vector<GameObject *> others;
+            for (auto otherFurn : placedFurn)
+                if (furn != otherFurn)
+                    others.push_back(furn);
+            if (currFurn)
+                others.push_back(currFurn);
+            furn->handleCollisions(others);
+        }
 
         if (currFurn && currFurn->isDragging)
             cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?

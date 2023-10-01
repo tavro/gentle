@@ -53,6 +53,8 @@ game::Game *gameInstance = NULL;
 GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
 GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
 
+
+
 bool init()
 {
 	bool success = true;

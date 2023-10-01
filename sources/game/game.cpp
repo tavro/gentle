@@ -13,6 +13,16 @@ static Vector2D getMousePos()
     return {(float)mouseX, (float)mouseY};
 }
 
+/*
+std::map<std::string, int> furniture {
+    {"bed", 12}, {"sofa", 10}, {"piano", 20}, {"plant", 3}, {"oven", 15},
+    {"bathtub", 10}, {"bedsidetable", 6}, {"bookshelf", 7}, {"chair", 5}, 
+    {"coffeetable", 7}, {"dinnertable", 10}, {"dishwasher", 13}, {"dresser", 9}, 
+    {"fridge", 14}, {"lamp", 3}, {"sink", 12}, {"toilet", 7}, {"washingmachine", 13},
+    {"washingstation", 7}
+};
+*/
+
 namespace game
 {
     Game::Game(SDL_Renderer *renderer)
@@ -126,7 +136,7 @@ namespace game
                 }
             }
         }
-            
+
         switch (event->type)
         {
         case SDL_MOUSEBUTTONDOWN:

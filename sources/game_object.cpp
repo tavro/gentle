@@ -112,6 +112,46 @@ SDL_Rect GameObject::toBox()
     return box;
 }
 
+std::vector<Vector2D> GameObject::getCorners()
+{
+    std::vector<Vector2D> corners;
+
+    float halfWidth = size.getX() / 2;
+    float halfHeight = size.getY() / 2;
+
+    float radians = rotation * (M_PI / 180.0);
+
+    float cosine = std::cos(radians);
+    float sine = std::sin(radians);
+
+    Vector2D topLeft{
+        position.getX() + halfWidth/2 - halfWidth * cosine + halfHeight * sine,
+        position.getY() + halfHeight/2 - halfWidth * sine - halfHeight * cosine
+    };
+
+    Vector2D topRight{
+        position.getX() + halfWidth/2 + halfWidth * cosine + halfHeight * sine,
+        position.getY() + halfHeight/2 + halfWidth * sine - halfHeight * cosine
+    };
+
+    Vector2D bottomLeft{
+        position.getX() + halfWidth/2 - halfWidth * cosine - halfHeight * sine,
+        position.getY() + halfHeight/2 - halfWidth * sine + halfHeight * cosine
+    };
+
+    Vector2D bottomRight{
+        position.getX() + halfWidth/2 + halfWidth * cosine - halfHeight * sine,
+        position.getY() + halfHeight/2 + halfWidth * sine + halfHeight * cosine
+    };
+
+    corners.push_back(topLeft);
+    corners.push_back(topRight);
+    corners.push_back(bottomLeft);
+    corners.push_back(bottomRight);
+
+    return corners;
+}
+
 Texture& GameObject::getTexture()
 {
     return texture;
@@ -157,14 +197,53 @@ bool GameObject::hasCollision(GameObject& other)
     return true;
 }
 
+bool GameObject::hasCollision(std::vector<Vector2D> cornersB)
+{
+    std::vector<Vector2D> cornersA = getCorners();
+
+    for (int edge = 0; edge < 4; ++edge) {
+        Vector2D axis(-cornersA[edge].getY() + cornersA[(edge + 1) % 4].getY(), 
+                      cornersA[edge].getX() - cornersA[(edge + 1) % 4].getX());
+
+        float minA = INFINITY, maxA = -INFINITY;
+        float minB = INFINITY, maxB = -INFINITY;
+
+        for (const auto& corner : cornersA) {
+            float projection = corner.getX() * axis.getX() + corner.getY() * axis.getY();
+            minA = std::min(minA, projection);
+            maxA = std::max(maxA, projection);
+        }
+
+        for (const auto& corner : cornersB) {
+            float projection = corner.getX() * axis.getX() + corner.getY() * axis.getY();
+            minB = std::min(minB, projection);
+            maxB = std::max(maxB, projection);
+        }
+
+        if (maxA < minB || maxB < minA) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {
-    return texture.loadFromFile(path, renderer);
+    bool loaded = texture.loadFromFile(path, renderer);
+    size.setX(texture.getWidth());
+    size.setY(texture.getHeight());
+    return loaded;
 }
 
 bool GameObject::loadTexture(SDL_Renderer* renderer)
 {
-    return texture.loadFromFile(texturePath, renderer);
+    debugTexture.loadFromFile("./resources/debug.png", renderer);
+
+    bool loaded = texture.loadFromFile(texturePath, renderer);
+    size.setX(texture.getWidth());
+    size.setY(texture.getHeight());
+    return loaded;
 }
 
 std::string GameObject::getName()
@@ -174,9 +253,17 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
-    texture.setWidth(size.getX());
-    texture.setHeight(size.getY());
+    //texture.setWidth(size.getX()) ; TODO: for walls
+    //texture.setHeight(size.getY());
     texture.render( position.getX(), position.getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer );
+
+    if(debugMode)
+    {
+        for (auto corner: getCorners())
+        {
+            debugTexture.render( corner.getX()+2, corner.getY()+2, NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+        }
+    }
 }
 
 void GameObject::setTexturePath(std::string path)

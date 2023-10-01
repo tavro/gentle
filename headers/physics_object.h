@@ -29,7 +29,7 @@ class PhysicsObject : public GameObject
             getPosition().increaseX(getVelocity().getX());
             getPosition().increaseY(getVelocity().getY());
 
-            if(getPosition().getX() >= SCREEN_WIDTH-32)
+            if(getPosition().getX() >= SCREEN_WIDTH-getSize().getX())
             {
                 getVelocity().setX(getVelocity().getX()*-1);
             }
@@ -39,7 +39,7 @@ class PhysicsObject : public GameObject
                 getVelocity().setX(getVelocity().getX()*-1);
             }
 
-            if(getPosition().getY() >= SCREEN_HEIGHT-32)
+            if(getPosition().getY() >= SCREEN_HEIGHT-getSize().getY())
             {
                 getVelocity().setY(getVelocity().getY()*-1);
             }
@@ -68,7 +68,7 @@ class PhysicsObject : public GameObject
                 {
                     if(other != this)
                     {
-                        if(hasCollision(*other))
+                        if(hasCollision(other->getCorners()))
                         {
                             other->getVelocity().set(getVelocity().getX(), getVelocity().getY());
                             getVelocity()*=-1;

@@ -12,12 +12,12 @@ Vector2D::Vector2D(float x, float y)
     this->y = y;
 }
 
-float Vector2D::getX()
+float Vector2D::getX() const
 {
     return x;
 }
 
-float Vector2D::getY()
+float Vector2D::getY() const
 {
     return y;
 }

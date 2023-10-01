@@ -8,8 +8,8 @@ class Vector2D {
         Vector2D();
         Vector2D(float x, float y);
 
-        float getX();
-        float getY();
+        float getX() const;
+        float getY() const;
 
         void setX(float x);
         void setY(float y);

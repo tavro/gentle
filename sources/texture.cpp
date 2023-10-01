@@ -125,13 +125,13 @@ int Texture::getHeight()
 	return height;
 }
 
-int Texture::setWidth(int w)
+void Texture::setWidth(int w)
 {
 	width = w;
 	return 0; // TODO: remove when isak is done
 }
 
-int Texture::setHeight(int h)
+void Texture::setHeight(int h)
 {
 	height = h;
 	return 0; // TODO: remove when isak is done

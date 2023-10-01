@@ -287,7 +287,10 @@ namespace game
         }
 
         if (currFurn && currFurn->isDragging)
-            cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?
+        {
+            Vector2D newPos = currFurn->getPosition() + currFurn->getSize() / 2 - cursor.getSize() / 2;
+            cursor.setPosition(newPos);
+        }
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
     }

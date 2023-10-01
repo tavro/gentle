@@ -4,8 +4,8 @@
 const int LEVEL_WIDTH = 640;
 const int LEVEL_HEIGHT = 480;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 1080;
+const int SCREEN_HEIGHT = 720;
 
 const int TILE_WIDTH = 32;
 const int TILE_HEIGHT = 32;

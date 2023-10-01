@@ -16,31 +16,6 @@ namespace game
         nameText = new Text{name, x+xOffset+8, y+yOffset+8};
     }
 
-    void Room::generateWalls(int wallThickness)
-    {
-        int x1 = position.getX();
-        int y1 = position.getY();
-        int x2 = size.getX() + x1;
-        int y2 = size.getY() + y1;
-
-        Vector2D startUpper{xOffset + x1, yOffset + y1};
-        Vector2D endUpper{xOffset + x2, yOffset + y1+wallThickness};
-
-        Vector2D startLower{xOffset + x1, yOffset + y2-wallThickness};
-        Vector2D endLower{xOffset + x2, yOffset + y2+wallThickness};
-
-        Vector2D startLeft{xOffset + x1, yOffset + y1};
-        Vector2D endLeft{xOffset + x1+wallThickness, yOffset + y2};
-
-        Vector2D startRight{xOffset + x2-wallThickness, yOffset + y1};
-        Vector2D endRight{xOffset + x2, yOffset + y2};
-
-        walls.push_back(new GameObject{startUpper, endUpper});
-        walls.push_back(new GameObject{startLower, endLower});
-        walls.push_back(new GameObject{startLeft , endLeft});
-        walls.push_back(new GameObject{startRight, endRight});
-    }
-
     bool Room::isInside(int x, int y)
     {
         bool xInBound = x >= position.getX()+xOffset && x <= position.getX()+xOffset + size.getX();
@@ -57,11 +32,6 @@ namespace game
     {
         nameText->loadFont( "./resources/font.ttf", 14 );
         nameText->loadTexture( renderer );
-    }
-
-    std::vector<GameObject*> Room::getWalls()
-    {
-        return walls;
     }
 
     void Room::render(SDL_Renderer* renderer)
@@ -93,10 +63,6 @@ namespace game
             }
         }
         nameText->render(renderer);
-        for (auto* wall : getWalls())
-        {
-            wall->render(renderer);
-        }
     }
 
     std::string Room::getName()

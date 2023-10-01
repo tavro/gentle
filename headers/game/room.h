@@ -15,10 +15,6 @@ namespace game
     public:
         Room(int x, int y, int w, int h, std::string n, int xOff, int yOff);
 
-        void generateWalls(int wallThickness);
-
-        std::vector<GameObject*> getWalls();
-
         bool isInside(int x, int y);
 
         void loadFloorImage(SDL_Renderer* renderer);
@@ -35,8 +31,6 @@ namespace game
 
         Text* nameText = nullptr;
         Image* floorImage = nullptr;
-
-        std::vector<GameObject*> walls;
 
         void setColor( Uint8 r, Uint8 g, Uint8 b );
 

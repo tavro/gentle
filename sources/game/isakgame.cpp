@@ -8,7 +8,7 @@
 #include "../../headers/scene.h"
 #include "../../headers/utils/constants.h"
 
-#include "../../headers/game/room_generator.h"
+#include "../../headers/game/house_generator.h"
 #include "../../headers/game/room.h"
 
 static Vector2D getMousePos()
@@ -84,8 +84,9 @@ namespace game
             }
         }
 
-        RoomGenerator roomGenerator{4};
-        rooms = roomGenerator.generateRoomScene();
+        HouseGenerator houseGenerator{};
+        rooms = houseGenerator.generateRooms();
+        testObjs = houseGenerator.generateWalls();
     }
 
     Game::~Game()
@@ -108,12 +109,13 @@ namespace game
 
         for (auto* room : rooms)
         {
-            for (auto* wall : room->getWalls())
-            {
-                wall->loadTexture(renderer);
-            }
             room->loadFloorImage(renderer);
             room->loadNameText(renderer);
+        }
+
+        for (auto* testObj : testObjs)
+        {
+            testObj->loadTexture(renderer);
         }
 
         fpsText.loadFont("./resources/font.ttf", 28);
@@ -155,6 +157,11 @@ namespace game
         for (auto* room : rooms)
         {
             room->render(renderer);
+        }
+
+        for (auto* testObj : testObjs)
+        {
+            testObj->render(renderer);
         }
 
         for (auto box : boxes)

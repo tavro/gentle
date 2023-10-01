@@ -46,13 +46,28 @@ class PhysicsObject : public GameObject
         {
             if(hasFriction) 
             {
-                float localVel = getVelocity().getX()*getVelocity().getX() + getVelocity().getY()*getVelocity().getY();
-                Vector2D friction = (getVelocity().getNormalizedVector() * -1) * (float)(localVel * 0.0025);
+                float velSqrMagnitude = getVelocity().getX()*getVelocity().getX() + getVelocity().getY()*getVelocity().getY();
+                bool isNotMoving = velSqrMagnitude <= 1; // TODO: decide better value
 
-                acceleration.set(friction.getX()*mass, friction.getY()*mass);
+                if (isNotMoving)
+                {
+                    acceleration.setX(-getVelocity().getX());
+                    acceleration.setY(-getVelocity().getY());
+                    getVelocity().increaseX(acceleration.getX());
+                    getVelocity().increaseY(acceleration.getY());
+                }
+                else
+                {
+                    float fricCoefficient = 0.0025f * mass; // TODO: decide better value
+                    float fricMagnitude = fricCoefficient * 9.82f;
 
-                getVelocity().increaseX(acceleration.getX());
-                getVelocity().increaseY(acceleration.getY());
+                    Vector2D fricDirection = getVelocity().getNormalizedVector() * -1;
+                    Vector2D friction = fricDirection * fricMagnitude;
+                    acceleration.set(friction.getX(), friction.getY());
+
+                    getVelocity().increaseX(acceleration.getX());
+                    getVelocity().increaseY(acceleration.getY());
+                }
             }
 
             getPosition().increaseX(getVelocity().getX());

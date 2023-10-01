@@ -66,7 +66,7 @@ namespace game
                 furniturePtr->loadTexture(renderer);
 
                 boxes.push_back(new Box(
-                    {xPositionDistribution(generator), yPositionDistribution(generator)}, 
+                    {(float)xPositionDistribution(generator), (float)yPositionDistribution(generator)}, 
                     "Box", 
                     "./resources/box.png",
                     furniturePtr));
@@ -76,10 +76,14 @@ namespace game
         // Living Room, Dining Room, Pantry, Kitchen, Laundry, Bedroom, Bathroom
         RoomGenerator roomGenerator{4};
         roomScene = roomGenerator.generateRoomScene();
+
+        harold = new Harold({64, 64}); // TODO: change position
     }
 
     Game::~Game()
     {
+        free(harold);
+
         for (auto box : boxes)
             free(box);
         if (currFurn != nullptr)
@@ -128,6 +132,9 @@ namespace game
             currFurn->render(renderer);
         for (auto furniture : placedFurn)
             furniture->render(renderer);
+
+        harold->updateTexture(renderer);
+        harold->render(renderer);
 
         roomScene->render(renderer);
 

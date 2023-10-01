@@ -35,6 +35,7 @@ add_executable(ld54 main.cpp
     sources/game/box.cpp
     sources/game/cursor.cpp
     sources/game/furniture.cpp
+    sources/game/harold.cpp
     sources/game/room_generator.cpp)
 
 target_link_libraries(ld54 ${SDL2_LIBRARIES})

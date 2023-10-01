@@ -67,6 +67,31 @@ namespace game
     void Room::render(SDL_Renderer* renderer)
     {
         floorImage->render(renderer);
+        floorImage->getTexture().setColor(red, green, blue);
+        if(red<255){
+            if(red+3 > 255) {
+                red = 255;
+            }
+            else {
+                red+=3;
+            }
+        }
+        if(green<255){
+            if(green+3 > 255) {
+                green = 255;
+            }
+            else {
+                green+=3;
+            }
+        }
+        if(blue<255){
+            if(blue+3 > 255) {
+                blue = 255;
+            }
+            else {
+                blue+=3;
+            }
+        }
         nameText->render(renderer);
         for (auto* wall : getWalls())
         {
@@ -77,6 +102,13 @@ namespace game
     std::string Room::getName()
     {
         return name;
+    }
+
+    void Room::setColor( Uint8 r, Uint8 g, Uint8 b )
+    {
+        red = r;
+        green = g;
+        blue = b;
     }
 
 }

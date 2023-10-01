@@ -54,6 +54,8 @@ namespace game
         int furnitureAmount = 0;
         Text* placedFurnText = nullptr;
 
+        Text* tutorialText = nullptr;
+
         AudioSource audioSource;
     };
 }

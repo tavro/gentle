@@ -38,10 +38,15 @@ namespace game
 
         std::vector<GameObject*> walls;
 
+        void setColor( Uint8 r, Uint8 g, Uint8 b );
+
         int xOffset = 0;
         int yOffset = 0;
 
     private:
+        Uint8 red = 255;
+        Uint8 green = 255;
+        Uint8 blue = 255;
         std::map<std::string, std::string> floorMap {
             {"Living Room", "./resources/floor.png"},
             {"Dining Room", "./resources/floor.png"},

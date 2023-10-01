@@ -166,6 +166,7 @@ bool loadMedia()
 		PhysicsObject* pObj = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, key, "./resources/furniture/" + key + ".png", val};
  		pObj->loadTexture(renderer);
 		pObj->setRotation(getRandomAngle());
+		pObj->debugMode = true;
 		boxScene->addObj(pObj);
 	}
 

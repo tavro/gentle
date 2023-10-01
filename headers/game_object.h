@@ -104,6 +104,7 @@ class GameObject
         SDL_Rect toBox();
 
         bool hasCollision(GameObject& other);
+        bool hasCollision(std::vector<Vector2D> cornersB);
 
         bool isInside(int x, int y);
         
@@ -141,9 +142,14 @@ class GameObject
 
         bool isMoving();
 
+        std::vector<Vector2D> getCorners();
+        bool debugMode = false;
+
     protected:
 
     private:
+        Texture debugTexture;
+
 		State currentState;
         bool toggle = false;
 

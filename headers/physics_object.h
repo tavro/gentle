@@ -68,7 +68,7 @@ class PhysicsObject : public GameObject
                 {
                     if(other != this)
                     {
-                        if(hasCollision(*other))
+                        if(hasCollision(other->getCorners()))
                         {
                             other->getVelocity().set(getVelocity().getX(), getVelocity().getY());
                             getVelocity()*=-1;

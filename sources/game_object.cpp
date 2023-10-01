@@ -159,12 +159,18 @@ bool GameObject::hasCollision(GameObject& other)
 
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {
-    return texture.loadFromFile(path, renderer);
+    bool loaded = texture.loadFromFile(path, renderer);
+    size.setX(texture.getWidth());
+    size.setY(texture.getHeight());
+    return loaded;
 }
 
 bool GameObject::loadTexture(SDL_Renderer* renderer)
 {
-    return texture.loadFromFile(texturePath, renderer);
+    bool loaded = texture.loadFromFile(texturePath, renderer);
+    size.setX(texture.getWidth());
+    size.setY(texture.getHeight());
+    return loaded;
 }
 
 std::string GameObject::getName()
@@ -174,8 +180,8 @@ std::string GameObject::getName()
 
 void GameObject::render(SDL_Renderer* renderer)
 {
-    texture.setWidth(size.getX());
-    texture.setHeight(size.getY());
+    //texture.setWidth(size.getX()) ; TODO: for walls
+    //texture.setHeight(size.getY());
     texture.render( position.getX(), position.getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer );
 }
 

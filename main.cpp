@@ -62,6 +62,8 @@ GameObject a{};
 GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
 GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
 
+
+
 bool init()
 {
 	bool success = true;
@@ -141,42 +143,38 @@ bool loadMedia()
 
 	testScene->load("./test.scene");
 
+	std::map<std::string, int> furniture {
+		{"bed", 12}, {"sofa", 10}, {"piano", 20}, {"plant", 3}, {"oven", 15},
+		{"bathtub", 10}, {"bedsidetable", 6}, {"bookshelf", 7}, {"chair", 5}, 
+		{"coffeetable", 7}, {"dinnertable", 10}, {"dishwasher", 13}, {"dresser", 9}, 
+		{"fridge", 14}, {"lamp", 3}, {"sink", 12}, {"toilet", 7}, {"washingmachine", 13},
+		{"washingstation", 7}
+	};
+
 	std::string result;
     std::random_device rd;
     std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> distribution(0, SCREEN_HEIGHT);
+    std::uniform_int_distribution<int> distribution(64, SCREEN_HEIGHT-64);
     std::uniform_int_distribution<int> distribution2(-10, 10);
     std::uniform_int_distribution<int> distribution3(1, 10);
 
 	int xVel = distribution2(generator);
 	int yVel = distribution2(generator);
 
-	PhysicsObject* bed = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, "bed", "./resources/furniture/0.png", 12};
- 	bed->loadTexture(renderer);
-	bed->setRotation(getRandomAngle());
-	boxScene->addObj(bed);
-	PhysicsObject* sofa = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, "sofa", "./resources/furniture/1.png", 10};
- 	sofa->loadTexture(renderer);
-	sofa->setRotation(getRandomAngle());
-	boxScene->addObj(sofa);
-	PhysicsObject* piano = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, "piano", "./resources/furniture/2.png", 20};
- 	piano->loadTexture(renderer);
-	piano->setRotation(getRandomAngle());
-	boxScene->addObj(piano);
-	PhysicsObject* plant = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, "plant", "./resources/furniture/3.png", 2};
- 	plant->loadTexture(renderer);
-	plant->setRotation(getRandomAngle());
-	boxScene->addObj(plant);
-	PhysicsObject* oven = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, "oven", "./resources/furniture/4.png", 15};
- 	oven->loadTexture(renderer);
-	oven->setRotation(getRandomAngle());
-	boxScene->addObj(oven);
+	for (auto const& [key, val] : furniture)
+	{
+		PhysicsObject* pObj = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, key, "./resources/furniture/" + key + ".png", val};
+ 		pObj->loadTexture(renderer);
+		pObj->setRotation(getRandomAngle());
+		boxScene->addObj(pObj);
+	}
 
-
+	/*
 	wall.loadTexture(renderer);
 	wall2.loadTexture(renderer);
 	wallScene->addObj(&wall);
 	wallScene->addObj(&wall2);
+	*/
 
 	cursor.loadTexture(renderer);
 
@@ -347,13 +345,13 @@ int main( int argc, char* args[] )
 				for (auto* obj: boxScene->getObjs())
 				{
 					obj->handleCollisions(boxScene->getObjs());
-					obj->handleCollisions(wallScene->getObjs());
+					//obj->handleCollisions(wallScene->getObjs());
 					obj->move();
 				}
 
 				boxScene->render(renderer);
 
-				wallScene->render(renderer);
+				//wallScene->render(renderer);
 
 				cursor.render(renderer);
 

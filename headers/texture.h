@@ -31,8 +31,8 @@ class Texture
 		int getWidth();
 		int getHeight();
 
-		int setWidth(int w);
-		int setHeight(int h);
+		void setWidth(int w);
+		void setHeight(int h);
 
 	private:
 		SDL_Texture* texture;

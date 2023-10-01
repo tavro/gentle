@@ -1,4 +1,5 @@
 #include "../../headers/game/game.h"
+#include "../../headers/game/room_generator.h"
 
 #include <vector>
 #include <map>
@@ -45,7 +46,8 @@ namespace game
 
         std::random_device rd;
         std::mt19937 generator(rd());
-        std::uniform_int_distribution<int> positionDistribution(64, SCREEN_HEIGHT-64);
+        std::uniform_int_distribution<int> xPositionDistribution(240, SCREEN_WIDTH-240);
+        std::uniform_int_distribution<int> yPositionDistribution(0, 160);
         std::uniform_int_distribution<int> velocityDistribution(-10, 10);
 
         for (auto const& [key, val] : furniture)
@@ -63,12 +65,16 @@ namespace game
                 furniturePtr->loadTexture(renderer);
 
                 boxes.push_back(new Box(
-                    {positionDistribution(generator), positionDistribution(generator)}, 
+                    {xPositionDistribution(generator), yPositionDistribution(generator)}, 
                     "Box", 
                     "./resources/box.png",
                     furniturePtr));
             }
         }
+
+        // Living Room, Dining Room, Pantry, Kitchen, Laundry, Bedroom, Bathroom
+        RoomGenerator roomGenerator{4};
+        roomScene = roomGenerator.generateRoomScene();
     }
 
     Game::~Game()
@@ -85,6 +91,9 @@ namespace game
     {
         bool success = true;
 
+        background.getTexture().loadFromFile("./resources/grass.png", renderer);
+        floor.getTexture().loadFromFile("./resources/floor.png", renderer);
+
         fpsText.loadFont("./resources/font.ttf", 28);
         fpsText.loadTexture(renderer);
         canvas.addObj(&fpsText);
@@ -97,11 +106,18 @@ namespace game
             box->furniture->loadTexture(renderer);
         }
 
+        for (auto* wall : roomScene->getObjs())
+        {
+            wall->loadTexture(renderer);
+        }
+
         return success;
     }
 
     void Game::render()
     {
+        background.render(renderer);
+        floor.render(renderer);
         fpsText.render(renderer);
 
         for (auto box : boxes)
@@ -113,6 +129,8 @@ namespace game
 
         cursor.updateTexture(renderer);
         cursor.render(renderer);
+
+        roomScene->render(renderer);
     }
 
     void Game::handleEvent(SDL_Event *event)

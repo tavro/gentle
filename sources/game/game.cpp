@@ -142,6 +142,13 @@ namespace game
                 currFurn->isDragging = true;
                 break;
             }
+
+            bool canRotate = currFurn->isDragging || currFurn->getCurrentState() != State::MOUSE_OUT;
+            if (event->type == SDL_MOUSEWHEEL && canRotate)
+            {
+                float rotationAmount = event->wheel.y * 5;
+                currFurn->increaseRotation(rotationAmount);
+            }
         }
 
         if (clickedBox)

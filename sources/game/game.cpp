@@ -1,10 +1,13 @@
 #include "../../headers/game/game.h"
 
+#include <map>
 #include <vector>
 
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
 #include "../../headers/utils/constants.h"
+
+#include "../../headers/game/room_generator.h"
 
 static Vector2D getMousePos()
 {
@@ -13,30 +16,6 @@ static Vector2D getMousePos()
     return {(float)mouseX, (float)mouseY};
 }
 
-/*
-std::map<std::string, FurnitureMeta> furniture {
-    {"bed",  			{1 , 12, {"bedroom"}}}, 
-    {"sofa", 			{1 , 10, {"livingroom"}}}, 
-    {"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
-    {"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
-    {"oven", 			{1 , 15, {"kitchen"}}},
-    {"bathtub", 		{1 , 10, {"bathroom"}}}, 
-    {"bedsidetable",	{2 , 6 , {"bedroom"}}},
-    {"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
-    {"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
-    {"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
-    {"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
-    {"dishwasher", 		{1 , 13, {"kitchen"}}},
-    {"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
-    {"fridge", 			{1 , 14, {"kitchen"}}}, 
-    {"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
-    {"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
-    {"toilet", 			{1 , 7 , {"bathroom"}}}, 
-    {"washingmachine", 	{1 , 13, {"bathroom"}}},
-    {"washingstation", 	{1 , 7 , {"bathroom"}}}
-};
-*/
-
 namespace game
 {
     Game::Game(SDL_Renderer *renderer)
@@ -44,10 +23,59 @@ namespace game
         , cursor(Cursor("Cursor"))
         , fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
-        boxes = {
-            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png", 30.0f),
-            new Box({32, 0}, "Box 2", "./resources/folder.png", "Furn 2", "./resources/gameobject.png", 1.0f)
+        std::map<std::string, FurnitureMeta> furniture {
+            {"bed",  			{1 , 12, {"bedroom"}}}, 
+            {"sofa", 			{1 , 10, {"livingroom"}}}, 
+            {"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
+            {"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
+            {"oven", 			{1 , 15, {"kitchen"}}},
+            {"bathtub", 		{1 , 10, {"bathroom"}}}, 
+            {"bedsidetable",	{2 , 6 , {"bedroom"}}},
+            {"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
+            {"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
+            {"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
+            {"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
+            {"dishwasher", 		{1 , 13, {"kitchen"}}},
+            {"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
+            {"fridge", 			{1 , 14, {"kitchen"}}}, 
+            {"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
+            {"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
+            {"toilet", 			{1 , 7 , {"bathroom"}}}, 
+            {"washingmachine", 	{1 , 13, {"bathroom"}}},
+            {"washingstation", 	{1 , 7 , {"bathroom"}}}
         };
+
+        std::random_device rd;
+        std::mt19937 generator(rd());
+        std::uniform_int_distribution<int> xPositionDistribution(240, SCREEN_WIDTH-240);
+        std::uniform_int_distribution<int> yPositionDistribution(0, 160);
+        std::uniform_int_distribution<int> velocityDistribution(-10, 10);
+
+        for (auto const& [key, val] : furniture)
+        {
+            std::uniform_int_distribution<int> amountDistribution(1, val.maxAmount);
+            int amount = amountDistribution(generator);
+
+            for(int i = 0; i < amount; i++)
+            {
+                Furniture* furniturePtr = new Furniture {
+                    key,
+                    "./resources/furniture/" + key + ".png", 
+                    val.weight
+                };
+                furniturePtr->loadTexture(renderer);
+
+                boxes.push_back(new Box(
+                    {xPositionDistribution(generator), yPositionDistribution(generator)}, 
+                    "Box", 
+                    "./resources/box.png",
+                    furniturePtr));
+            }
+        }
+
+        // Living Room, Dining Room, Pantry, Kitchen, Laundry, Bedroom, Bathroom
+        RoomGenerator roomGenerator{4};
+        roomScene = roomGenerator.generateRoomScene();
     }
 
     Game::~Game()
@@ -58,11 +86,16 @@ namespace game
             free(currFurn);
         for (auto furn : placedFurn)
             free(furn);
+        
+        free(roomScene);
     }
 
     bool Game::loadMedia(Canvas &canvas)
     {
         bool success = true;
+
+        background.getTexture().loadFromFile("./resources/grass.png", renderer);
+        floor.getTexture().loadFromFile("./resources/floor.png", renderer);
 
         fpsText.loadFont("./resources/font.ttf", 28);
         fpsText.loadTexture(renderer);
@@ -76,12 +109,18 @@ namespace game
             box->furniture->loadTexture(renderer);
         }
 
+        for (auto* wall : roomScene->getObjs())
+        {
+            wall->loadTexture(renderer);
+        }
+
         return success;
     }
 
     void Game::render()
     {
-        fpsText.render(renderer);
+        background.render(renderer);
+        floor.render(renderer);
 
         for (auto box : boxes)
             box->render(renderer);
@@ -89,6 +128,10 @@ namespace game
             currFurn->render(renderer);
         for (auto furniture : placedFurn)
             furniture->render(renderer);
+
+        roomScene->render(renderer);
+
+        fpsText.render(renderer);
 
         cursor.updateTexture(renderer);
         cursor.render(renderer);

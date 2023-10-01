@@ -10,8 +10,12 @@ namespace game
     class Furniture : public PhysicsObject
     {
     public:
-        Furniture(std::string name, std::string texPath, float mass);
+        Furniture(std::string name, std::string texPath, float mass, std::vector<std::string> roomNames);
+        
+        bool compatableWith(std::string roomName);
+        
         bool isDragging = false;
+        std::vector<std::string> compatableRooms;
     };
 
     struct FurnitureMeta {

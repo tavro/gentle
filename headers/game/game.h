@@ -9,6 +9,7 @@
 #include "../../headers/game/box.h"
 #include "../../headers/game/cursor.h"
 #include "../../headers/game/furniture.h"
+#include "../../headers/game/room.h"
 
 #include "../../headers/canvas.h"
 #include "../../headers/text.h"
@@ -38,7 +39,7 @@ namespace game
         Furniture *currFurn = nullptr;
         std::vector<Furniture *> placedFurn;
 
-        Scene* roomScene = nullptr; 
+        std::vector<Room*> rooms;
 
         Box *hoveredBox = nullptr;
         Furniture *hoveredFurn = nullptr;

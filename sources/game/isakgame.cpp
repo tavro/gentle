@@ -2,12 +2,14 @@
 
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
 #include "../../headers/utils/constants.h"
 
 #include "../../headers/game/room_generator.h"
+#include "../../headers/game/room.h"
 
 static Vector2D getMousePos()
 {
@@ -24,25 +26,25 @@ namespace game
         , fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
         std::map<std::string, FurnitureMeta> furniture {
-            {"bed",  			{1 , 12, {"bedroom"}}}, 
-            {"sofa", 			{1 , 10, {"livingroom"}}}, 
-            {"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
-            {"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
-            {"oven", 			{1 , 15, {"kitchen"}}},
-            {"bathtub", 		{1 , 10, {"bathroom"}}}, 
-            {"bedsidetable",	{2 , 6 , {"bedroom"}}},
-            {"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
-            {"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
-            {"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
-            {"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
-            {"dishwasher", 		{1 , 13, {"kitchen"}}},
-            {"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
-            {"fridge", 			{1 , 14, {"kitchen"}}}, 
-            {"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
-            {"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
-            {"toilet", 			{1 , 7 , {"bathroom"}}}, 
-            {"washingmachine", 	{1 , 13, {"bathroom"}}},
-            {"washingstation", 	{1 , 7 , {"bathroom"}}}
+            {"bed",  			{1 , 12, {"Bedroom"}}}, 
+            {"sofa", 			{1 , 10, {"Living Room"}}}, 
+            {"piano",			{1 , 20, {"Bedroom", "Living Room"}}}, 
+            {"plant",			{21, 3 , {"Bedroom", "Living Room", "Bathroom"}}},
+            {"oven", 			{1 , 15, {"Kitchen"}}},
+            {"bathtub", 		{1 , 10, {"Bathroom"}}}, 
+            {"bedsidetable",	{2 , 6 , {"Bedroom"}}},
+            {"bookshelf", 		{2 , 7 , {"Bedroom", "Living Room"}}}, 
+            {"chair", 			{12, 5 , {"Bedroom", "Living Room", "Kitchen"}}},
+            {"coffeetable", 	{2 , 7 , {"Bedroom", "Living Room", "Kitchen"}}},
+            {"dinnertable", 	{2 , 10, {"Living Room", "Kitchen"}}},
+            {"dishwasher", 		{1 , 13, {"Kitchen"}}},
+            {"dresser", 		{2 , 9 , {"Bedroom", "Living Room"}}},
+            {"fridge", 			{1 , 14, {"Kitchen"}}}, 
+            {"lamp", 			{14, 3 , {"Bedroom", "Living Room", "Kitchen", "Bathroom"}}}, 
+            {"sink", 			{2 , 12, {"Kitchen", "Bathroom"}}}, 
+            {"toilet", 			{1 , 7 , {"Bathroom"}}}, 
+            {"washingmachine", 	{1 , 13, {"Bathroom"}}},
+            {"washingstation", 	{1 , 7 , {"Bathroom"}}}
         };
 
         std::random_device rd;
@@ -61,7 +63,8 @@ namespace game
                 Furniture* furniturePtr = new Furniture {
                     key,
                     "./resources/furniture/" + key + ".png", 
-                    val.weight
+                    val.weight,
+                    val.compatableRooms
                 };
                 furniturePtr->loadTexture(renderer);
 
@@ -73,9 +76,8 @@ namespace game
             }
         }
 
-        // Living Room, Dining Room, Pantry, Kitchen, Laundry, Bedroom, Bathroom
         RoomGenerator roomGenerator{4};
-        roomScene = roomGenerator.generateRoomScene();
+        rooms = roomGenerator.generateRoomScene();
     }
 
     Game::~Game()
@@ -87,7 +89,7 @@ namespace game
         for (auto furn : placedFurn)
             free(furn);
         
-        free(roomScene);
+        //free(roomScene); TODO: rooms
     }
 
     bool Game::loadMedia(Canvas &canvas)
@@ -95,7 +97,16 @@ namespace game
         bool success = true;
 
         background.getTexture().loadFromFile("./resources/grass.png", renderer);
-        floor.getTexture().loadFromFile("./resources/floor.png", renderer);
+
+        for (auto* room : rooms)
+        {
+            for (auto* wall : room->getWalls())
+            {
+                wall->loadTexture(renderer);
+            }
+            room->loadFloorImage(renderer);
+            room->loadNameText(renderer);
+        }
 
         fpsText.loadFont("./resources/font.ttf", 28);
         fpsText.loadTexture(renderer);
@@ -109,18 +120,17 @@ namespace game
             box->furniture->loadTexture(renderer);
         }
 
-        for (auto* wall : roomScene->getObjs())
-        {
-            wall->loadTexture(renderer);
-        }
-
         return success;
     }
 
     void Game::render()
     {
         background.render(renderer);
-        floor.render(renderer);
+
+        for (auto* room : rooms)
+        {
+            room->render(renderer);
+        }
 
         for (auto box : boxes)
             box->render(renderer);
@@ -128,8 +138,6 @@ namespace game
             currFurn->render(renderer);
         for (auto furniture : placedFurn)
             furniture->render(renderer);
-
-        roomScene->render(renderer);
 
         fpsText.render(renderer);
 
@@ -142,6 +150,35 @@ namespace game
         if (currFurn)
         {
             placedFurn.push_back(currFurn);
+
+            int x = currFurn->getPosition().getX();
+            int y = currFurn->getPosition().getY();
+
+            Room* activeRoom = nullptr;
+            for (auto* room : rooms)
+            {
+                if(room->isInside(x, y))
+                {
+                    activeRoom = room;
+                    break;
+                }
+            }
+
+            std::string roomName = activeRoom->getName();
+            if(currFurn->compatableWith(roomName))
+            {
+                std::cout << "YOU GET POINTS" << std::endl;
+            }
+            else
+            {
+                std::cout << "WTF! NO POINTS FOR YOU!" << std::endl;
+            }
+
+            if(boxes.size() == 0)
+            {
+                // NOTE: ALL FURNITURE PLACED!
+            }
+
             currFurn = nullptr;
         }
     }
@@ -281,6 +318,7 @@ namespace game
             for (auto otherFurn : placedFurn)
                 if (furn != otherFurn)
                     others.push_back(furn);
+
             if (currFurn)
                 others.push_back(currFurn);
             furn->handleCollisions(others);

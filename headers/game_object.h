@@ -176,6 +176,8 @@ class GameObject
         RotDir rotationDirection = RotDir::NONE;
 
     private:
+        bool isStatic;
+
         Texture debugTexture;
 
 		State currentState;

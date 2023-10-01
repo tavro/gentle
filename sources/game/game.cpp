@@ -11,8 +11,8 @@ namespace game
     Game::Game(SDL_Renderer *renderer) : renderer(renderer), cursor(Cursor("Cursor")), fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
         boxes = {
-            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png"),
-            new Box({32, 0}, "Box 2", "./resources/folder.png", "Furn 2", "./resources/gameobject.png")
+            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png", 1.0f),
+            new Box({32, 0}, "Box 2", "./resources/folder.png", "Furn 2", "./resources/gameobject.png", 1.0f)
         };
     }
 

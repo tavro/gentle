@@ -18,6 +18,7 @@ add_executable(ld54 main.cpp
     sources/game_object.cpp
     sources/particle.cpp
     sources/player.cpp
+    sources/physics_object.cpp
     sources/text.cpp
     sources/texture.cpp
     sources/tile.cpp

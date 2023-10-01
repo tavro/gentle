@@ -3,14 +3,14 @@
 
 #include <SDL2/SDL_render.h>
 
-#include "../game_object.h"
+#include "../physics_object.h"
 
 namespace game
 {
-    class Furniture : public GameObject
+    class Furniture : public PhysicsObject
     {
     public:
-        Furniture(std::string name, std::string texPath);
+        Furniture(std::string name, std::string texPath, float mass);
         bool isDragging = false;
     };
 }

@@ -12,6 +12,8 @@
 
 #include "../../headers/canvas.h"
 #include "../../headers/text.h"
+#include "../../headers/scene.h"
+#include "../../headers/image.h"
 
 namespace game
 {
@@ -36,8 +38,13 @@ namespace game
         Furniture *currFurn = nullptr;
         std::vector<Furniture *> placedFurn;
 
+        Scene* roomScene = nullptr; 
+
         Box *hoveredBox = nullptr;
         Furniture *hoveredFurn = nullptr;
+
+        Image background{0, 0, 1080, 720};
+        Image floor{240, 160, 600, 400};
     };
 }
 

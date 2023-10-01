@@ -10,7 +10,7 @@ namespace game
     class Box : public GameObject
     {
     public:
-        Box(Vector2D pos, std::string name, std::string texPath, std::string furnName, std::string furnTexPath, float furnMass);
+        Box(Vector2D pos, std::string name, std::string texPath, Furniture* furniturePtr);
         Furniture *furniture = nullptr;
     };
 }

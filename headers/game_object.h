@@ -162,7 +162,7 @@ class GameObject
         Vector2D velocity;
         Vector2D size;
 
-        float rotation;
+        float rotation = 0.0f;
 };
 
 #endif // GAMEOBJECT_H

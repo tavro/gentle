@@ -31,7 +31,7 @@ namespace game
         , fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
         boxes = {
-            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png", 1.0f),
+            new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png", 30.0f),
             new Box({32, 0}, "Box 2", "./resources/folder.png", "Furn 2", "./resources/gameobject.png", 1.0f)
         };
     }
@@ -179,12 +179,22 @@ namespace game
         Vector2D mousePos = getMousePos();
         if (currFurn && currFurn->isDragging)
         {
-            currFurn->setPosition(mousePos - currFurn->getSize() / 2); // TODO: move smoothly instead
+            Vector2D moveDir = mousePos - currFurn->getPosition();
+
+            float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead
+            currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
+
+            // TODO: make unable to move out of bounds
+        }
+
+        if (currFurn)
+            currFurn->move();
+        for (auto furn : placedFurn)
+            furn->move();
+
+        if (currFurn && currFurn->isDragging)
             cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?
-        }
         else
-        {
             cursor.setPosition(mousePos - cursor.getSize() / 2);
-        }
     }
 }

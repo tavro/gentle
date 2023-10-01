@@ -12,10 +12,6 @@
 #include <map>
 #include <random>
 
-//#include "./headers/editor/explorer.h"
-//#include "./headers/editor/heirarchy.h"
-//#include "./headers/editor/inspector.h"
-
 #include "./headers/texture.h"
 #include "./headers/particle.h"
 #include "./headers/player.h"
@@ -45,10 +41,6 @@ SDL_Renderer*   renderer = NULL;
 
 Canvas canvas;
 game::Game *gameInstance = NULL;
-
-//Explorer explorer{ "", 0, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
-//Heirarchy heirarchy{ SCREEN_WIDTH/2, SCREEN_HEIGHT+32, SCREEN_WIDTH/2, UI_AREA };
-//Inspector inspector{SCREEN_WIDTH, 0};
 
 GameObject wall{{32, 32}, {SCREEN_WIDTH-32, 32+16}};
 GameObject wall2{{32, SCREEN_HEIGHT-32-16}, {SCREEN_WIDTH-32, SCREEN_HEIGHT-32}};
@@ -116,27 +108,17 @@ bool loadMedia()
 {
 	bool success = true;
 
-	//heirarchy.loadTextures(renderer);
-	//heirarchy.setActiveScene(testScene, renderer);
-
-	//inspector.setActiveObj(&a);
-	//inspector.loadFont(renderer);
-
-	//explorer.folderTexture.loadFromFile( "./resources/folderSheet.png", renderer );
-	//explorer.fileTexture.loadFromFile( "./resources/fileSheet.png", renderer );
-	//explorer.texture.loadFromFile( "./resources/explorer.png", renderer );
-
 	success = gameInstance->loadMedia(canvas);
 	
 	/* ISAKS TESTGREJOR
 	std::vector<std::vector<int>> rooms;
-	rooms.push_back({0, 0, 292, 300}); 
-	rooms.push_back({0, 300, 292, 100}); 
-	rooms.push_back({292, 0, 307, 190}); 
-	rooms.push_back({292, 190, 223, 209}); 
-	rooms.push_back({516, 190, 83, 209}); 
-	rooms.push_back({0, 300, 58, 100}); 
-	rooms.push_back({58, 300, 175, 100}); 
+	rooms.push_back({0, 0, 292, 300});
+	rooms.push_back({0, 300, 292, 100});
+	rooms.push_back({292, 0, 307, 190});
+	rooms.push_back({292, 190, 223, 209});
+	rooms.push_back({516, 190, 83, 209});
+	rooms.push_back({0, 300, 58, 100});
+	rooms.push_back({58, 300, 175, 100});
 	rooms.push_back({233, 300, 58, 100});
 	
 	const int WALL_THICKNESS = 4;
@@ -175,51 +157,6 @@ bool loadMedia()
 		wallScene->addObj(rightWall);
 	}
 
-	//EX:
-	//	
-	//	x = 0, y = 0, w = 292, h = 300
-	//	{0, 0, 292, 300}, => 	Upper wall: GameObject{x, y, w, y+WALL_THICKNESS}
-	//							Lower wall: GameObject{x, h-WALL_THICKNESS, w, h+WALL_THICKNESS}
-	//							Left wall:  GameObject{x, y, x+WALL_THICKNESS, h}
-	//							Right wall: GameObject{w-WALL_THICKNESS, y, w, h}
-	
-	std::string result;
-    std::random_device rd;
-    std::mt19937 generator(rd());
-    std::uniform_int_distribution<int> distribution(64, SCREEN_HEIGHT-64);
-    std::uniform_int_distribution<int> distribution2(-10, 10);
-    std::uniform_int_distribution<int> distribution3(1, 10);
-
-	int xVel = distribution2(generator);
-	int yVel = distribution2(generator);
-
-	for (auto const& [key, val] : furniture)
-	{
-    	std::uniform_int_distribution<int> distribution4(1, val.maxAmount);
-		int amount = distribution4(generator);
-
-		for(int i = 0; i < amount; i++)
-		{
-			PhysicsObject* pObj = new PhysicsObject{{distribution(generator), distribution(generator)}, {32, 32}, {xVel, yVel}, key, "./resources/furniture/" + key + ".png", val.weight};
-			pObj->loadTexture(renderer);
-			pObj->setRotation(getRandomAngle());
-			//pObj->debugMode = true;
-			boxScene->addObj(pObj);
-		}
-	}
-
-	//wall.loadTexture(renderer);
-	//wall2.loadTexture(renderer);
-	//wallScene->addObj(&wall);
-	//wallScene->addObj(&wall2);
-
-	cursor.loadTexture(renderer);
-
-	box.loadTexture(renderer);
-
-    success = !FPSText.loadFont( "./resources/font.ttf", 28 );
-    success = !FPSText.loadTexture( renderer );
-	canvas.addObj(&FPSText);
 	*/
 	
 	return success;
@@ -294,23 +231,6 @@ int main( int argc, char* args[] )
 						quit = true;
 					}
 					/*
-					else if( e.type == SDL_KEYDOWN )
-					{
-						std::string result;
-						std::random_device rd;
-						std::mt19937 generator(rd());
-						std::uniform_int_distribution<int> distribution2(-10, 10);
-						int xVel = distribution2(generator);
-						int yVel = distribution2(generator);
-						switch( e.key.keysym.sym )
-						{
-							case SDLK_UP:
-								activeObj->getVelocity().set(xVel, yVel);
-							break;
-							case SDLK_DOWN:
-							break;
-						}
-					}
 					else
 					{
 						switch( e.type )
@@ -335,21 +255,10 @@ int main( int argc, char* args[] )
 					*/
 
 					canvas.handleEvent( &e );
-					//explorer.handleEvent( &e );
 
 					gameInstance->handleEvent(&e);
 				}
 				gameInstance->update(avgFPS);
-
-				/*
-				if(explorer.fileHasChanged())
-				{
-					testScene->load(explorer.currentFile); // TODO: Check if scene
-					heirarchy.setActiveScene(testScene, renderer);
-					explorer.toggleFileChanged();
-					box.handleEvent( &e );
-				}
-				*/
 
 				SDL_SetRenderDrawColor( renderer, 0xFF, 0xFF, 0xFF, 0xFF );
 				SDL_RenderClear( renderer );
@@ -358,16 +267,8 @@ int main( int argc, char* args[] )
 
 				gameInstance->render();
 
-				//explorer.render(renderer);
-				//heirarchy.render(renderer);
-				//inspector.render(renderer);
-
 				/* ISAKS TESTGREJOR
-				boxScene->render(renderer);
-
 				wallScene->render(renderer);
-
-				cursor.render(renderer);
 				*/
 
 				SDL_RenderPresent( renderer );

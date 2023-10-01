@@ -348,6 +348,7 @@ int main( int argc, char* args[] )
 					obj->handleCollisions(boxScene->getObjs());
 					//obj->handleCollisions(wallScene->getObjs());
 					obj->move();
+					obj->rotate();
 				}
 
 				boxScene->render(renderer);

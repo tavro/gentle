@@ -319,3 +319,13 @@ bool GameObject::isMoving()
 {
     return (getVelocity().getX() != 0 || getVelocity().getY() != 0);
 }
+
+void GameObject::setRotationDirection(RotDir dir)
+{
+    rotationDirection = dir;
+}
+
+void GameObject::setRotationSpeed(float speed)
+{
+    rotationSpeed = speed;
+}

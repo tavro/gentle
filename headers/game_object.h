@@ -16,6 +16,13 @@ enum State
     TOTAL             = 4
 }; 
 
+enum RotDir
+{
+    RIGHT = 1,
+    LEFT = -1,
+    NONE = 0
+};
+
 class GameObject
 {
     public:
@@ -124,10 +131,28 @@ class GameObject
 
         void decreaseRotation(float amount);
 
+        void setRotationDirection(RotDir dir);
+        void setRotationSpeed(float speed);
+
         virtual void move()
         {
             getPosition().increaseX(getVelocity().getX());
             getPosition().increaseY(getVelocity().getY());
+        }
+
+        virtual void rotate()
+        {
+            switch(rotationDirection)
+            {
+                case RotDir::RIGHT:
+                    increaseRotation(rotationSpeed);
+                break;
+                case RotDir::LEFT:
+                    decreaseRotation(rotationSpeed);
+                break;
+                case RotDir::NONE:
+                break;
+            }
         }
 
         virtual void setHasFriction(bool state)
@@ -146,6 +171,9 @@ class GameObject
         bool debugMode = false;
 
     protected:
+        float rotation;
+        float rotationSpeed = 1;
+        RotDir rotationDirection = RotDir::NONE;
 
     private:
         Texture debugTexture;
@@ -161,8 +189,6 @@ class GameObject
         Vector2D position;
         Vector2D velocity;
         Vector2D size;
-
-        float rotation;
 };
 
 #endif // GAMEOBJECT_H

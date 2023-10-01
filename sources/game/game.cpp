@@ -6,9 +6,19 @@
 #include "../../headers/scene.h"
 #include "../../headers/utils/constants.h"
 
+static Vector2D getMousePos()
+{
+    int mouseX, mouseY;
+    SDL_GetMouseState(&mouseX, &mouseY);
+    return {(float)mouseX, (float)mouseY};
+}
+
 namespace game
 {
-    Game::Game(SDL_Renderer *renderer) : renderer(renderer), cursor(Cursor("Cursor")), fpsText({"", 0, SCREEN_HEIGHT - 28})
+    Game::Game(SDL_Renderer *renderer)
+        : renderer(renderer)
+        , cursor(Cursor("Cursor"))
+        , fpsText({"", 0, SCREEN_HEIGHT - 28})
     {
         boxes = {
             new Box({96, 0}, "Box 1", "./resources/folder.png", "Furn 1", "./resources/gameobject.png", 1.0f),
@@ -19,80 +29,30 @@ namespace game
     Game::~Game()
     {
         for (auto box : boxes)
-        {
             free(box);
-        }
-        if (currFurniture != nullptr)
-        {
-            free(currFurniture);
-        }
-        for (auto furniture : placedFurniture)
-        {
-            free(furniture);
-        }
+        if (currFurn != nullptr)
+            free(currFurn);
+        for (auto furn : placedFurn)
+            free(furn);
     }
 
     bool Game::loadMedia(Canvas &canvas)
     {
         bool success = true;
-        
-        success = !fpsText.loadFont("./resources/font.ttf", 28);
-        success = !fpsText.loadTexture(renderer);
-	    canvas.addObj(&fpsText);
-        
+
+        fpsText.loadFont("./resources/font.ttf", 28);
+        fpsText.loadTexture(renderer);
+        canvas.addObj(&fpsText);
+
+        cursor.loadTexture(renderer);
+
         for (auto box : boxes)
         {
             box->loadTexture(renderer);
             box->furniture->loadTexture(renderer);
         }
-        cursor.loadTexture(renderer);
 
         return success;
-    }
-
-    void Game::update(float avgFPS, SDL_Event &event)
-    {
-        int mouseX, mouseY;
-        SDL_GetMouseState(&mouseX, &mouseY);
-        cursor.getPosition().set(mouseX - 32/2, mouseY - 32/2);
-
-        hoveredBox = nullptr;
-        for (auto box : boxes)
-        {
-            if (box->isInside(cursor.getPosition().getX() + 32/2, cursor.getPosition().getY() + 32/2))
-            {
-                hoveredBox = box;
-                break;
-            }
-        }
-        cursor.isHoveringBox = hoveredBox != nullptr;
-
-        cursor.isHoveringFurn = currFurniture != nullptr && currFurniture->isInside(cursor.getPosition().getX() + 32/2, cursor.getPosition().getY() + 32/2);
-
-        switch (event.type)
-        {
-        case SDL_MOUSEBUTTONDOWN:
-            onMouseDown(mouseX, mouseY);
-            break;
-        case SDL_MOUSEBUTTONUP:
-            onMouseUp(mouseX, mouseY);
-            break;
-        }
-        
-        cursor.updateTexture(renderer);
-
-        std::stringstream timeText;
-        timeText.str("");
-        timeText << "Average FPS: " << avgFPS;
-
-        fpsText.updateContent(timeText.str());
-        fpsText.loadTexture(renderer);
-
-        if (currFurniture != nullptr && currFurniture->isDragging)
-        {
-            Vector2D &cursorPos = cursor.getPosition();
-            currFurniture->setPosition(cursorPos);
-        }
     }
 
     void Game::render()
@@ -100,53 +60,121 @@ namespace game
         fpsText.render(renderer);
 
         for (auto box : boxes)
-        {
             box->render(renderer);
-        }
-        if (currFurniture != nullptr)
-        {
-            currFurniture->render(renderer);
-        }
-        for (auto furniture : placedFurniture)
-        {
+        if (currFurn != nullptr)
+            currFurn->render(renderer);
+        for (auto furniture : placedFurn)
             furniture->render(renderer);
-        }
+
+        cursor.updateTexture(renderer);
         cursor.render(renderer);
     }
 
-    void Game::onMouseDown(int mouseX, int mouseY)
+    void Game::handleEvent(SDL_Event *event)
     {
-        cursor.isClosed = true;
-        
-        if (currFurniture != nullptr && cursor.isHoveringFurn)
+        Box *clickedBox = nullptr;
+
+        for (auto box : boxes)
         {
-            currFurniture->isDragging = true;
-        }
-        else if (currFurniture == nullptr && hoveredBox != nullptr)
-        {
-            currFurniture = hoveredBox->furniture;
-            for (auto iter = boxes.begin(); iter != boxes.end(); iter++)
+            box->handleEvent(event);
+
+            switch (box->getCurrentState())
             {
-                if (*iter == hoveredBox)
+            case State::MOUSE_OVER_MOTION:
+                cursor.isHovering = true;
+                break;
+            case State::MOUSE_OUT:
+                cursor.isHovering = false;
+                break;
+            case State::MOUSE_DOWN:
+                if (!currFurn)
+                    clickedBox = box;
+                break;
+            }
+        }
+
+        if (currFurn)
+        {
+            currFurn->handleEvent(event);
+            
+            switch (currFurn->getCurrentState())
+            {
+            case State::MOUSE_OVER_MOTION:
+                cursor.isHovering = true;
+                break;
+            case State::MOUSE_OUT:
+                cursor.isHovering = false;
+                break;
+            case State::MOUSE_DOWN:
+                currFurn->isDragging = true;
+                break;
+            }
+        }
+
+        if (clickedBox)
+        {
+            for (auto i = boxes.begin(); i != boxes.end(); i++)
+            {
+                Box *box = *i;
+                if (box == clickedBox)
                 {
-                    boxes.erase(iter);
+                    boxes.erase(i);
+                    currFurn = box->furniture;
+                    currFurn->setPosition(box->getPosition()); // TODO: need to make centered?
+                    free(box);
                     break;
                 }
             }
+        }
             
-            currFurniture->setPosition(hoveredBox->getPosition());
-
-            free(hoveredBox);
-            hoveredBox = nullptr;
+        switch (event->type)
+        {
+        case SDL_MOUSEBUTTONDOWN:
+            cursor.isClosed = true;
+            break;
+        case SDL_MOUSEBUTTONUP:
+            cursor.isClosed = false;
+            if (currFurn)
+                currFurn->isDragging = false;
+            break;
         }
     }
 
-    void Game::onMouseUp(int mouseX, int mouseY)
+    void Game::update(float avgFPS)
     {
-        cursor.isClosed = false;
-        if (currFurniture != nullptr)
+        std::stringstream fpsTextStream;
+        fpsTextStream.str("");
+        fpsTextStream << "Average FPS: " << avgFPS;
+
+        fpsText.updateContent(fpsTextStream.str());
+        fpsText.loadTexture(renderer);
+
+        if (currFurn)
         {
-            currFurniture->isDragging = false;
+            cursor.isHovering = currFurn->getCurrentState() != State::MOUSE_OUT;
+        }
+        else
+        {
+            cursor.isHovering = false;
+            for (auto box : boxes)
+            {
+                if (box->getCurrentState() != State::MOUSE_OUT)
+                {
+                    cursor.isHovering = true;
+                    break;
+                }
+            }
+        }
+
+        Vector2D mousePos = getMousePos();
+        if (currFurn && currFurn->isDragging)
+        {
+            currFurn->setPosition(mousePos - currFurn->getSize() / 2); // TODO: move smoothly instead
+            cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?
+        }
+        else
+        {
+            cursor.setPosition(mousePos - cursor.getSize() / 2);
         }
     }
 }

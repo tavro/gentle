@@ -21,21 +21,21 @@ namespace game
         Game(SDL_Renderer *renderer);
         ~Game();
         bool loadMedia(Canvas &canvas);
-        void update(float avgFPS, SDL_Event &event);
+        void handleEvent(SDL_Event *event);
+        void update(float avgFPS);
         void render();
     private:
-        void onMouseDown(int mouseX, int mouseY);
-        void onMouseUp(int mouseX, int mouseY);
-
         SDL_Renderer *renderer = nullptr;
         
         Text fpsText;
         Cursor cursor;
 
-        Box *hoveredBox = nullptr;
         std::vector<Box *> boxes;
-        Furniture *currFurniture = nullptr;
-        std::vector<Furniture *> placedFurniture;
+        Furniture *currFurn = nullptr;
+        std::vector<Furniture *> placedFurn;
+
+        Box *hoveredBox = nullptr;
+        Furniture *hoveredFurn = nullptr;
     };
 }
 

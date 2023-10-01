@@ -257,8 +257,9 @@ int main( int argc, char* args[] )
 					canvas.handleEvent( &e );
 					//explorer.handleEvent( &e );
 
-					gameInstance->update(avgFPS, e);
+					gameInstance->handleEvent(&e);
 				}
+				gameInstance->update(avgFPS);
 
 				/*
 				if(explorer.fileHasChanged())

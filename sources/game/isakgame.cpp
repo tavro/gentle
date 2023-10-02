@@ -161,39 +161,46 @@ namespace game
 
     void Game::render()
     {
-        background.render(renderer);
-
-        for (auto* room : rooms)
+        if(!gameStarted)
         {
-            room->render(renderer);
+            mainMenuBackground.render(renderer);
         }
-
-        for (auto* testObj : testObjs)
+        else
         {
-            testObj->render(renderer);
-        }
+            background.render(renderer);
 
-        for (auto box : boxes)
-            box->render(renderer);
-        
-        if (currFurn != nullptr) 
-        {
-            currFurn->render(renderer);
-            currentFurnText->render(renderer);
-        }
-        
-        for (auto furniture : placedFurn)
-            furniture->render(renderer);
+            for (auto* room : rooms)
+            {
+                room->render(renderer);
+            }
 
-        for (auto* checkpoint : checkpoints)
-        {
-            checkpoint->render(renderer);
-        }
+            for (auto* testObj : testObjs)
+            {
+                testObj->render(renderer);
+            }
 
-        fpsText.render(renderer);
-        scoreText->render(renderer);
-        placedFurnText->render(renderer);
-        tutorialText->render(renderer);
+            for (auto box : boxes)
+                box->render(renderer);
+            
+            if (currFurn != nullptr) 
+            {
+                currFurn->render(renderer);
+                currentFurnText->render(renderer);
+            }
+            
+            for (auto furniture : placedFurn)
+                furniture->render(renderer);
+
+            for (auto* checkpoint : checkpoints)
+            {
+                checkpoint->render(renderer);
+            }
+
+            fpsText.render(renderer);
+            scoreText->render(renderer);
+            placedFurnText->render(renderer);
+            tutorialText->render(renderer);
+        }
 
         if(gameOver)
         {
@@ -348,6 +355,8 @@ namespace game
         case SDL_KEYDOWN:
             if (event->key.keysym.sym == SDLK_e)
                 placeFurn();
+            if (event->key.keysym.sym == SDLK_p)
+                gameStarted = true;
             if (event->key.keysym.sym == SDLK_SPACE) 
             {
                 int indexToRemove = -1;

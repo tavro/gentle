@@ -70,8 +70,9 @@ namespace game
 
         AudioSource audioSource;
 
-        bool furnished = false;
-        bool gameOver = false;
+        bool furnished   = false;
+        bool gameOver    = false;
+        bool gameStarted = false;
     };
 }
 

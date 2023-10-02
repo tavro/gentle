@@ -110,7 +110,7 @@ class GameObject
 
         SDL_Rect toBox();
 
-        bool hasCollision(GameObject& other);
+        bool hasCollision(GameObject* other);
         bool hasCollision(std::vector<Vector2D> cornersB);
 
         bool isInside(int x, int y);

@@ -14,9 +14,6 @@
 #include "../../headers/game/house_generator.h"
 #include "../../headers/game/room.h"
 
-// General TODO: Discuss what should give and remove points
-// as well as decide on how many points.
-
 static Vector2D getMousePos()
 {
     int mouseX, mouseY;
@@ -31,8 +28,8 @@ namespace game
         , cursor(Cursor("Cursor"))
         , fpsText({"", 0, 96})
     {
-        audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addMusic( "./resources/main_menu.wav" );
+        audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addMusic( "./resources/Harold_the_Hoarder_theme.wav" );
         audioSource.addSound( "./resources/wrong_placement.wav" );
         audioSource.addSound( "./resources/correct_placement.wav"    );
@@ -53,7 +50,7 @@ namespace game
 
         tutorialText->getPosition().set(SCREEN_WIDTH / 2 - (tutorialText->getContent().length()*28/3)/2, SCREEN_HEIGHT - 28 - 14);
 
-        harold = new Harold({64, 64}); // TODO: change position
+        harold = new Harold({SCREEN_WIDTH / 2, 64});
     }
 
     void Game::reset()
@@ -84,7 +81,7 @@ namespace game
         boxes = loader.loadBoxes(renderer, houseGenerator.dir);
         furnitureAmount = boxes.size();
 
-        harold = new Harold({64, 64}); // TODO: change position
+        harold = new Harold({SCREEN_WIDTH / 2, 64});
 
         loadMedia();
     }
@@ -100,7 +97,7 @@ namespace game
         for (auto furn : placedFurn)
             free(furn);
         
-        //free(roomScene); TODO: rooms
+        //TODO: free other unfreed objects
     }
 
     bool Game::loadMedia()
@@ -109,7 +106,7 @@ namespace game
 
         background.getTexture().loadFromFile(         "./resources/grass.png",      renderer);
         mainMenuBackground.getTexture().loadFromFile( "./resources/harold_start_screen.png",   renderer);
-        highscoreBackground.getTexture().loadFromFile("./resources/scoreboard.png", renderer);
+        highscoreBackground.getTexture().loadFromFile("./resources/end_screen.png", renderer);
 
         for (auto* room : rooms)
         {
@@ -142,10 +139,7 @@ namespace game
             box->furniture->loadTexture(renderer);
         }
 
-        if( Mix_PlayingMusic() == 0 )
-		{
-			Mix_PlayMusic( audioSource.getMusic(0), -1 );
-		}
+		Mix_PlayMusic( audioSource.getMusic(0), -1 );
         
         harold->loadAnimation(renderer);
 
@@ -189,10 +183,9 @@ namespace game
                 checkpoint->render(renderer);
             }
 
-            //harold->updateTexture(renderer);
             harold->renderAnimation(renderer);
 
-            fpsText.render(renderer); // TODO: disable on release
+            //fpsText.render(renderer);
             scoreText->render(renderer);
             placedFurnText->render(renderer);
             tutorialText->render(renderer);
@@ -260,7 +253,7 @@ namespace game
             placedFurnText->updateContent("Placed:" + std::to_string(placedFurn.size()) + "/" + std::to_string(furnitureAmount));
             placedFurnText->loadTexture(renderer);
 
-            if(boxes.size() == 0) // Done furnishing // TODO: make Harold controlable
+            if(boxes.size() == 0) // Done furnishing
             {
                 furnished = true;
 
@@ -377,7 +370,10 @@ namespace game
                 }
             }
             if (event->key.keysym.sym == SDLK_p)
+            {
                 gameStarted = true;
+		        Mix_PlayMusic( audioSource.getMusic(1), -1 );
+            }
             break;
         }
     }
@@ -417,7 +413,9 @@ namespace game
             Vector2D moveDir = mousePos - currFurn->getPosition();
 
             float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
-            currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
+
+            float pullSpeed = 20 / currFurn->getMass(); // TODO: finjustera
+            currFurn->setVelocity(moveDir * deltaTime * pullSpeed);
         }
 
         if (currFurn)
@@ -428,7 +426,21 @@ namespace game
             for (auto furn : placedFurn)
                 others.push_back(furn);
             currFurn->handleCollisions(others);
+
+            bool hadCollision = false;
+            for (auto* other: walls)
+            {
+                if(currFurn->hasCollision(other->getCorners()))
+                {
+                    hadCollision = true;
+                }
+            }
             currFurn->handleCollisions(walls);
+
+            if(hadCollision)
+            {
+                placeFurn();
+            }
         }
         for (auto furn : placedFurn)
         {
@@ -503,9 +515,19 @@ namespace game
                 f.close(); 
 
                 gameOver = true;
+		        Mix_PlayMusic( audioSource.getMusic(2), -1 );
             }
             else // Harold completes task
             {
+                for (auto* other: walls)
+                {
+                    if(harold->hasCollision(other))
+                    {
+                        harold->getPosition().set(SCREEN_WIDTH / 2, 64);
+                        Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                    }
+                }
+
                 checkpoint->getPosition().set(currFurnToVisit->getPosition().getX()-32+currFurnToVisit->getSize().getX()/2, currFurnToVisit->getPosition().getY()-32+currFurnToVisit->getSize().getY()/2);
                 if(checkpoint->isInside(harold->getPosition().getX(), harold->getPosition().getY()))
                 {

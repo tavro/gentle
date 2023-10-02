@@ -160,7 +160,7 @@ Texture& GameObject::getTexture()
     return texture;
 }
 
-bool GameObject::hasCollision(GameObject& other)
+bool GameObject::hasCollision(GameObject* other)
 {
     int leftA, leftB;
     int rightA, rightB;
@@ -172,10 +172,10 @@ bool GameObject::hasCollision(GameObject& other)
     topA = getPosition().getY();
     bottomA = getPosition().getY() + getSize().getY();
 
-    leftB = other.getPosition().getX();
-    rightB = other.getPosition().getX() + other.getSize().getX();
-    topB = other.getPosition().getY();
-    bottomB = other.getPosition().getY() + other.getSize().getY();
+    leftB = other->getPosition().getX();
+    rightB = other->getPosition().getX() + other->getSize().getX();
+    topB = other->getPosition().getY();
+    bottomB = other->getPosition().getY() + other->getSize().getY();
 
     if( bottomA <= topB )
     {
@@ -203,94 +203,39 @@ bool GameObject::hasCollision(GameObject& other)
 bool GameObject::hasCollision(std::vector<Vector2D> otherCorners)
 {
     std::vector<Vector2D> corners = getCorners();
-
+    
     Vector2D offset = getPosition() + getSize() / 2;
 
-    // 0. Interpolate between points // TODO: add more points betwen otherCorners
-    std::vector<Vector2D> topOthers();
-    std::vector<Vector2D> bottomOthers();
-
-    for (float i = 0.0f; i <= 1.0f; i += 0.1f)
-    {
-        Vector2D topLeftOther = otherCorners[0];
-        Vector2D topRightOther = otherCorners[1];
-    }
-
-    // 1. Remove offset from all corners
+    // Apply offset and rotation to this object's corners
     for (int idx = 0; idx < 4; idx++)
     {
         corners[idx] -= offset;
-        otherCorners[idx] -= offset;
-    } 
+        float rotatedX = corners[idx].getX() * cos(rotation) - corners[idx].getY() * sin(rotation);
+        float rotatedY = corners[idx].getX() * sin(rotation) + corners[idx].getY() * cos(rotation);
+        corners[idx] = {rotatedX, rotatedY};
+        corners[idx] += offset; // Apply offset back
+    }
 
-    // 2. Rotate all corners around origo by negative this->rotation
-    float radians = rotation * (M_PI / 180.0);
-    float cosine = std::cos(-radians);
-    float sine = std::sin(-radians);
-
+    // Apply offset and rotation to other object's corners
     for (int idx = 0; idx < 4; idx++)
     {
-        float cornerX = corners[idx].getX();
-        float cornerY = corners[idx].getY();
-
-        corners[idx] = {
-            cosine * cornerX - sine * cornerY,
-            cosine * cornerY + sine * cornerX
-        };
-
-        float otherCornerX = otherCorners[idx].getX();
-        float otherCornerY = otherCorners[idx].getY();
-
-        otherCorners[idx] = {
-            cosine * otherCornerX - sine * otherCornerY,
-            cosine * otherCornerY + sine * otherCornerX
-        };
+        otherCorners[idx] -= offset;
+        float rotatedX = otherCorners[idx].getX() * cos(rotation) - otherCorners[idx].getY() * sin(rotation);
+        float rotatedY = otherCorners[idx].getX() * sin(rotation) + otherCorners[idx].getY() * cos(rotation);
+        otherCorners[idx] = {rotatedX, rotatedY};
+        otherCorners[idx] += offset; // Apply offset back
     }
 
-    const float TOP_LEFT = 0;
-    const float BOTTOM_RIGHT = 3;
-    float minX = corners[TOP_LEFT].getX();
-    float minY = corners[TOP_LEFT].getY();
-    float maxX = corners[BOTTOM_RIGHT].getX();
-    float maxY = corners[BOTTOM_RIGHT].getY();
-
-    for (Vector2D currOther : otherCorners)
+    // Check for overlap
+    if ((corners[0].getX() < otherCorners[1].getX() && corners[1].getX() > otherCorners[0].getX()) &&
+        (corners[0].getY() < otherCorners[3].getY() && corners[3].getY() > otherCorners[0].getY()))
     {
-        // 3. Check if other corner is within the bound of this object's corners
-        if (currOther.getX() < maxX && currOther.getX() > minX && currOther.getY() < maxY && currOther.getY() > minY)
-            return true;
+        return true; // Collision detected
     }
 
-    return false;
-
-    /* Original code
-    for (int edge = 0; edge < 4; ++edge) {
-        Vector2D axis(-corners[edge].getY() + corners[(edge + 1) % 4].getY(), 
-                      corners[edge].getX() - corners[(edge + 1) % 4].getX());
-
-        float minA = INFINITY, maxA = -INFINITY;
-        float minB = INFINITY, maxB = -INFINITY;
-
-        for (const auto& corner : corners) {
-            float projection = corner.getX() * axis.getX() + corner.getY() * axis.getY();
-            minA = std::min(minA, projection);
-            maxA = std::max(maxA, projection);
-        }
-
-        for (const auto& corner : otherCorners) {
-            float projection = corner.getX() * axis.getX() + corner.getY() * axis.getY();
-            minB = std::min(minB, projection);
-            maxB = std::max(maxB, projection);
-        }
-
-        if (maxA < minB || maxB < minA) {
-            return false;
-        }
-    }
-
-    return true;
-    */
+    return false; // No collision
 }
+
 
 bool GameObject::loadTexture(SDL_Renderer* renderer, std::string path)
 {

@@ -81,7 +81,7 @@ namespace game
     void Harold::move()
     {
         Vector2D normalVel = getVelocity().getNormalizedVector();
-        getPosition() += normalVel;
+        getPosition() += normalVel*2;
     }
 
     void Harold::loadAnimation(SDL_Renderer *renderer)

@@ -11,3 +11,4 @@ Viktor:
 	[ ] - Kanske nån text ska poppa upp när man öppnar en låda/hoverar över
 	      en möbel, så att man vet vad det är?
 	[ ] - Vissa möbler/lådor blir supersized!
+	[ ] - Fixa konstig screen bounds collisions

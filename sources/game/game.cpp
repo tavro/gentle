@@ -365,8 +365,6 @@ namespace game
 
             float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
             currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
-
-            // TODO: make unable to move out of bounds
         }
 
         if (currFurn)

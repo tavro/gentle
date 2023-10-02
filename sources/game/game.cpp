@@ -403,6 +403,7 @@ namespace game
             if (currFurn)
                 others.push_back(currFurn);
             furn->handleCollisions(others);
+            furn->handleCollisions(walls);
         }
 
         if (currFurn && currFurn->isDragging)

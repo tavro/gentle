@@ -25,10 +25,12 @@ namespace game
     public:
         Game(SDL_Renderer *renderer);
         ~Game();
-        bool loadMedia(Canvas &canvas);
+        bool loadMedia();
         void handleEvent(SDL_Event *event);
         void update(float avgFPS);
         void render();
+        void reset();
+
     private:
         void placeFurn();
 
@@ -40,12 +42,17 @@ namespace game
         Harold *harold = nullptr;
 
         std::vector<Box *> boxes;
+        
         Furniture *currFurn = nullptr;
+        Furniture *currFurnToVisit = nullptr;
+
         std::vector<Furniture *> placedFurn;
+        std::vector<Furniture *> furnToVisit;
 
         std::vector<Room*> rooms;
         std::vector<GameObject*> walls;
-        std::vector<GameObject*> checkpoints;
+
+        GameObject* checkpoint = nullptr;
 
         Box *hoveredBox = nullptr;
         Furniture *hoveredFurn = nullptr;

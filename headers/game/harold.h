@@ -10,6 +10,8 @@ namespace game
     {
     public:
         Harold(Vector2D pos);
+        void loadAnimation(SDL_Renderer *renderer);
+        void renderAnimation(SDL_Renderer *renderer);
         void updateTexture(SDL_Renderer *renderer);
         void handleEvent(SDL_Event* event) override;
         void move();
@@ -18,9 +20,11 @@ namespace game
     private:
         void onKeyDown(SDL_Keycode keyCode);
         void onKeyUp(SDL_Keycode keyCode);
+        
+        Animation* activeAnimation;
+		bool playAnimation = false;
 
         Texture idleTexture;
-        Animation walkAnimation;
     };
 }
 

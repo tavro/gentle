@@ -4,7 +4,7 @@
 Animation::Animation() {
     frame = 0;
     frameAmount = 4;
-    size = Vector2D(20, 20);
+    size = Vector2D(16, 22);
 
     for(int i = 0; i < frameAmount; i++) {
         addFrame({ (int)(i * size.getX()), 0, (int)size.getX(), (int)size.getY() });
@@ -34,7 +34,7 @@ Texture& Animation::getTexture() {
     return sheetTexture;
 }
 
-void Animation::render( Vector2D position, SDL_Renderer* gRenderer )
+void Animation::render( Vector2D position, SDL_Renderer* gRenderer, float rotation )
 {
     tick();
     sheetTexture.render( position.getX(), position.getY(), &getCurrentFrame(), 0.0, NULL, SDL_FLIP_NONE, gRenderer );

@@ -125,24 +125,34 @@ std::vector<Vector2D> GameObject::getCorners()
     float cosine = std::cos(radians);
     float sine = std::sin(radians);
 
+    /*
     Vector2D topLeft{
         position.getX() + halfWidth/2 - halfWidth * cosine + halfHeight * sine,
         position.getY() + halfHeight/2 - halfWidth * sine - halfHeight * cosine
     };
+    */
+
+    float xOffset = position.getX() + halfWidth;
+    float yOffset = position.getY() + halfHeight;
+
+    Vector2D topLeft{
+        cosine * (-halfWidth) - sine * (-halfHeight) + xOffset,
+        cosine * (-halfHeight) + sine * (-halfWidth) + yOffset
+    };
 
     Vector2D topRight{
-        position.getX() + halfWidth/2 + halfWidth * cosine + halfHeight * sine,
-        position.getY() + halfHeight/2 + halfWidth * sine - halfHeight * cosine
+        cosine * (halfWidth) - sine * (-halfHeight) + xOffset,
+        cosine * (-halfHeight) + sine * (halfWidth) + yOffset
     };
 
     Vector2D bottomLeft{
-        position.getX() + halfWidth/2 - halfWidth * cosine - halfHeight * sine,
-        position.getY() + halfHeight/2 - halfWidth * sine + halfHeight * cosine
+        cosine * (-halfWidth) - sine * (halfHeight) + xOffset,
+        cosine * (halfHeight) + sine * (-halfWidth) + yOffset
     };
 
     Vector2D bottomRight{
-        position.getX() + halfWidth/2 + halfWidth * cosine - halfHeight * sine,
-        position.getY() + halfHeight/2 + halfWidth * sine + halfHeight * cosine
+        cosine * (halfWidth) - sine * (halfHeight) + xOffset,
+        cosine * (halfHeight) + sine * (halfWidth) + yOffset
     };
 
     corners.push_back(topLeft);
@@ -271,7 +281,7 @@ void GameObject::render(SDL_Renderer* renderer)
     {
         for (auto corner: getCorners())
         {
-            debugTexture.render( corner.getX()+2, corner.getY()+2, NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+            debugTexture.render( corner.getX()-2, corner.getY()-2, NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
         }
     }
 }

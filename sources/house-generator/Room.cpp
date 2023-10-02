@@ -25,27 +25,33 @@ Wall::Wall(float startX, float startY, float endX, float endY, bool hasDoor)
 	this->endY = endY;
 	this->hasDoor = hasDoor;
 
+	isHorizontal = startY == endY;
+
+	if (doorSize > length()) {
+		doorSuccess = false;
+	}
+
+	// Place random door
+	if (openRandomDoors && doorSuccess && !this->hasDoor) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		if (r < forceDoorChance) {
+			this->hasDoor = true;
+		}
+	}
 	generateLineSegments();
 }
 
 void Wall::generateLineSegments()
 {
+	if (hasDoor && doorSuccess) {
+		float center = calculateDoorLocation();
 
-	isHorizontal = startY == endY;
-
-	if (doorSize > length()) {
-		hasDoor = false;
-	}
-
-	if (hasDoor) {
-
+		//float center = length() / 2;
 		if (isHorizontal) {
-			float center = (endX - startX) / 2;
 			lineSegments.emplace_back(LineSegment(startX, startY, startX + center - doorSize / 2, endY));
 			lineSegments.emplace_back(LineSegment(startX + center + doorSize / 2, startY, endX, endY));
 		}
 		else {
-			float center = (endY - startY) / 2;
 			lineSegments.emplace_back(LineSegment(startX, startY, endX, startY + center - doorSize / 2));
 			lineSegments.emplace_back(LineSegment(startX, startY + center + doorSize / 2, endX, endY));
 		}
@@ -57,8 +63,21 @@ void Wall::generateLineSegments()
 
 float Wall::length()
 {
-	return sqrt(std::pow(endX - startX, 2) + pow(endY - startY, 2));
+	return std::sqrt(std::pow(endX - startX, 2) + std::pow(endY - startY, 2));
 }
+
+float Wall::calculateDoorLocation()
+{
+	float len = length();
+	// If wall is short: place in center
+	if (len < 2 * doorSize) {
+		return len / 2;
+	}
+	// Otherwise, pick a random location along wall
+	float random = ((float)rand()) / (float)RAND_MAX;
+	float range = (length() - doorSize / 2) - doorSize / 2;
+	return (random * range) + doorSize / 2;
+}	
 
 
 // ------------------ GeneratedRoom Id

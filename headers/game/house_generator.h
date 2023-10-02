@@ -2,6 +2,7 @@
 #define HOUSE_GENERATOR_H
 
 #include <random>
+#include <algorithm>
 
 #include "../game_object.h"
 #include "../scene.h"

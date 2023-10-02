@@ -8,6 +8,58 @@ RoomHandler::RoomHandler(std::vector<RoomId> roomTree, Rectangle houseSize) {
 void RoomHandler::createRooms() {
 	processNodes(this->roomTree, {});
 	findRoomNeighbors();
+	createOuterWalls();
+}
+
+void RoomHandler::createOuterWalls()
+{
+	for (const auto& room : this->rooms) {
+		
+		bool placeDoor = false;
+		bool isEntranceRoom = room.roomId.name == entranceRoomName;
+		uint8_t entranceWall = 0; // 0 (none), 1 (left), 2 (right), 3 (top), 4 (bottom)
+
+		bool hasLeft = room.x == 0;
+		bool hasRight = room.x + room.width == houseSize.Width;
+		bool hasTop = room.y == 0;
+		bool hasBottom = room.y + room.height == houseSize.Height;
+		
+		uint8_t numBorderingWalls = (uint8_t)(hasLeft + hasRight + hasTop + hasBottom);
+		if (numBorderingWalls == 0) {
+			continue;
+		}
+		
+		std::vector<uint8_t> validWallNumbers;
+		for (const auto& num : { hasLeft * 1, hasRight * 2, hasTop * 3, hasBottom * 4 }) {
+			if (num != 0) {
+				validWallNumbers.emplace_back(num);
+			}
+		}
+		if (isEntranceRoom) {
+			entranceWall = randomWallNumber(validWallNumbers);
+		}
+
+		// Left wall
+		if (hasLeft) {
+			placeDoor = (entranceWall == 1);
+			this->walls.emplace_back(Wall(room.x, room.y, room.x, room.y + room.height, placeDoor));
+		}
+		// Right wall 
+		if (hasRight) {
+			placeDoor = (entranceWall == 2);
+			this->walls.emplace_back(Wall(room.x + room.width, room.y, room.x + room.width, room.y + room.height, placeDoor));
+		}
+		// Top wall
+		if (hasTop) {
+			placeDoor = (entranceWall == 3);
+			this->walls.emplace_back(Wall(room.x, room.y, room.x + room.width, room.y, placeDoor));
+		}
+		// Bottom wall
+		if (hasBottom) {
+			placeDoor = (entranceWall == 4);
+			this->walls.emplace_back(Wall(room.x, room.y + room.height, room.x + room.width, room.y + room.height, placeDoor));
+		}
+	}
 }
 
 void RoomHandler::processNodes(std::vector<RoomId>& nodes, std::optional<GeneratedRoom> parent)
@@ -63,6 +115,14 @@ void RoomHandler::processNodes(std::vector<RoomId>& nodes, std::optional<Generat
 			processNodes(children, std::make_optional(parent));
 		}
 	}
+}
+
+uint8_t RoomHandler::randomWallNumber(std::vector<uint8_t> validWalls)
+{
+	std::vector<uint8_t>::iterator randIt = validWalls.begin();
+	std::advance(randIt, std::rand() % validWalls.size());
+	uint8_t wallNumber = *randIt;
+	return wallNumber;
 }
 
 void RoomHandler::findRoomNeighbors()
@@ -121,8 +181,9 @@ void RoomHandler::findRoomNeighbors()
 					}
 				}				
 			}
-			walls.emplace_back(Wall(xStart, yStart, xEnd, yEnd, isDoor));
-			other.isConnectedToStart = true;
+			Wall wall = Wall(xStart, yStart, xEnd, yEnd, isDoor);
+			walls.emplace_back(wall);
+			other.isConnectedToStart = wall.doorSuccess;
 		}
 	}
 }

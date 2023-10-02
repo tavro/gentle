@@ -7,6 +7,7 @@
 #include <ostream>
 #include <cmath>
 
+
 struct LineSegment
 {
 public:
@@ -23,14 +24,20 @@ public:
 	float startX, startY;
 	float endX, endY;
 	bool hasDoor;
+	
+	bool doorSuccess = true;
 
 	std::vector<LineSegment> lineSegments;
 	void generateLineSegments();
 
 	bool isHorizontal = false;
 	float doorSize = 50;
+
+	bool openRandomDoors = false;
+	float forceDoorChance = 0.5;
 private:
 	float length();
+	float calculateDoorLocation();
 };
 
 struct RoomId

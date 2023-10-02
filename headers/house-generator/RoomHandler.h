@@ -5,16 +5,17 @@
 
 #include <stack>
 #include <unordered_map>
-#include <optional>
 
-#include "./Room.h"
-#include "./SquarifiedTreemap.hpp"
+#include "Room.h"
+#include "SquarifiedTreemap.hpp"
+#include <optional>
 
 class RoomHandler
 {
 public:
 	RoomHandler(std::vector<RoomId> roomTree, Rectangle houseSize);
 	void createRooms();
+	void createOuterWalls();
 
 	std::vector<Wall> walls;
 
@@ -29,6 +30,13 @@ private:
 	Rectangle houseSize; // houseSize.Width, houseSize.Height (I think)
 	std::vector<GeneratedRoom> rooms;
 	std::vector<RoomId> areas;
+
+
+	// Return a random wall number. 
+	// Left, right, top, bottom = 1, 2, 3, 4 respectively.
+	static uint8_t randomWallNumber(std::vector<uint8_t> validWalls); 
+
+	std::string entranceRoomName = "Living room";
 
 	void findRoomNeighbors();
 };

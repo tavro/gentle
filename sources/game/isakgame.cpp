@@ -379,6 +379,7 @@ namespace game
             for (auto furn : placedFurn)
                 others.push_back(furn);
             currFurn->handleCollisions(others);
+            currFurn->handleCollisions(walls);
         }
         for (auto furn : placedFurn)
         {

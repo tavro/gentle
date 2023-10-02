@@ -29,64 +29,19 @@ namespace game
         , fpsText({"", 0, SCREEN_HEIGHT - 28*2})
     {
         scoreText = new Text{"Score:0", 0, SCREEN_HEIGHT - 28*3};
-        placedFurnText = new Text{"Placed:0/0", 0, SCREEN_HEIGHT - 28*4};
         currentFurnText = new Text{"Placeholder", 0, 0};
         tutorialText = new Text{"Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28};
+        
         audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addSound( "./resources/scratch.wav" );
         audioSource.addSound( "./resources/high.wav" );
 
-        std::map<std::string, FurnitureMeta> furniture {
-            {"bed",  			{1 , 12, {"Bedroom"}}}, 
-            {"sofa", 			{1 , 10, {"Living Room"}}}, 
-            {"piano",			{1 , 20, {"Bedroom", "Living Room"}}}, 
-            //{"plant",			{21, 3 , {"Bedroom", "Living Room", "Bathroom"}}},
-            {"oven", 			{1 , 15, {"Kitchen"}}},
-            {"bathtub", 		{1 , 10, {"Bathroom"}}}, 
-            //{"bedsidetable",	{2 , 6 , {"Bedroom"}}},
-            //{"bookshelf", 		{2 , 7 , {"Bedroom", "Living Room"}}}, 
-            //{"chair", 			{12, 5 , {"Bedroom", "Living Room", "Kitchen"}}},
-            //{"coffeetable", 	{2 , 7 , {"Bedroom", "Living Room", "Kitchen"}}},
-            //{"dinnertable", 	{2 , 10, {"Living Room", "Kitchen"}}},
-            {"dishwasher", 		{1 , 13, {"Kitchen"}}},
-            //{"dresser", 		{2 , 9 , {"Bedroom", "Living Room"}}},
-            {"fridge", 			{1 , 14, {"Kitchen"}}}, 
-            //{"lamp", 			{14, 3 , {"Bedroom", "Living Room", "Kitchen", "Bathroom"}}}, 
-            //{"sink", 			{2 , 12, {"Kitchen", "Bathroom"}}}, 
-            {"toilet", 			{1 , 7 , {"Bathroom"}}}, 
-            {"washingmachine", 	{1 , 13, {"Bathroom"}}},
-            {"washingstation", 	{1 , 7 , {"Bathroom"}}}
-        };
+        FurnitureLoader loader{};
+        loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
+        boxes = loader.loadBoxes(renderer);
+        furnitureAmount = boxes.size();
 
-        std::random_device rd;
-        std::mt19937 generator(rd());
-        std::uniform_int_distribution<int> xPositionDistribution(240, SCREEN_WIDTH-240);
-        std::uniform_int_distribution<int> yPositionDistribution(0+32, 160-32);
-        std::uniform_int_distribution<int> velocityDistribution(-10, 10);
-
-        for (auto const& [key, val] : furniture)
-        {
-            std::uniform_int_distribution<int> amountDistribution(1, val.maxAmount);
-            int amount = amountDistribution(generator);
-
-            for(int i = 0; i < amount; i++)
-            {
-                Furniture* furniturePtr = new Furniture {
-                    key,
-                    "./resources/furniture/" + key + ".png", 
-                    val.weight,
-                    val.compatableRooms
-                };
-                furniturePtr->loadTexture(renderer);
-
-                boxes.push_back(new Box(
-                    {xPositionDistribution(generator), yPositionDistribution(generator)}, 
-                    "Box", 
-                    "./resources/box.png",
-                    furniturePtr));
-                furnitureAmount++;
-            }
-        }
+        placedFurnText = new Text{"Placed:0/" + std::to_string(furnitureAmount), 0, SCREEN_HEIGHT - 28*4};
 
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();

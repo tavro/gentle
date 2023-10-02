@@ -7,6 +7,8 @@
 
 namespace game
 {
+    class Furniture;
+
     class Box : public GameObject
     {
     public:

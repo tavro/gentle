@@ -3,10 +3,22 @@
 
 #include <SDL2/SDL_render.h>
 
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <random>
+#include <vector>
+#include <string>
+#include <map>
+
 #include "../physics_object.h"
+#include "./box.h"
 
 namespace game
 {
+    class Box;
+
     class Furniture : public PhysicsObject
     {
     public:
@@ -24,6 +36,18 @@ namespace game
         std::vector<std::string> compatableRooms;
 
         FurnitureMeta(int maxAmount, float weight, const std::vector<std::string>& rooms);
+    };
+
+    class FurnitureLoader
+    {
+    public:
+        FurnitureLoader();
+
+        void loadFurnitureData(const std::string& filename);
+        std::vector<Box*> loadBoxes(SDL_Renderer* renderer);
+
+    private:
+        std::map<std::string, FurnitureMeta> furniture;
     };
 }
 

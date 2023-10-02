@@ -30,7 +30,7 @@ namespace game
 
     void Room::loadNameText(SDL_Renderer* renderer)
     {
-        nameText->loadFont( "./resources/font.ttf", 14 );
+        nameText->loadFont( "./resources/fonts/bebasneue-regular.ttf", 14 );
         nameText->loadTexture( renderer );
     }
 

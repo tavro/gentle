@@ -3,6 +3,8 @@
 #include <map>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <random>
 
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
@@ -27,6 +29,7 @@ namespace game
     {
         scoreText = new Text{"Score:0", 0, SCREEN_HEIGHT - 28*3};
         placedFurnText = new Text{"Placed:0/0", 0, SCREEN_HEIGHT - 28*4};
+        currentFurnText = new Text{"Placeholder", 0, 0};
         tutorialText = new Text{"Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28};
         audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addSound( "./resources/scratch.wav" );
@@ -36,19 +39,19 @@ namespace game
             {"bed",  			{1 , 12, {"Bedroom"}}}, 
             {"sofa", 			{1 , 10, {"Living Room"}}}, 
             {"piano",			{1 , 20, {"Bedroom", "Living Room"}}}, 
-            {"plant",			{21, 3 , {"Bedroom", "Living Room", "Bathroom"}}},
+            //{"plant",			{21, 3 , {"Bedroom", "Living Room", "Bathroom"}}},
             {"oven", 			{1 , 15, {"Kitchen"}}},
             {"bathtub", 		{1 , 10, {"Bathroom"}}}, 
-            {"bedsidetable",	{2 , 6 , {"Bedroom"}}},
-            {"bookshelf", 		{2 , 7 , {"Bedroom", "Living Room"}}}, 
-            {"chair", 			{12, 5 , {"Bedroom", "Living Room", "Kitchen"}}},
-            {"coffeetable", 	{2 , 7 , {"Bedroom", "Living Room", "Kitchen"}}},
-            {"dinnertable", 	{2 , 10, {"Living Room", "Kitchen"}}},
+            //{"bedsidetable",	{2 , 6 , {"Bedroom"}}},
+            //{"bookshelf", 		{2 , 7 , {"Bedroom", "Living Room"}}}, 
+            //{"chair", 			{12, 5 , {"Bedroom", "Living Room", "Kitchen"}}},
+            //{"coffeetable", 	{2 , 7 , {"Bedroom", "Living Room", "Kitchen"}}},
+            //{"dinnertable", 	{2 , 10, {"Living Room", "Kitchen"}}},
             {"dishwasher", 		{1 , 13, {"Kitchen"}}},
-            {"dresser", 		{2 , 9 , {"Bedroom", "Living Room"}}},
+            //{"dresser", 		{2 , 9 , {"Bedroom", "Living Room"}}},
             {"fridge", 			{1 , 14, {"Kitchen"}}}, 
-            {"lamp", 			{14, 3 , {"Bedroom", "Living Room", "Kitchen", "Bathroom"}}}, 
-            {"sink", 			{2 , 12, {"Kitchen", "Bathroom"}}}, 
+            //{"lamp", 			{14, 3 , {"Bedroom", "Living Room", "Kitchen", "Bathroom"}}}, 
+            //{"sink", 			{2 , 12, {"Kitchen", "Bathroom"}}}, 
             {"toilet", 			{1 , 7 , {"Bathroom"}}}, 
             {"washingmachine", 	{1 , 13, {"Bathroom"}}},
             {"washingstation", 	{1 , 7 , {"Bathroom"}}}
@@ -118,19 +121,22 @@ namespace game
             testObj->loadTexture(renderer);
         }
 
-        fpsText.loadFont("./resources/font.ttf", 28);
+        fpsText.loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
         fpsText.loadTexture(renderer);
         canvas.addObj(&fpsText);
 
-        scoreText->loadFont("./resources/font.ttf", 28);
+        scoreText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
         scoreText->loadTexture(renderer);
         canvas.addObj(scoreText);
 
-        placedFurnText->loadFont("./resources/font.ttf", 28);
+        placedFurnText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
         placedFurnText->loadTexture(renderer);
         canvas.addObj(placedFurnText);
 
-        tutorialText->loadFont("./resources/font.ttf", 28);
+        currentFurnText->loadFont("./resources/fonts/bebasneue-regular.ttf", 14);
+        currentFurnText->loadTexture(renderer);
+
+        tutorialText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
         tutorialText->loadTexture(renderer);
         canvas.addObj(tutorialText);
 
@@ -166,10 +172,20 @@ namespace game
 
         for (auto box : boxes)
             box->render(renderer);
-        if (currFurn != nullptr)
+        
+        if (currFurn != nullptr) 
+        {
             currFurn->render(renderer);
+            currentFurnText->render(renderer);
+        }
+        
         for (auto furniture : placedFurn)
             furniture->render(renderer);
+
+        for (auto* checkpoint : checkpoints)
+        {
+            checkpoint->render(renderer);
+        }
 
         fpsText.render(renderer);
         scoreText->render(renderer);
@@ -219,9 +235,26 @@ namespace game
             placedFurnText->updateContent("Placed:" + std::to_string(placedFurn.size()) + "/" + std::to_string(furnitureAmount));
             placedFurnText->loadTexture(renderer);
 
-            if(boxes.size() == 0)
+            if(boxes.size() == 0) // Done furnishing
             {
-                // GAME OVER
+                furnished = true;
+
+                // Pick furniture randomly from placedFurn.
+                size_t amount = placedFurn.size()/2;
+                std::sample(
+                    placedFurn.begin(),
+                    placedFurn.end(),
+                    std::back_inserter(furnToVisit),
+                    amount,
+                    std::mt19937{std::random_device{}()}
+                );
+
+                for(auto* furn : furnToVisit)
+                {
+                    GameObject* tmp = new GameObject{{furn->getPosition().getX()-32+furn->getSize().getX()/2, furn->getPosition().getY()-32+furn->getSize().getY()/2}, {64, 64}, {0, 0}, "checkpoint", "./resources/ring.png"};
+                    tmp->loadTexture(renderer);
+                    checkpoints.push_back(tmp);
+                }
             }
 
             currFurn = nullptr;
@@ -305,6 +338,22 @@ namespace game
         case SDL_KEYDOWN:
             if (event->key.keysym.sym == SDLK_e)
                 placeFurn();
+            if (event->key.keysym.sym == SDLK_SPACE) 
+            {
+                int indexToRemove = -1;
+                for(int i = 0; i < checkpoints.size(); i++)
+                {
+                    if(checkpoints[i]->isInside(cursor.getPosition().getX(), cursor.getPosition().getY()))
+                    {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+                if(indexToRemove >= 0)
+                {
+                    checkpoints.erase(checkpoints.begin() + indexToRemove);
+                }
+            }
             break;
         }
     }
@@ -321,6 +370,9 @@ namespace game
         if (currFurn)
         {
             cursor.isHovering = currFurn->getCurrentState() != State::MOUSE_OUT;
+            currentFurnText->setPosition(currFurn->getPosition().getX(), currFurn->getPosition().getY()-currFurn->getSize().getY());
+            currentFurnText->updateContent(currFurn->getName());
+            currentFurnText->loadTexture(renderer);
         }
         else
         {
@@ -373,5 +425,11 @@ namespace game
             cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
+
+        std::cout << furnToVisit.size() << std::endl;
+        if(furnished && furnToVisit.size() == 0) // "GAME OVER"
+        {
+            std::cout << "YOU WON: SAVE HIGHSCORE TO FILE!" << std::endl;
+        }
     }
 }

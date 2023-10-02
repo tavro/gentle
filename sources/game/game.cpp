@@ -280,6 +280,8 @@ namespace game
             {
                 float rotationAmount = event->wheel.y * 5;
                 currFurn->increaseRotation(rotationAmount);
+                currFurn->setRotationDirection(RotDir::NONE);
+                currFurn->setRotationSpeed(0.0f);
             }
         }
 

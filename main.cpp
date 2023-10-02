@@ -110,55 +110,6 @@ bool loadMedia()
 
 	success = gameInstance->loadMedia(canvas);
 	
-	/* ISAKS TESTGREJOR
-	std::vector<std::vector<int>> rooms;
-	rooms.push_back({0, 0, 292, 300});
-	rooms.push_back({0, 300, 292, 100});
-	rooms.push_back({292, 0, 307, 190});
-	rooms.push_back({292, 190, 223, 209});
-	rooms.push_back({516, 190, 83, 209});
-	rooms.push_back({0, 300, 58, 100});
-	rooms.push_back({58, 300, 175, 100});
-	rooms.push_back({233, 300, 58, 100});
-	
-	const int WALL_THICKNESS = 4;
-	for (auto room : rooms)
-	{
-		int x1 = room[0];
-		int y1 = room[1];
-		int x2 = room[2] + room[0];
-		int y2 = room[3] + room[1];
-
-		Vector2D startUpper{x1, y1};
-		Vector2D endUpper{x2, y1+WALL_THICKNESS};
-
-		Vector2D startLower{x1, y2-WALL_THICKNESS};
-		Vector2D endLower{x2, y2+WALL_THICKNESS};
-
-		Vector2D startLeft{x1, y1};
-		Vector2D endLeft{x1+WALL_THICKNESS, y2};
-
-		Vector2D startRight{x2-WALL_THICKNESS, y1};
-		Vector2D endRight{x2, y2};
-
-		GameObject* upperWall = new GameObject{startUpper, endUpper};
-		GameObject* lowerWall = new GameObject{startLower, endLower};
-		GameObject* leftWall  = new GameObject{startLeft , endLeft};
-		GameObject* rightWall = new GameObject{startRight, endRight};
-		
-		upperWall->loadTexture(renderer);
-		lowerWall->loadTexture(renderer);
-		leftWall->loadTexture(renderer);
-		rightWall->loadTexture(renderer);
-
-		wallScene->addObj(upperWall);
-		wallScene->addObj(lowerWall);
-		wallScene->addObj(leftWall);
-		wallScene->addObj(rightWall);
-	}
-
-	*/
-	
 	return success;
 }
 

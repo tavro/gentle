@@ -10,11 +10,13 @@
 #include "../../headers/game/cursor.h"
 #include "../../headers/game/furniture.h"
 #include "../../headers/game/harold.h"
+#include "../../headers/game/room.h"
 
 #include "../../headers/canvas.h"
 #include "../../headers/text.h"
 #include "../../headers/scene.h"
 #include "../../headers/image.h"
+#include "../../headers/audio_source.h"
 
 namespace game
 {
@@ -41,13 +43,24 @@ namespace game
         Furniture *currFurn = nullptr;
         std::vector<Furniture *> placedFurn;
 
-        Scene* roomScene = nullptr; 
+        std::vector<Room*> rooms;
+        std::vector<GameObject*> testObjs;
 
         Box *hoveredBox = nullptr;
         Furniture *hoveredFurn = nullptr;
 
         Image background{0, 0, 1080, 720};
         Image floor{240, 160, 600, 400};
+
+        int score = 0;
+        Text* scoreText = nullptr;
+
+        int furnitureAmount = 0;
+        Text* placedFurnText = nullptr;
+
+        Text* tutorialText = nullptr;
+
+        AudioSource audioSource;
     };
 }
 

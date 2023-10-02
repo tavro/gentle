@@ -25,7 +25,15 @@ class UIObject
 
         virtual void render(SDL_Renderer* renderer)
         {
-            texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+            if(crop)
+            {
+                SDL_Rect cropBox = { 0, 0, size.getX(), size.getY() };
+                texture.render( position.getX(), position.getY(), &cropBox, 0.0, NULL, SDL_FLIP_NONE, renderer );
+            }
+            else
+            {
+                texture.render( position.getX(), position.getY(), NULL, 0.0, NULL, SDL_FLIP_NONE, renderer );
+            }
         }
 
         Vector2D& getPosition();
@@ -35,6 +43,7 @@ class UIObject
 
         void freeTexture();
 
+        bool crop = false;
 	private:
         Texture texture;
 

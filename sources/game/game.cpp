@@ -245,6 +245,8 @@ namespace game
                     tmp->loadTexture(renderer);
                     checkpoints.push_back(tmp);
                 }
+
+                harold->canControl = true;
             }
 
             currFurn = nullptr;

@@ -206,18 +206,27 @@ namespace game
                 }
             }
 
-            std::string roomName = activeRoom->getName();
-            if(currFurn->compatableWith(roomName))
+            if (activeRoom)
             {
-                score += 10;
-                activeRoom->setColor(0, 255, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                std::string roomName = activeRoom->getName();
+                if(currFurn->compatableWith(roomName))
+                {
+                    score += 10;
+                    activeRoom->setColor(0, 255, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                }
+                else
+                {
+                    score -= 10;
+                    activeRoom->setColor(255, 0, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                }
             }
             else
             {
                 score -= 10;
-                activeRoom->setColor(255, 0, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                // TODO: flash background red?
+                Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
             }
 
             scoreText->updateContent("Score:" + std::to_string(score));

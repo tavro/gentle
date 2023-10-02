@@ -36,7 +36,7 @@ private:
 	// Left, right, top, bottom = 1, 2, 3, 4 respectively.
 	static uint8_t randomWallNumber(std::vector<uint8_t> validWalls); 
 
-	std::string entranceRoomName = "Living room";
+	std::string entranceRoomName = "LivingRoom";
 
 	void findRoomNeighbors();
 };

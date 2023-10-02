@@ -72,7 +72,7 @@ namespace game
 
     void Harold::move()
     {
-        getPosition().increaseX(getVelocity().getX());
-        getPosition().increaseY(getVelocity().getY());
+        Vector2D normalVel = getVelocity().getNormalizedVector();
+        getPosition() += normalVel;
     }
 }

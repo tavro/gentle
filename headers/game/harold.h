@@ -14,7 +14,7 @@ namespace game
         void handleEvent(SDL_Event* event) override;
         void move();
         
-        bool canControl = true; // TODO: should not be true until all furniture are placed;
+        bool canControl = false;
     private:
         void onKeyDown(SDL_Keycode keyCode);
         void onKeyUp(SDL_Keycode keyCode);

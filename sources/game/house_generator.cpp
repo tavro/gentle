@@ -58,7 +58,7 @@ namespace game
         std::vector<Room*> rooms;
         for(const auto& room : roomHandler->getRooms())
         {
-            rooms.push_back(new Room{room.x, room.y, room.width, room.height, room.roomId.name, xOff, yOff});
+            rooms.push_back(new Room{(int)room.x, (int)room.y, (int)room.width, (int)room.height, room.roomId.name, xOff, yOff});
         }
         return rooms;
     }

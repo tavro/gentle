@@ -31,7 +31,7 @@ namespace game
         int yOff = screenH/2 - houseH/2;
         int wallThickness = 8;
 
-        Rectangle container = { houseW, houseH };
+        Rectangle container = { (float)houseW, (float)houseH };
 
         RoomHandler* roomHandler = nullptr;
 

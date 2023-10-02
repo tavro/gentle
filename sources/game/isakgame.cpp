@@ -14,6 +14,9 @@
 #include "../../headers/game/house_generator.h"
 #include "../../headers/game/room.h"
 
+// General TODO: Discuss what should give and remove points
+// as well as decide on how many points.
+
 static Vector2D getMousePos()
 {
     int mouseX, mouseY;
@@ -159,7 +162,7 @@ namespace game
             {
                 highscore->render(renderer);
             }
-            // TODO: Render buttons for 'Play Again' and 'Quit'
+            // TODO: Implement reset function and add 'Play Again' button.
         }
 
         cursor.updateTexture(renderer);

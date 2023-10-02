@@ -45,7 +45,7 @@ namespace game
         {
             for(const auto& lineSegment : wall.lineSegments)
             {
-                walls.push_back(genWall(lineSegment.startX, lineSegment.startY, lineSegment.endX, lineSegment.endY, xOff, yOff, wallThickness));
+                walls.push_back(genWall(static_cast<int>(floor(lineSegment.startX)), static_cast<int>(floor(lineSegment.startY)), static_cast<int>(floor(lineSegment.endX)), static_cast<int>(floor(lineSegment.endY)), xOff, yOff, wallThickness));
             }
         }
         return walls;

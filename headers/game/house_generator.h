@@ -3,6 +3,7 @@
 
 #include <random>
 #include <algorithm>
+#include <cmath>
 
 #include "../game_object.h"
 #include "../scene.h"
@@ -28,7 +29,7 @@ namespace game
         int screenH = 720;
         int xOff = screenW/2 - houseW/2;
         int yOff = screenH/2 - houseH/2;
-        int wallThickness = 4;
+        int wallThickness = 8;
 
         Rectangle container = { houseW, houseH };
 

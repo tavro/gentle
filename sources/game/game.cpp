@@ -337,22 +337,6 @@ namespace game
                 placeFurn();
             if (event->key.keysym.sym == SDLK_p)
                 gameStarted = true;
-            if (event->key.keysym.sym == SDLK_SPACE) 
-            {
-                int indexToRemove = -1;
-                for(int i = 0; i < checkpoints.size(); i++)
-                {
-                    if(checkpoints[i]->isInside(cursor.getPosition().getX(), cursor.getPosition().getY()))
-                    {
-                        indexToRemove = i;
-                        break;
-                    }
-                }
-                if(indexToRemove >= 0)
-                {
-                    checkpoints.erase(checkpoints.begin() + indexToRemove);
-                }
-            }
             break;
         }
     }
@@ -429,52 +413,71 @@ namespace game
 
         harold->move();
 
-        if(!gameOver && furnished && checkpoints.size() == 0) // "GAME OVER"
+        if (!gameOver && furnished)
         {
-            std::ifstream file("./resources/scoreboard.txt");
-            std::vector<int> scoreboard;
+            if(checkpoints.size() == 0) // "GAME OVER"
+            {
+                std::ifstream file("./resources/scoreboard.txt");
+                std::vector<int> scoreboard;
 
-            int num;
-            while (file >> num) {
-                scoreboard.push_back(num);
+                int num;
+                while (file >> num) {
+                    scoreboard.push_back(num);
+                }
+                file.close();
+
+                scoreboard.push_back(score);
+
+                std::sort(scoreboard.begin(), scoreboard.end(), std::greater<int>());
+
+                std::ofstream out("./resources/scoreboard.txt");
+                for (const auto& highscore : scoreboard) {
+                    out << highscore << std::endl;
+                }
+                out.close();
+
+                // Load highscores into vector
+                std::ifstream f("./resources/scoreboard.txt");
+
+                std::vector<std::string> lines;
+                std::string line;
+
+                int count = 0;
+                while (std::getline(f, line) && count < 10) {
+                    lines.push_back(line);
+                    count++;
+                }
+
+                highscores.clear();
+                int offset = 0;
+                for (const auto& l : lines) {
+                    offset++;
+                    Text* t = new Text{std::to_string(offset) + ") " + l, SCREEN_WIDTH/2, 28*offset};
+                    t->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
+                    t->loadTexture(renderer);
+                    highscores.push_back(t);
+                }
+
+                f.close(); 
+
+                gameOver = true;
             }
-            file.close();
-
-            scoreboard.push_back(score);
-
-            std::sort(scoreboard.begin(), scoreboard.end(), std::greater<int>());
-
-            std::ofstream out("./resources/scoreboard.txt");
-            for (const auto& highscore : scoreboard) {
-                out << highscore << std::endl;
+            else // Harold completes task
+            {
+                int indexToRemove = -1;
+                for(int i = 0; i < checkpoints.size(); i++)
+                {
+                    if(checkpoints[i]->isInside(harold->getPosition().getX(), harold->getPosition().getY()))
+                    {
+                        indexToRemove = i;
+                        break;
+                    }
+                }
+                if(indexToRemove >= 0)
+                {
+                    checkpoints.erase(checkpoints.begin() + indexToRemove);
+                }
             }
-            out.close();
-
-            // Load highscores into vector
-            std::ifstream f("./resources/scoreboard.txt");
-
-            std::vector<std::string> lines;
-            std::string line;
-
-            int count = 0;
-            while (std::getline(f, line) && count < 10) {
-                lines.push_back(line);
-                count++;
-            }
-
-            highscores.clear();
-            int offset = 0;
-            for (const auto& l : lines) {
-                offset++;
-                Text* t = new Text{std::to_string(offset) + ") " + l, SCREEN_WIDTH/2, 28*offset};
-                t->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
-                t->loadTexture(renderer);
-                highscores.push_back(t);
-            }
-
-            f.close(); 
-
-            gameOver = true;
         }
     }
 }

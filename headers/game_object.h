@@ -168,7 +168,7 @@ class GameObject
         bool isMoving();
 
         std::vector<Vector2D> getCorners();
-        bool debugMode = false;
+        bool debugMode = true;
 
     protected:
         float rotation = 0.0f;

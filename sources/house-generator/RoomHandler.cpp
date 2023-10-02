@@ -37,6 +37,22 @@ void RoomHandler::createOuterWalls()
 		}
 		if (isEntranceRoom) {
 			entranceWall = randomWallNumber(validWallNumbers);
+			if(entranceWall == 1)
+			{
+				dir = "left";
+			}
+			else if(entranceWall == 2)
+			{
+				dir = "right";
+			}
+			else if(entranceWall == 3)
+			{
+				dir = "top";
+			}
+			else 
+			{
+				dir = "bottom";
+			}
 		}
 
 		// Left wall

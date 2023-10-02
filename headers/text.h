@@ -20,9 +20,9 @@ class Text : public UIObject
 
         std::string getContent();
 
+        SDL_Color color;
     private:
         TTF_Font* font;
-        SDL_Color color;
         std::string content;
 };
 

@@ -24,6 +24,8 @@ public:
 	std::optional<GeneratedRoom> findLargestRoom(std::vector<RoomId>& rooms);
 	std::optional<GeneratedRoom> findRoomWithId(RoomId id);
 
+	std::string dir = "";
+
 private:
 	std::vector<RoomId> roomTree;
 	void processNodes(std::vector<RoomId>& nodes, std::optional<GeneratedRoom> parent);

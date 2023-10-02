@@ -44,7 +44,7 @@ namespace game
         FurnitureLoader();
 
         void loadFurnitureData(const std::string& filename);
-        std::vector<Box*> loadBoxes(SDL_Renderer* renderer);
+        std::vector<Box*> loadBoxes(SDL_Renderer* renderer, std::string dir);
 
     private:
         std::map<std::string, FurnitureMeta> furniture;

@@ -426,8 +426,7 @@ namespace game
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
 
-        std::cout << furnToVisit.size() << std::endl;
-        if(furnished && furnToVisit.size() == 0) // "GAME OVER"
+        if(furnished && checkpoints.size() == 0) // "GAME OVER"
         {
             std::cout << "YOU WON: SAVE HIGHSCORE TO FILE!" << std::endl;
         }

@@ -1,0 +1,12 @@
+Viktor:
+	- Object roterar för länge
+	- Rotation ska stoppas om man manuellt roterar
+	- Collision är lite jank, förekommer när det inte ser ut som objekt
+	  rör varandra
+	- Spelet kraschar om man placerar möbel utanför huset
+	- Pantry, kitchen, och laundry funkar inte korrekt när de ska lysa
+	  grönt eller rött. 
+		- Det finns nåt under/vid sidan som lyser istället? En liten
+		  sliver av checker golv
+	- Kanske nån text ska poppa upp när man öppnar en låda/hoverar över
+	  en möbel, så att man vet vad det är?

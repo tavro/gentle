@@ -48,10 +48,14 @@ namespace game
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
         walls = houseGenerator.generateWalls();
+
+        harold = new Harold({64, 64}); // TODO: change position
     }
 
     Game::~Game()
     {
+        free(harold);
+
         for (auto box : boxes)
             free(box);
         if (currFurn != nullptr)
@@ -59,7 +63,7 @@ namespace game
         for (auto furn : placedFurn)
             free(furn);
         
-        // TODO: Free unfreed pointers
+        //free(roomScene); TODO: rooms
     }
 
     bool Game::loadMedia(Canvas &canvas)
@@ -113,7 +117,7 @@ namespace game
 
     void Game::render()
     {
-        if(!gameStarted)
+        if (!gameStarted)
         {
             mainMenuBackground.render(renderer);
         }
@@ -147,6 +151,9 @@ namespace game
             {
                 checkpoint->render(renderer);
             }
+
+            harold->updateTexture(renderer);
+            harold->render(renderer);
 
             fpsText.render(renderer);
             scoreText->render(renderer);
@@ -188,18 +195,27 @@ namespace game
                 }
             }
 
-            std::string roomName = activeRoom->getName();
-            if(currFurn->compatableWith(roomName))
+            if (activeRoom)
             {
-                score += 10;
-                activeRoom->setColor(0, 255, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                std::string roomName = activeRoom->getName();
+                if(currFurn->compatableWith(roomName))
+                {
+                    score += 10;
+                    activeRoom->setColor(0, 255, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                }
+                else
+                {
+                    score -= 10;
+                    activeRoom->setColor(255, 0, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                }
             }
             else
             {
                 score -= 10;
-                activeRoom->setColor(255, 0, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                // TODO: flash background red?
+                Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
             }
 
             scoreText->updateContent("Score:" + std::to_string(score));
@@ -208,7 +224,7 @@ namespace game
             placedFurnText->updateContent("Placed:" + std::to_string(placedFurn.size()) + "/" + std::to_string(furnitureAmount));
             placedFurnText->loadTexture(renderer);
 
-            if(boxes.size() == 0) // Done furnishing
+            if(boxes.size() == 0) // Done furnishing // TODO: make Harold controlable
             {
                 furnished = true;
 
@@ -280,6 +296,8 @@ namespace game
             {
                 float rotationAmount = event->wheel.y * 5;
                 currFurn->increaseRotation(rotationAmount);
+                currFurn->setRotationDirection(RotDir::NONE);
+                currFurn->setRotationSpeed(0.0f);
             }
         }
 
@@ -292,12 +310,17 @@ namespace game
                 {
                     boxes.erase(i);
                     currFurn = box->furniture;
-                    currFurn->setPosition(box->getPosition()); // TODO: need to make centered?
+
+                    Vector2D furnPos = box->getPosition() + box->getSize() / 2 - currFurn->getSize() / 2;
+                    currFurn->setPosition(furnPos);
+
                     free(box);
                     break;
                 }
             }
         }
+
+        harold->handleEvent(event);
 
         switch (event->type)
         {
@@ -370,8 +393,6 @@ namespace game
 
             float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
             currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
-
-            // TODO: make unable to move out of bounds
         }
 
         if (currFurn)
@@ -399,9 +420,14 @@ namespace game
         }
 
         if (currFurn && currFurn->isDragging)
-            cursor.setPosition(currFurn->getPosition()); // TODO: need to adjust so it's centered?
+        {
+            Vector2D newPos = currFurn->getPosition() + currFurn->getSize() / 2 - cursor.getSize() / 2;
+            cursor.setPosition(newPos);
+        }
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
+
+        harold->move();
 
         if(!gameOver && furnished && checkpoints.size() == 0) // "GAME OVER"
         {

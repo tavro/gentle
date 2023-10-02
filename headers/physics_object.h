@@ -142,6 +142,7 @@ class PhysicsObject : public GameObject
                             
                             getVelocity()*=-1;
                         }
+
                     }
                 }
             }

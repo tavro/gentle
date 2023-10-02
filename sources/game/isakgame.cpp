@@ -54,6 +54,39 @@ namespace game
         harold = new Harold({64, 64}); // TODO: change position
     }
 
+    void Game::reset()
+    {
+        placedFurn.clear();
+
+        currFurn = nullptr;
+        checkpoint = nullptr;
+
+        score = 0;
+        gameStarted = false;
+        gameOver = false;
+        furnished = false;
+
+        scoreText       = new Text{ "Score:0",                                                              0,                48                 };
+        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28 };
+        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0,                0                  };
+        currentFurnText = new Text{ "Placeholder",                                                          0,                0                  };
+
+        tutorialText->getPosition().set(SCREEN_WIDTH / 2 - (tutorialText->getContent().length()*28/3)/2, SCREEN_HEIGHT - 28 - 14);
+
+        HouseGenerator houseGenerator{};
+        rooms = houseGenerator.generateRooms();
+        walls = houseGenerator.generateWalls();
+
+        FurnitureLoader loader{};
+        loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
+        boxes = loader.loadBoxes(renderer, houseGenerator.dir);
+        furnitureAmount = boxes.size();
+
+        harold = new Harold({64, 64}); // TODO: change position
+
+        loadMedia();
+    }
+
     Game::~Game()
     {
         free(harold);
@@ -68,7 +101,7 @@ namespace game
         //free(roomScene); TODO: rooms
     }
 
-    bool Game::loadMedia(Canvas &canvas)
+    bool Game::loadMedia()
     {
         bool success = true;
 
@@ -99,8 +132,6 @@ namespace game
         placedFurnText->loadTexture( renderer);
         currentFurnText->loadTexture(renderer);
         
-        canvas.addObj(&fpsText);
-
         cursor.loadTexture(renderer);
 
         for (auto box : boxes)
@@ -113,6 +144,8 @@ namespace game
 		{
 			Mix_PlayMusic( audioSource.getMusic(0), -1 );
 		}
+        
+        harold->loadAnimation(renderer);
 
         return success;
     }
@@ -149,13 +182,13 @@ namespace game
             for (auto furniture : placedFurn)
                 furniture->render(renderer);
 
-            for (auto* checkpoint : checkpoints)
+            if(checkpoint != nullptr)
             {
                 checkpoint->render(renderer);
             }
 
-            harold->updateTexture(renderer);
-            harold->render(renderer);
+            //harold->updateTexture(renderer);
+            harold->renderAnimation(renderer);
 
             fpsText.render(renderer); // TODO: disable on release
             scoreText->render(renderer);
@@ -171,7 +204,6 @@ namespace game
             {
                 highscore->render(renderer);
             }
-            // TODO: Implement reset function and add 'Play Again' button.
         }
 
         cursor.updateTexture(renderer);
@@ -232,7 +264,6 @@ namespace game
 
                 // Pick furniture randomly from placedFurn.
                 size_t amount = placedFurn.size()/2;
-                std::vector<Furniture *> furnToVisit;
                 std::sample(
                     placedFurn.begin(),
                     placedFurn.end(),
@@ -241,12 +272,9 @@ namespace game
                     std::mt19937{std::random_device{}()}
                 );
 
-                for(auto* furn : furnToVisit)
-                {
-                    GameObject* tmp = new GameObject{{furn->getPosition().getX()-32+furn->getSize().getX()/2, furn->getPosition().getY()-32+furn->getSize().getY()/2}, {64, 64}, {0, 0}, "checkpoint", "./resources/ring.png"};
-                    tmp->loadTexture(renderer);
-                    checkpoints.push_back(tmp);
-                }
+                currFurnToVisit = furnToVisit[0];
+                checkpoint = new GameObject{{currFurnToVisit->getPosition().getX()-32+currFurnToVisit->getSize().getX()/2, currFurnToVisit->getPosition().getY()-32+currFurnToVisit->getSize().getY()/2}, {64, 64}, {0, 0}, "checkpoint", "./resources/ring.png"};
+                checkpoint->loadTexture(renderer);
 
                 harold->canControl = true;
             }
@@ -339,6 +367,13 @@ namespace game
         case SDL_KEYDOWN:
             if (event->key.keysym.sym == SDLK_e)
                 placeFurn();
+            if (event->key.keysym.sym == SDLK_r)
+            {
+                if(gameOver)
+                {
+                    reset();
+                }
+            }
             if (event->key.keysym.sym == SDLK_p)
                 gameStarted = true;
             break;
@@ -420,7 +455,7 @@ namespace game
 
         if (!gameOver && furnished)
         {
-            if(checkpoints.size() == 0) // "GAME OVER"
+            if(furnToVisit.size() == 0) // "GAME OVER"
             {
                 std::ifstream file("./resources/scoreboard.txt");
                 std::vector<int> scoreboard;
@@ -469,18 +504,14 @@ namespace game
             }
             else // Harold completes task
             {
-                int indexToRemove = -1;
-                for(int i = 0; i < checkpoints.size(); i++)
+                checkpoint->getPosition().set(currFurnToVisit->getPosition().getX()-32+currFurnToVisit->getSize().getX()/2, currFurnToVisit->getPosition().getY()-32+currFurnToVisit->getSize().getY()/2);
+                if(checkpoint->isInside(harold->getPosition().getX(), harold->getPosition().getY()))
                 {
-                    if(checkpoints[i]->isInside(harold->getPosition().getX(), harold->getPosition().getY()))
+                    furnToVisit.erase(furnToVisit.begin());
+                    if(furnToVisit.size() > 0)
                     {
-                        indexToRemove = i;
-                        break;
+                        currFurnToVisit = furnToVisit[0];
                     }
-                }
-                if(indexToRemove >= 0)
-                {
-                    checkpoints.erase(checkpoints.begin() + indexToRemove);
                 }
             }
         }

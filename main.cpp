@@ -108,7 +108,7 @@ bool loadMedia()
 {
 	bool success = true;
 
-	success = gameInstance->loadMedia(canvas);
+	success = gameInstance->loadMedia();
 	
 	return success;
 }

@@ -86,8 +86,6 @@ namespace game
 
     std::vector<Box*> FurnitureLoader::loadBoxes(SDL_Renderer* renderer, std::string dir)
     {
-        std::cout << "Door dir: " << dir << std::endl;
-        
         std::vector<Box*> boxes;
 
         std::random_device rd;
@@ -110,6 +108,20 @@ namespace game
             xPosDistEnd=1080-240;
             yPosDistStart = 720-160+32;
             yPosDistEnd = 720-32;
+        }
+        else if(dir == "left")
+        {
+            xPosDistStart = 32;
+            xPosDistEnd = 240-32;
+            yPosDistStart = 160+32;
+            yPosDistEnd = 720-160-32;
+        }
+        else
+        {
+            xPosDistStart = 1080-240+32;
+            xPosDistEnd = 1080-32;
+            yPosDistStart = 160+32;
+            yPosDistEnd = 720-160-32;
         }
 
         std::uniform_int_distribution<int> xPosDist(xPosDistStart, xPosDistEnd);

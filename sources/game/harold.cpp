@@ -3,7 +3,7 @@
 namespace game
 {
     Harold::Harold(Vector2D pos)
-        : GameObject(pos, {32, 32}, {0, 0}, "Harold", "./resources/harold/haroldstill.png")
+        : GameObject(pos, {16, 22}, {0, 0}, "Harold", "./resources/haroldstill.png")
     {
         // TODO: init walk and idle animation
     }
@@ -38,15 +38,19 @@ namespace game
         {
         case SDLK_w:
             getVelocity().increaseY(-1.0f);
+            rotation = 0;
             break;
         case SDLK_a:
             getVelocity().increaseX(-1.0f);
+            rotation = 270;
             break;
         case SDLK_s:
             getVelocity().increaseY(1.0f);
+            rotation = 180;
             break;
         case SDLK_d:
             getVelocity().increaseX(1.0f);
+            rotation = 90;
             break;
         }
     }
@@ -57,15 +61,19 @@ namespace game
         {
         case SDLK_w:
             getVelocity().increaseY(1.0f);
+            playAnimation = false;
             break;
         case SDLK_a:
             getVelocity().increaseX(1.0f);
+            playAnimation = false;
             break;
         case SDLK_s:
             getVelocity().increaseY(-1.0f);
+            playAnimation = false;
             break;
         case SDLK_d:
             getVelocity().increaseX(-1.0f);
+            playAnimation = false;
             break;
         }
     }
@@ -75,4 +83,26 @@ namespace game
         Vector2D normalVel = getVelocity().getNormalizedVector();
         getPosition() += normalVel;
     }
+
+    void Harold::loadAnimation(SDL_Renderer *renderer)
+    {
+        Animation* anim = new Animation{};
+        anim->loadTexture( renderer, "./resources/harold-anim.png" );
+        idleTexture.loadFromFile("./resources/haroldstill.png", renderer);
+        activeAnimation = anim;
+    }
+
+    void Harold::renderAnimation(SDL_Renderer *renderer)
+    {
+        if(playAnimation)
+        {
+            activeAnimation->render({getPosition().getX(), getPosition().getY()}, renderer, rotation);
+        }
+        else
+        {
+            idleTexture.render( getPosition().getX(), getPosition().getY(), NULL, rotation, NULL, SDL_FLIP_NONE, renderer);
+        }
+    }
+
+
 }

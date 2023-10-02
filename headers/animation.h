@@ -19,7 +19,7 @@ class Animation
 
         void addFrame(SDL_Rect frame);
 
-		void render( Vector2D position, SDL_Renderer* gRenderer );
+		void render( Vector2D position, SDL_Renderer* gRenderer, float rotation );
 
         SDL_Rect& getCurrentFrame();
 

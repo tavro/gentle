@@ -12,7 +12,6 @@ namespace game
         std::uniform_int_distribution<int> sizeDistribution3(2, 8);
 
         std::vector<RoomId> roomOrder = {
-            RoomId("LivingRoom", sizeDistribution2(generator)),
             RoomId("Kitchen", sizeDistribution3(generator)), 
             RoomId("Laundry", sizeDistribution1(generator)),
             RoomId("DiningRoom", sizeDistribution2(generator)),
@@ -21,6 +20,18 @@ namespace game
         };
 
         std::shuffle(roomOrder.begin(), roomOrder.end(), generator);
+
+        auto boolgen = std::bind(std::uniform_int_distribution<>(0,1),std::default_random_engine());
+        bool b = boolgen();
+
+        if(b)
+        {
+            roomOrder.insert(roomOrder.begin() + 1, RoomId("LivingRoom", sizeDistribution2(generator)));
+        }
+        else
+        {
+            roomOrder.push_back(RoomId("LivingRoom", sizeDistribution2(generator)));
+        }
 
         roomHandler = new RoomHandler{roomOrder, container};
         roomHandler->createRooms();

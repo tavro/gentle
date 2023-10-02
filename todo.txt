@@ -1,0 +1,10 @@
+- Väggkollision
+- Slå in i andra möbler
+- Finslipa rotationsfriktion AKA mera friktion
+
+- EÖÖÖÖH ljudeffekt (fel placering)
+- BONK ljudeffekt (kollision)
+- Checkpoint o möbler kan separeras
+- Press R to replay
+
+- PlacedText uppdaterar inte förän man placerat

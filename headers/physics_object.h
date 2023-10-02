@@ -149,6 +149,8 @@ class PhysicsObject : public GameObject
 
         void setHasFriction(bool state);
 
+        float getMass();
+
     private:
         Vector2D acceleration{0, 0};
 

@@ -380,7 +380,8 @@ namespace game
             Vector2D moveDir = mousePos - currFurn->getPosition();
 
             float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
-            currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
+            float pullSpeed = 20 / currFurn->getMass(); // TODO: finjustera
+            currFurn->setVelocity(moveDir * deltaTime * pullSpeed);
         }
 
         if (currFurn)

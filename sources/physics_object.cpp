@@ -19,3 +19,8 @@ void PhysicsObject::setHasFriction(bool state)
 {
     hasFriction = state;
 }
+
+float PhysicsObject::getMass()
+{
+    return mass;
+}

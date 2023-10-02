@@ -1,0 +1,5 @@
+- Väggkollision
+- Slå in i andra möbler o få minus poäng
+- Finslipa rotationsfriktion AKA mera friktion
+
+- PlacedText uppdaterar inte förän man placerat

@@ -142,12 +142,15 @@ class PhysicsObject : public GameObject
                             
                             getVelocity()*=-1;
                         }
+
                     }
                 }
             }
         }
 
         void setHasFriction(bool state);
+
+        float getMass();
 
     private:
         Vector2D acceleration{0, 0};

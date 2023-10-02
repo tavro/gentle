@@ -32,10 +32,10 @@ namespace game
         , fpsText({"", 0, 96})
     {
         audioSource.addMusic( "./resources/Gamejam.wav" );
+        audioSource.addMusic( "./resources/main_menu.wav" );
         audioSource.addMusic( "./resources/Harold_the_Hoarder_theme.wav" );
-        //audioSource.addMusic( "./resources/Gamejam.wav" );
-        audioSource.addSound( "./resources/scratch.wav" );
-        audioSource.addSound( "./resources/high.wav"    );
+        audioSource.addSound( "./resources/wrong_placement.wav" );
+        audioSource.addSound( "./resources/correct_placement.wav"    );
 
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
@@ -108,7 +108,7 @@ namespace game
         bool success = true;
 
         background.getTexture().loadFromFile(         "./resources/grass.png",      renderer);
-        mainMenuBackground.getTexture().loadFromFile( "./resources/mainmenu.png",   renderer);
+        mainMenuBackground.getTexture().loadFromFile( "./resources/harold_start_screen.png",   renderer);
         highscoreBackground.getTexture().loadFromFile("./resources/scoreboard.png", renderer);
 
         for (auto* room : rooms)
@@ -509,6 +509,7 @@ namespace game
                 checkpoint->getPosition().set(currFurnToVisit->getPosition().getX()-32+currFurnToVisit->getSize().getX()/2, currFurnToVisit->getPosition().getY()-32+currFurnToVisit->getSize().getY()/2);
                 if(checkpoint->isInside(harold->getPosition().getX(), harold->getPosition().getY()))
                 {
+                    Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
                     furnToVisit.erase(furnToVisit.begin());
                     if(furnToVisit.size() > 0)
                     {

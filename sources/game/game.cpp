@@ -294,7 +294,10 @@ namespace game
                 {
                     boxes.erase(i);
                     currFurn = box->furniture;
-                    currFurn->setPosition(box->getPosition()); // TODO: need to make centered?
+
+                    Vector2D furnPos = box->getPosition() + box->getSize() / 2 - currFurn->getSize() / 2;
+                    currFurn->setPosition(furnPos);
+
                     free(box);
                     break;
                 }

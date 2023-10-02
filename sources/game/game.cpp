@@ -29,16 +29,18 @@ namespace game
     Game::Game(SDL_Renderer *renderer)
         : renderer(renderer)
         , cursor(Cursor("Cursor"))
-        , fpsText({"", 0, SCREEN_HEIGHT - 28*2})
+        , fpsText({"", 0, 96})
     {
         audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addSound( "./resources/scratch.wav" );
         audioSource.addSound( "./resources/high.wav"    );
 
-        scoreText       = new Text{ "Score:0",                                                              0, SCREEN_HEIGHT - 28*3 };
-        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28   };
-        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0, SCREEN_HEIGHT - 28*4 };
-        currentFurnText = new Text{ "Placeholder",                                                          0, 0                    };
+        scoreText       = new Text{ "Score:0",                                                              0,                48                 };
+        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28 };
+        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0,                0                  };
+        currentFurnText = new Text{ "Placeholder",                                                          0,                0                  };
+
+        tutorialText->getPosition().set(SCREEN_WIDTH / 2 - (tutorialText->getContent().length()*28/3)/2, SCREEN_HEIGHT - 28 - 14);
 
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
@@ -46,7 +48,7 @@ namespace game
 
         FurnitureLoader loader{};
         loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
-        boxes = loader.loadBoxes(renderer);
+        boxes = loader.loadBoxes(renderer, houseGenerator.dir);
         furnitureAmount = boxes.size();
 
         harold = new Harold({64, 64}); // TODO: change position
@@ -85,10 +87,10 @@ namespace game
             wall->loadTexture(renderer);
         }
 
-        fpsText.loadFont(         "./resources/fonts/bebasneue-regular.ttf", 28);
-        scoreText->loadFont(      "./resources/fonts/bebasneue-regular.ttf", 28);
+        fpsText.loadFont(         "./resources/fonts/bebasneue-regular.ttf", 48);
+        scoreText->loadFont(      "./resources/fonts/bebasneue-regular.ttf", 48);
         tutorialText->loadFont(   "./resources/fonts/bebasneue-regular.ttf", 28);
-        placedFurnText->loadFont( "./resources/fonts/bebasneue-regular.ttf", 28);
+        placedFurnText->loadFont( "./resources/fonts/bebasneue-regular.ttf", 48);
         currentFurnText->loadFont("./resources/fonts/bebasneue-regular.ttf", 14);
 
         fpsText.loadTexture(         renderer);
@@ -155,7 +157,7 @@ namespace game
             harold->updateTexture(renderer);
             harold->render(renderer);
 
-            fpsText.render(renderer);
+            fpsText.render(renderer); // TODO: disable on release
             scoreText->render(renderer);
             placedFurnText->render(renderer);
             tutorialText->render(renderer);

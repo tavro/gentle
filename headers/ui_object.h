@@ -27,7 +27,7 @@ class UIObject
         {
             if(crop)
             {
-                SDL_Rect cropBox = { 0, 0, size.getX(), size.getY() };
+                SDL_Rect cropBox = { 0, 0, (int)size.getX(), (int)size.getY() };
                 texture.render( position.getX(), position.getY(), &cropBox, 0.0, NULL, SDL_FLIP_NONE, renderer );
             }
             else

@@ -35,11 +35,6 @@ namespace game
         audioSource.addSound( "./resources/scratch.wav" );
         audioSource.addSound( "./resources/high.wav"    );
 
-        FurnitureLoader loader{};
-        loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
-        boxes = loader.loadBoxes(renderer);
-        furnitureAmount = boxes.size();
-
         scoreText       = new Text{ "Score:0",                                                              0, SCREEN_HEIGHT - 28*3 };
         tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28   };
         placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0, SCREEN_HEIGHT - 28*4 };
@@ -48,6 +43,11 @@ namespace game
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
         walls = houseGenerator.generateWalls();
+
+        FurnitureLoader loader{};
+        loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
+        boxes = loader.loadBoxes(renderer);
+        furnitureAmount = boxes.size();
 
         harold = new Harold({64, 64}); // TODO: change position
     }

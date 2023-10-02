@@ -24,6 +24,8 @@ namespace game
 
         roomHandler = new RoomHandler{roomOrder, container};
         roomHandler->createRooms();
+
+        dir = roomHandler->dir;
     }
 
     GameObject* genWall(float x1, float y1, float x2, float y2, int xOffset, int yOffset, float thickness)

@@ -84,15 +84,36 @@ namespace game
         furniture = furnitureMap;
     }
 
-    std::vector<Box*> FurnitureLoader::loadBoxes(SDL_Renderer* renderer)
+    std::vector<Box*> FurnitureLoader::loadBoxes(SDL_Renderer* renderer, std::string dir)
     {
+        std::cout << "Door dir: " << dir << std::endl;
+        
         std::vector<Box*> boxes;
 
         std::random_device rd;
         std::mt19937 generator(rd());
 
-        std::uniform_int_distribution<int> xPosDist(240, 1080-240);
-        std::uniform_int_distribution<int> yPosDist(0+64, 160-64);
+        int xPosDistStart = 0;
+        int xPosDistEnd = 0;
+        int yPosDistStart = 0;
+        int yPosDistEnd = 0;
+        if(dir == "top")
+        {
+            xPosDistStart=240;
+            xPosDistEnd=1080-240;
+            yPosDistStart = 0+32;
+            yPosDistEnd = 160-32;
+        }
+        else if(dir == "bottom")
+        {
+            xPosDistStart=240;
+            xPosDistEnd=1080-240;
+            yPosDistStart = 720-160+32;
+            yPosDistEnd = 720-32;
+        }
+
+        std::uniform_int_distribution<int> xPosDist(xPosDistStart, xPosDistEnd);
+        std::uniform_int_distribution<int> yPosDist(yPosDistStart, yPosDistEnd);
 
         for (auto const& [key, val] : furniture)
         {

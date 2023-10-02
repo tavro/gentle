@@ -34,6 +34,8 @@ namespace game
         Rectangle container = { houseW, houseH };
 
         RoomHandler* roomHandler = nullptr;
+
+        std::string dir = "";
     };
 }
 

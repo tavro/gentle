@@ -2,12 +2,14 @@
 
 #include <map>
 #include <vector>
+#include <iostream>
 
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
 #include "../../headers/utils/constants.h"
 
-#include "../../headers/game/room_generator.h"
+#include "../../headers/game/house_generator.h"
+#include "../../headers/game/room.h"
 
 static Vector2D getMousePos()
 {
@@ -21,34 +23,41 @@ namespace game
     Game::Game(SDL_Renderer *renderer)
         : renderer(renderer)
         , cursor(Cursor("Cursor"))
-        , fpsText({"", 0, SCREEN_HEIGHT - 28})
+        , fpsText({"", 0, SCREEN_HEIGHT - 28*2})
     {
+        scoreText = new Text{"Score:0", 0, SCREEN_HEIGHT - 28*3};
+        placedFurnText = new Text{"Placed:0/0", 0, SCREEN_HEIGHT - 28*4};
+        tutorialText = new Text{"Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28};
+        audioSource.addMusic( "./resources/Gamejam.wav" );
+        audioSource.addSound( "./resources/scratch.wav" );
+        audioSource.addSound( "./resources/high.wav" );
+
         std::map<std::string, FurnitureMeta> furniture {
-            {"bed",  			{1 , 12, {"bedroom"}}}, 
-            {"sofa", 			{1 , 10, {"livingroom"}}}, 
-            {"piano",			{1 , 20, {"bedroom", "livingroom"}}}, 
-            {"plant",			{21, 3 , {"bedroom", "livingroom", "bathroom"}}},
-            {"oven", 			{1 , 15, {"kitchen"}}},
-            {"bathtub", 		{1 , 10, {"bathroom"}}}, 
-            {"bedsidetable",	{2 , 6 , {"bedroom"}}},
-            {"bookshelf", 		{2 , 7 , {"bedroom", "livingroom"}}}, 
-            {"chair", 			{12, 5 , {"bedroom", "livingroom", "kitchen"}}},
-            {"coffeetable", 	{2 , 7 , {"bedroom", "livingroom", "kitchen"}}},
-            {"dinnertable", 	{2 , 10, {"livingroom", "kitchen"}}},
-            {"dishwasher", 		{1 , 13, {"kitchen"}}},
-            {"dresser", 		{2 , 9 , {"bedroom", "livingroom"}}},
-            {"fridge", 			{1 , 14, {"kitchen"}}}, 
-            {"lamp", 			{14, 3 , {"bedroom", "livingroom", "kitchen", "bathroom"}}}, 
-            {"sink", 			{2 , 12, {"kitchen", "bathroom"}}}, 
-            {"toilet", 			{1 , 7 , {"bathroom"}}}, 
-            {"washingmachine", 	{1 , 13, {"bathroom"}}},
-            {"washingstation", 	{1 , 7 , {"bathroom"}}}
+            {"bed",  			{1 , 12, {"Bedroom"}}}, 
+            {"sofa", 			{1 , 10, {"Living Room"}}}, 
+            {"piano",			{1 , 20, {"Bedroom", "Living Room"}}}, 
+            {"plant",			{21, 3 , {"Bedroom", "Living Room", "Bathroom"}}},
+            {"oven", 			{1 , 15, {"Kitchen"}}},
+            {"bathtub", 		{1 , 10, {"Bathroom"}}}, 
+            {"bedsidetable",	{2 , 6 , {"Bedroom"}}},
+            {"bookshelf", 		{2 , 7 , {"Bedroom", "Living Room"}}}, 
+            {"chair", 			{12, 5 , {"Bedroom", "Living Room", "Kitchen"}}},
+            {"coffeetable", 	{2 , 7 , {"Bedroom", "Living Room", "Kitchen"}}},
+            {"dinnertable", 	{2 , 10, {"Living Room", "Kitchen"}}},
+            {"dishwasher", 		{1 , 13, {"Kitchen"}}},
+            {"dresser", 		{2 , 9 , {"Bedroom", "Living Room"}}},
+            {"fridge", 			{1 , 14, {"Kitchen"}}}, 
+            {"lamp", 			{14, 3 , {"Bedroom", "Living Room", "Kitchen", "Bathroom"}}}, 
+            {"sink", 			{2 , 12, {"Kitchen", "Bathroom"}}}, 
+            {"toilet", 			{1 , 7 , {"Bathroom"}}}, 
+            {"washingmachine", 	{1 , 13, {"Bathroom"}}},
+            {"washingstation", 	{1 , 7 , {"Bathroom"}}}
         };
 
         std::random_device rd;
         std::mt19937 generator(rd());
         std::uniform_int_distribution<int> xPositionDistribution(240, SCREEN_WIDTH-240);
-        std::uniform_int_distribution<int> yPositionDistribution(0, 160);
+        std::uniform_int_distribution<int> yPositionDistribution(0+32, 160-32);
         std::uniform_int_distribution<int> velocityDistribution(-10, 10);
 
         for (auto const& [key, val] : furniture)
@@ -61,21 +70,23 @@ namespace game
                 Furniture* furniturePtr = new Furniture {
                     key,
                     "./resources/furniture/" + key + ".png", 
-                    val.weight
+                    val.weight,
+                    val.compatableRooms
                 };
                 furniturePtr->loadTexture(renderer);
 
                 boxes.push_back(new Box(
-                    {(float)xPositionDistribution(generator), (float)yPositionDistribution(generator)}, 
+                    {xPositionDistribution(generator), yPositionDistribution(generator)}, 
                     "Box", 
                     "./resources/box.png",
                     furniturePtr));
+                furnitureAmount++;
             }
         }
 
-        // Living Room, Dining Room, Pantry, Kitchen, Laundry, Bedroom, Bathroom
-        RoomGenerator roomGenerator{4};
-        roomScene = roomGenerator.generateRoomScene();
+        HouseGenerator houseGenerator{};
+        rooms = houseGenerator.generateRooms();
+        testObjs = houseGenerator.generateWalls();
 
         harold = new Harold({64, 64}); // TODO: change position
     }
@@ -91,7 +102,7 @@ namespace game
         for (auto furn : placedFurn)
             free(furn);
         
-        free(roomScene);
+        //free(roomScene); TODO: rooms
     }
 
     bool Game::loadMedia(Canvas &canvas)
@@ -99,11 +110,33 @@ namespace game
         bool success = true;
 
         background.getTexture().loadFromFile("./resources/grass.png", renderer);
-        floor.getTexture().loadFromFile("./resources/floor.png", renderer);
+
+        for (auto* room : rooms)
+        {
+            room->loadFloorImage(renderer);
+            room->loadNameText(renderer);
+        }
+
+        for (auto* testObj : testObjs)
+        {
+            testObj->loadTexture(renderer);
+        }
 
         fpsText.loadFont("./resources/font.ttf", 28);
         fpsText.loadTexture(renderer);
         canvas.addObj(&fpsText);
+
+        scoreText->loadFont("./resources/font.ttf", 28);
+        scoreText->loadTexture(renderer);
+        canvas.addObj(scoreText);
+
+        placedFurnText->loadFont("./resources/font.ttf", 28);
+        placedFurnText->loadTexture(renderer);
+        canvas.addObj(placedFurnText);
+
+        tutorialText->loadFont("./resources/font.ttf", 28);
+        tutorialText->loadTexture(renderer);
+        canvas.addObj(tutorialText);
 
         cursor.loadTexture(renderer);
 
@@ -113,10 +146,10 @@ namespace game
             box->furniture->loadTexture(renderer);
         }
 
-        for (auto* wall : roomScene->getObjs())
-        {
-            wall->loadTexture(renderer);
-        }
+        if( Mix_PlayingMusic() == 0 )
+		{
+			Mix_PlayMusic( audioSource.getMusic(0), -1 );
+		}
 
         return success;
     }
@@ -124,7 +157,16 @@ namespace game
     void Game::render()
     {
         background.render(renderer);
-        floor.render(renderer);
+        
+        for (auto* room : rooms)
+        {
+            room->render(renderer);
+        }
+
+        for (auto* testObj : testObjs)
+        {
+            testObj->render(renderer);
+        }
 
         for (auto box : boxes)
             box->render(renderer);
@@ -136,9 +178,10 @@ namespace game
         harold->updateTexture(renderer);
         harold->render(renderer);
 
-        roomScene->render(renderer);
-
         fpsText.render(renderer);
+        scoreText->render(renderer);
+        placedFurnText->render(renderer);
+        tutorialText->render(renderer);
 
         cursor.updateTexture(renderer);
         cursor.render(renderer);
@@ -149,6 +192,45 @@ namespace game
         if (currFurn)
         {
             placedFurn.push_back(currFurn);
+
+            int x = currFurn->getPosition().getX();
+            int y = currFurn->getPosition().getY();
+
+            Room* activeRoom = nullptr;
+            for (auto* room : rooms)
+            {
+                if(room->isInside(x, y))
+                {
+                    activeRoom = room;
+                    break;
+                }
+            }
+
+            std::string roomName = activeRoom->getName();
+            if(currFurn->compatableWith(roomName))
+            {
+                score += 10;
+                activeRoom->setColor(0, 255, 0);
+				Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+            }
+            else
+            {
+                score -= 10;
+                activeRoom->setColor(255, 0, 0);
+				Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+            }
+
+            scoreText->updateContent("Score:" + std::to_string(score));
+            scoreText->loadTexture(renderer);
+
+            placedFurnText->updateContent("Placed:" + std::to_string(placedFurn.size()) + "/" + std::to_string(furnitureAmount));
+            placedFurnText->loadTexture(renderer);
+
+            if(boxes.size() == 0)
+            {
+                // GAME OVER
+            }
+
             currFurn = nullptr;
         }
     }
@@ -290,6 +372,7 @@ namespace game
             for (auto otherFurn : placedFurn)
                 if (furn != otherFurn)
                     others.push_back(furn);
+
             if (currFurn)
                 others.push_back(currFurn);
             furn->handleCollisions(others);

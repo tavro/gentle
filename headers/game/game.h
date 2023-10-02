@@ -62,10 +62,16 @@ namespace game
 
         Text* tutorialText = nullptr;
         Text* currentFurnText = nullptr;
+        
+        Image mainMenuBackground{0, 0, 1080, 720};
+        Image highscoreBackground{0, 0, 1080, 720};
+        Text* scoreboardTitleText = nullptr;
+        std::vector<Text*> highscores;
 
         AudioSource audioSource;
 
         bool furnished = false;
+        bool gameOver = false;
     };
 }
 

@@ -110,6 +110,8 @@ namespace game
         bool success = true;
 
         background.getTexture().loadFromFile("./resources/grass.png", renderer);
+        mainMenuBackground.getTexture().loadFromFile("./resources/mainmenu.png", renderer);
+        highscoreBackground.getTexture().loadFromFile("./resources/scoreboard.png", renderer);
 
         for (auto* room : rooms)
         {
@@ -192,6 +194,13 @@ namespace game
         scoreText->render(renderer);
         placedFurnText->render(renderer);
         tutorialText->render(renderer);
+
+        if(gameOver)
+        {
+            highscoreBackground.render(renderer);
+            // TODO: Render list of highscores
+            // TODO: Render buttons for 'Play Again' and 'Quit'
+        }
 
         cursor.updateTexture(renderer);
         cursor.render(renderer);
@@ -427,7 +436,7 @@ namespace game
         else
             cursor.setPosition(mousePos - cursor.getSize() / 2);
 
-        if(furnished && checkpoints.size() == 0) // "GAME OVER"
+        if(!gameOver && furnished && checkpoints.size() == 0) // "GAME OVER"
         {
             std::ifstream file("./resources/scoreboard.txt");
             std::vector<int> scoreboard;
@@ -447,7 +456,10 @@ namespace game
                 out << highscore << std::endl;
             }
             out.close();
-            furnished = false;
+
+            // TODO: load top 10 highscores into highscores text list
+
+            gameOver = true;
         }
     }
 }

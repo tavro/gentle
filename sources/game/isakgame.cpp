@@ -28,24 +28,23 @@ namespace game
         , cursor(Cursor("Cursor"))
         , fpsText({"", 0, SCREEN_HEIGHT - 28*2})
     {
-        scoreText = new Text{"Score:0", 0, SCREEN_HEIGHT - 28*3};
-        currentFurnText = new Text{"Placeholder", 0, 0};
-        tutorialText = new Text{"Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28};
-        
         audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addSound( "./resources/scratch.wav" );
-        audioSource.addSound( "./resources/high.wav" );
+        audioSource.addSound( "./resources/high.wav"    );
 
         FurnitureLoader loader{};
         loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
         boxes = loader.loadBoxes(renderer);
         furnitureAmount = boxes.size();
 
-        placedFurnText = new Text{"Placed:0/" + std::to_string(furnitureAmount), 0, SCREEN_HEIGHT - 28*4};
+        scoreText       = new Text{ "Score:0",                                                              0, SCREEN_HEIGHT - 28*3 };
+        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", 0, SCREEN_HEIGHT - 28   };
+        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0, SCREEN_HEIGHT - 28*4 };
+        currentFurnText = new Text{ "Placeholder",                                                          0, 0                    };
 
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
-        testObjs = houseGenerator.generateWalls();
+        walls = houseGenerator.generateWalls();
     }
 
     Game::~Game()
@@ -57,15 +56,15 @@ namespace game
         for (auto furn : placedFurn)
             free(furn);
         
-        //free(roomScene); TODO: rooms
+        // TODO: Free unfreed pointers
     }
 
     bool Game::loadMedia(Canvas &canvas)
     {
         bool success = true;
 
-        background.getTexture().loadFromFile("./resources/grass.png", renderer);
-        mainMenuBackground.getTexture().loadFromFile("./resources/mainmenu.png", renderer);
+        background.getTexture().loadFromFile(         "./resources/grass.png",      renderer);
+        mainMenuBackground.getTexture().loadFromFile( "./resources/mainmenu.png",   renderer);
         highscoreBackground.getTexture().loadFromFile("./resources/scoreboard.png", renderer);
 
         for (auto* room : rooms)
@@ -74,29 +73,24 @@ namespace game
             room->loadNameText(renderer);
         }
 
-        for (auto* testObj : testObjs)
+        for (auto* wall : walls)
         {
-            testObj->loadTexture(renderer);
+            wall->loadTexture(renderer);
         }
 
-        fpsText.loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
-        fpsText.loadTexture(renderer);
-        canvas.addObj(&fpsText);
-
-        scoreText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
-        scoreText->loadTexture(renderer);
-        canvas.addObj(scoreText);
-
-        placedFurnText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
-        placedFurnText->loadTexture(renderer);
-        canvas.addObj(placedFurnText);
-
+        fpsText.loadFont(         "./resources/fonts/bebasneue-regular.ttf", 28);
+        scoreText->loadFont(      "./resources/fonts/bebasneue-regular.ttf", 28);
+        tutorialText->loadFont(   "./resources/fonts/bebasneue-regular.ttf", 28);
+        placedFurnText->loadFont( "./resources/fonts/bebasneue-regular.ttf", 28);
         currentFurnText->loadFont("./resources/fonts/bebasneue-regular.ttf", 14);
-        currentFurnText->loadTexture(renderer);
 
-        tutorialText->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
-        tutorialText->loadTexture(renderer);
-        canvas.addObj(tutorialText);
+        fpsText.loadTexture(         renderer);
+        scoreText->loadTexture(      renderer);
+        tutorialText->loadTexture(   renderer);
+        placedFurnText->loadTexture( renderer);
+        currentFurnText->loadTexture(renderer);
+        
+        canvas.addObj(&fpsText);
 
         cursor.loadTexture(renderer);
 
@@ -129,9 +123,9 @@ namespace game
                 room->render(renderer);
             }
 
-            for (auto* testObj : testObjs)
+            for (auto* wall : walls)
             {
-                testObj->render(renderer);
+                wall->render(renderer);
             }
 
             for (auto box : boxes)

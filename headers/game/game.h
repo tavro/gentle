@@ -45,7 +45,7 @@ namespace game
         std::vector<Furniture *> furnToVisit;
 
         std::vector<Room*> rooms;
-        std::vector<GameObject*> testObjs;
+        std::vector<GameObject*> walls;
         std::vector<GameObject*> checkpoints;
 
         Box *hoveredBox = nullptr;

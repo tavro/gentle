@@ -32,15 +32,10 @@ namespace game
         , fpsText({"", 0, 96})
     {
         audioSource.addMusic( "./resources/Gamejam.wav" );
+        audioSource.addMusic( "./resources/Harold_the_Hoarder_theme.wav" );
+        //audioSource.addMusic( "./resources/Gamejam.wav" );
         audioSource.addSound( "./resources/scratch.wav" );
         audioSource.addSound( "./resources/high.wav"    );
-
-        scoreText       = new Text{ "Score:0",                                                              0,                48                 };
-        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28 };
-        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0,                0                  };
-        currentFurnText = new Text{ "Placeholder",                                                          0,                0                  };
-
-        tutorialText->getPosition().set(SCREEN_WIDTH / 2 - (tutorialText->getContent().length()*28/3)/2, SCREEN_HEIGHT - 28 - 14);
 
         HouseGenerator houseGenerator{};
         rooms = houseGenerator.generateRooms();
@@ -50,6 +45,13 @@ namespace game
         loader.loadFurnitureData("./resources/furniture/furniture_meta_data.txt");
         boxes = loader.loadBoxes(renderer, houseGenerator.dir);
         furnitureAmount = boxes.size();
+
+        scoreText       = new Text{ "Score:0",                                                              0,                48                 };
+        tutorialText    = new Text{ "Press [E] to place furniture. Use [Mouse Wheel] to rotate furniture.", SCREEN_WIDTH / 2, SCREEN_HEIGHT - 28 };
+        placedFurnText  = new Text{ "Placed:0/" + std::to_string(furnitureAmount),                          0,                0                  };
+        currentFurnText = new Text{ "Placeholder",                                                          0,                0                  };
+
+        tutorialText->getPosition().set(SCREEN_WIDTH / 2 - (tutorialText->getContent().length()*28/3)/2, SCREEN_HEIGHT - 28 - 14);
 
         harold = new Harold({64, 64}); // TODO: change position
     }

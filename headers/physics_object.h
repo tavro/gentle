@@ -70,28 +70,39 @@ class PhysicsObject : public GameObject
                 }
             }
 
-            getPosition().increaseX(getVelocity().getX());
-            getPosition().increaseY(getVelocity().getY());
+            Vector2D newPosition = getPosition() + getVelocity();
 
-            if(getPosition().getX() >= SCREEN_WIDTH-getSize().getX())
+            if (newPosition.getX() <= 0)
             {
-                getVelocity().setX(getVelocity().getX()*-1);
+                float magnitude = abs(getVelocity().getX());
+                getVelocity().setX(magnitude);
+                float distToBound = 0 - newPosition.getX();
+                newPosition.increaseX(distToBound);
+            }
+            else if (newPosition.getX() >= SCREEN_WIDTH - getSize().getX())
+            {
+                float magnitude = abs(getVelocity().getX());
+                getVelocity().setX(-magnitude);
+                float distToBound = newPosition.getX() + getSize().getX() - SCREEN_WIDTH;
+                newPosition.decreaseX(distToBound);
             }
 
-            if(getPosition().getX() <= 0)
+            if (newPosition.getY() <= 0)
             {
-                getVelocity().setX(getVelocity().getX()*-1);
+                float magnitude = abs(getVelocity().getY());
+                getVelocity().setY(magnitude);
+                float distToBound = 0 - newPosition.getY();
+                newPosition.increaseY(distToBound);
+            }
+            else if (newPosition.getY() >= SCREEN_HEIGHT - getSize().getY())
+            {
+                float magnitude = abs(getVelocity().getY());
+                getVelocity().setY(-magnitude);
+                float distToBound = newPosition.getY() + getSize().getY() - SCREEN_HEIGHT;
+                newPosition.decreaseY(distToBound);
             }
 
-            if(getPosition().getY() >= SCREEN_HEIGHT-getSize().getY())
-            {
-                getVelocity().setY(getVelocity().getY()*-1);
-            }
-
-            if(getPosition().getY() <= 0)
-            {
-                getVelocity().setY(getVelocity().getY()*-1);
-            }
+            setPosition(newPosition);
 
             if(getVelocity().getX() <= 0.1 && getVelocity().getX() >= -0.1)
             {

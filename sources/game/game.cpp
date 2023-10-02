@@ -206,18 +206,27 @@ namespace game
                 }
             }
 
-            std::string roomName = activeRoom->getName();
-            if(currFurn->compatableWith(roomName))
+            if (activeRoom)
             {
-                score += 10;
-                activeRoom->setColor(0, 255, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                std::string roomName = activeRoom->getName();
+                if(currFurn->compatableWith(roomName))
+                {
+                    score += 10;
+                    activeRoom->setColor(0, 255, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(1), 0 );
+                }
+                else
+                {
+                    score -= 10;
+                    activeRoom->setColor(255, 0, 0);
+                    Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                }
             }
             else
             {
                 score -= 10;
-                activeRoom->setColor(255, 0, 0);
-				Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
+                // TODO: flash background red?
+                Mix_PlayChannel( -1, audioSource.getSound(0), 0 );
             }
 
             scoreText->updateContent("Score:" + std::to_string(score));
@@ -280,6 +289,8 @@ namespace game
             {
                 float rotationAmount = event->wheel.y * 5;
                 currFurn->increaseRotation(rotationAmount);
+                currFurn->setRotationDirection(RotDir::NONE);
+                currFurn->setRotationSpeed(0.0f);
             }
         }
 
@@ -292,7 +303,10 @@ namespace game
                 {
                     boxes.erase(i);
                     currFurn = box->furniture;
-                    currFurn->setPosition(box->getPosition()); // TODO: need to make centered?
+
+                    Vector2D furnPos = box->getPosition() + box->getSize() / 2 - currFurn->getSize() / 2;
+                    currFurn->setPosition(furnPos);
+
                     free(box);
                     break;
                 }
@@ -351,8 +365,6 @@ namespace game
 
             float deltaTime = 1 / avgFPS; // TODO: pass in as parameter instead?
             currFurn->setVelocity(moveDir * deltaTime * 10); // TODO: make heavier objects more sluggish
-
-            // TODO: make unable to move out of bounds
         }
 
         if (currFurn)

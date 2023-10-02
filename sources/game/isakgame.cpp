@@ -154,7 +154,11 @@ namespace game
         if(gameOver)
         {
             highscoreBackground.render(renderer);
-            // TODO: Render list of highscores
+
+            for(auto* highscore : highscores)
+            {
+                highscore->render(renderer);
+            }
             // TODO: Render buttons for 'Play Again' and 'Quit'
         }
 
@@ -207,6 +211,7 @@ namespace game
 
                 // Pick furniture randomly from placedFurn.
                 size_t amount = placedFurn.size()/2;
+                std::vector<Furniture *> furnToVisit;
                 std::sample(
                     placedFurn.begin(),
                     placedFurn.end(),
@@ -415,7 +420,29 @@ namespace game
             }
             out.close();
 
-            // TODO: load top 10 highscores into highscores text list
+            // Load highscores into vector
+            std::ifstream f("./resources/scoreboard.txt");
+
+            std::vector<std::string> lines;
+            std::string line;
+
+            int count = 0;
+            while (std::getline(f, line) && count < 10) {
+                lines.push_back(line);
+                count++;
+            }
+
+            highscores.clear();
+            int offset = 0;
+            for (const auto& l : lines) {
+                offset++;
+                Text* t = new Text{std::to_string(offset) + ") " + l, SCREEN_WIDTH/2, 28*offset};
+                t->loadFont("./resources/fonts/bebasneue-regular.ttf", 28);
+                t->loadTexture(renderer);
+                highscores.push_back(t);
+            }
+
+            f.close(); 
 
             gameOver = true;
         }

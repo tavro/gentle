@@ -42,7 +42,6 @@ namespace game
         std::vector<Box *> boxes;
         Furniture *currFurn = nullptr;
         std::vector<Furniture *> placedFurn;
-        std::vector<Furniture *> furnToVisit;
 
         std::vector<Room*> rooms;
         std::vector<GameObject*> walls;

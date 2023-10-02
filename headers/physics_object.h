@@ -76,25 +76,31 @@ class PhysicsObject : public GameObject
             {
                 float magnitude = abs(getVelocity().getX());
                 getVelocity().setX(magnitude);
+                float distToBound = 0 - newPosition.getX();
+                newPosition.increaseX(distToBound);
             }
             else if (newPosition.getX() >= SCREEN_WIDTH - getSize().getX())
             {
                 float magnitude = abs(getVelocity().getX());
                 getVelocity().setX(-magnitude);
+                float distToBound = newPosition.getX() + getSize().getX() - SCREEN_WIDTH;
+                newPosition.decreaseX(distToBound);
             }
 
             if (newPosition.getY() <= 0)
             {
                 float magnitude = abs(getVelocity().getY());
                 getVelocity().setY(magnitude);
+                float distToBound = 0 - newPosition.getY();
+                newPosition.increaseY(distToBound);
             }
             else if (newPosition.getY() >= SCREEN_HEIGHT - getSize().getY())
             {
                 float magnitude = abs(getVelocity().getY());
                 getVelocity().setY(-magnitude);
+                float distToBound = newPosition.getY() + getSize().getY() - SCREEN_HEIGHT;
+                newPosition.decreaseY(distToBound);
             }
-
-            // TODO: adjust newPosition so that the object is not out of bounds
 
             setPosition(newPosition);
 

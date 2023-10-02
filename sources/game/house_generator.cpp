@@ -7,16 +7,20 @@ namespace game
         std::random_device rd;
         std::mt19937 generator(rd());
 
-        std::uniform_int_distribution<int> sizeDistribution1(1, 5);
+        std::uniform_int_distribution<int> sizeDistribution1(2, 5);
         std::uniform_int_distribution<int> sizeDistribution2(6, 12);
+        std::uniform_int_distribution<int> sizeDistribution3(2, 8);
 
         std::vector<RoomId> roomOrder = {
-            RoomId("Living Room", sizeDistribution2(generator)),
-            RoomId("Kitchen", sizeDistribution2(generator), {RoomId("Pantry", sizeDistribution1(generator)), RoomId("Kitchen", sizeDistribution1(generator)), RoomId("Laundry", sizeDistribution1(generator))}),
-            RoomId("Dining Room", sizeDistribution2(generator)),
+            RoomId("LivingRoom", sizeDistribution2(generator)),
+            RoomId("Kitchen", sizeDistribution3(generator)), 
+            RoomId("Laundry", sizeDistribution1(generator)),
+            RoomId("DiningRoom", sizeDistribution2(generator)),
             RoomId("Bedroom", sizeDistribution2(generator)),
             RoomId("Bathroom", sizeDistribution1(generator))
         };
+
+        std::shuffle(roomOrder.begin(), roomOrder.end(), generator);
 
         roomHandler = new RoomHandler{roomOrder, container};
         roomHandler->createRooms();

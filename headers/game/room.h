@@ -42,9 +42,8 @@ namespace game
         Uint8 green = 255;
         Uint8 blue = 255;
         std::map<std::string, std::string> floorMap {
-            {"Living Room", "./resources/floor.png"},
-            {"Dining Room", "./resources/floor.png"},
-            {"Pantry",      "./resources/floor.png"},
+            {"LivingRoom", "./resources/floor.png"},
+            {"DiningRoom", "./resources/floor.png"},
             {"Kitchen",     "./resources/kitchen-floor.png"},
             {"Laundry",     "./resources/floor.png"},
             {"Bedroom",     "./resources/floor.png"},

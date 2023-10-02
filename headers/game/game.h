@@ -42,10 +42,9 @@ namespace game
         std::vector<Box *> boxes;
         Furniture *currFurn = nullptr;
         std::vector<Furniture *> placedFurn;
-        std::vector<Furniture *> furnToVisit;
 
         std::vector<Room*> rooms;
-        std::vector<GameObject*> testObjs;
+        std::vector<GameObject*> walls;
         std::vector<GameObject*> checkpoints;
 
         Box *hoveredBox = nullptr;
@@ -62,10 +61,17 @@ namespace game
 
         Text* tutorialText = nullptr;
         Text* currentFurnText = nullptr;
+        
+        Image mainMenuBackground{0, 0, 1080, 720};
+        Image highscoreBackground{0, 0, 1080, 720};
+        Text* scoreboardTitleText = nullptr;
+        std::vector<Text*> highscores;
 
         AudioSource audioSource;
 
-        bool furnished = false;
+        bool furnished   = false;
+        bool gameOver    = false;
+        bool gameStarted = false;
     };
 }
 

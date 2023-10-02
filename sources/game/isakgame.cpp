@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <random>
+#include <fstream>
 
 #include "../../headers/game_object.h"
 #include "../../headers/scene.h"
@@ -428,7 +429,25 @@ namespace game
 
         if(furnished && checkpoints.size() == 0) // "GAME OVER"
         {
-            std::cout << "YOU WON: SAVE HIGHSCORE TO FILE!" << std::endl;
+            std::ifstream file("./resources/scoreboard.txt");
+            std::vector<int> scoreboard;
+
+            int num;
+            while (file >> num) {
+                scoreboard.push_back(num);
+            }
+            file.close();
+
+            scoreboard.push_back(score);
+
+            std::sort(scoreboard.begin(), scoreboard.end(), std::greater<int>());
+
+            std::ofstream out("./resources/scoreboard.txt");
+            for (const auto& highscore : scoreboard) {
+                out << highscore << std::endl;
+            }
+            out.close();
+            furnished = false;
         }
     }
 }

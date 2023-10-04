@@ -1,4 +1,4 @@
-#include "../../headers/game/cursor.h"
+#include "../../headers/editor/cursor.h"
 
 #include "../../headers/utils/constants.h"
 
